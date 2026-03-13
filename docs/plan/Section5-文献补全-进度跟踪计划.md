@@ -27,10 +27,10 @@
 - [x] 按 Benchmark / Theory / Method / Survey / Application 分组
 
 ### Phase 2｜两篇 Survey 精读与对比（新增）
-- [ ] 精读 Survey A：*Towards Graph Prompt Learning: A Survey and Beyond (2024, arXiv:2408.14520)*
-- [ ] 精读 Survey B：*Graph Prompting for Graph Learning Models: Recent Advances and Future Directions (2025, arXiv:2506.08326)*
-- [ ] 产出对比文档：`docs/papers/Section5-两篇Survey精读对比.md`
-- [ ] 在对比文档中覆盖：分类体系、任务覆盖、方法边界、评测口径、理论深度、与本文第5章差异、可吸收改写点
+- [x] 精读 Survey A：*Towards Graph Prompt Learning: A Survey and Beyond (2024, arXiv:2408.14520)*
+- [x] 精读 Survey B：*Graph Prompting for Graph Learning Models: Recent Advances and Future Directions (2025, arXiv:2506.08326)*
+- [x] 产出对比文档：`docs/papers/Section5-两篇Survey精读对比.md`
+- [x] 在对比文档中覆盖：分类体系、任务覆盖、方法边界、评测口径、理论深度、与本文第5章差异、可吸收改写点
 - [ ] 输出“可落到当前稿件”的改写建议清单（按 5.1/5.2/5.3/5.4 映射）
 
 ### Phase 3｜改稿映射（进行中）
@@ -91,4 +91,4 @@
 - [ ] 再输出“Phase 3 改稿映射表”（核心15篇 -> 第5章具体段落）
 - [ ] 等你确认后，开始 Phase 4 直接改 `tex/5.tex`
 
-> 更新时间：2026-03-13 11:42 (GMT+8)
+> 更新时间：2026-03-13 11:48 (GMT+8)
