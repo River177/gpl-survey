@@ -1,0 +1,32 @@
+\section{\texttt{ProG}: A Unified Library for Graph Prompting}\label{sec:prog}
+An indispensable component for fortifying the graph prompting ecosystem is a well-crafted tool. Despite the plethora of tools proposed for generalized graph learning, a notable absence persists in the realm of libraries dedicated to graph prompt functionalities. Addressing this gap, we are introducing \texttt{ProG} (Prompt Graph), an open-source, unified library meticulously designed to cater to the specific needs of graph prompting. This initiative promises to significantly enhance the landscape of graph-based applications by providing a versatile and comprehensive resource for researchers and practitioners alike.
+
+%  Description
+\texttt{ProG} is a PyTorch-based library designed to facilitate single or multi-task prompting for pre-trained GNNs. 
+The architecture is illustrated in Figure~\ref{fig:prog}.
+It seamlessly integrates several widely used datasets in the graph prompt evaluation, including Cora, CiteSeer, Reddit,
+% ~\cite{hamilton2017inductive}, 
+Amazon,
+% ~\cite{shchur2019pitfalls}, 
+and Pubmed etc.
+% ~\cite{kipf2017semisupervised}. 
+The tool is equipped with essential evaluation metrics such as Accuracy, F1 Score, and AUC score, commonly employed in various graph prompt-related tasks. Notably, \texttt{ProG} incorporates state-of-the-art methods like All in One~\cite{sun2023all}, GPPT~\cite{sun2022gppt}, GPF~\cite{fang2022prompt}, and GPF-Plus ~\cite{fang2023universal}, and it continues integrating more graph prompt models. In summary, \texttt{ProG} offers the following key features:
+
+
+
+\begin{itemize}
+    \item \textbf{Quick Initiation.} All models are implemented within a consistent environment, accompanied by detailed demos, ensuring a swift initiation for newcomers.
+    \item \textbf{Fully Modular.} \texttt{ProG} adopts a modular structure, empowering users to customize and construct models as needed.
+    \item \textbf{Easy Extendable.} \texttt{ProG} is designed for seamless extension to encompass additional methods and a broader spectrum of downstream tasks, adapting to evolving research needs.
+    \item \textbf{Standardized Evaluation.} \texttt{ProG} establishes a uniform set of evaluation processes, promoting equitable performance comparisons across models.
+\end{itemize}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.5\textwidth]{pic/ProG_pipeline.pdf}
+    \caption{The architecture of \texttt{ProG}.}
+    \label{fig:prog}
+\end{figure}
+
+
+For additional information and access to the library, please visit the website of our library\footnote{\url{https://github.com/sheldonresearch/ProG}}. Additionally, we have curated a GitHub repository\footnote{\url{https://github.com/WxxShirley/Awesome-Graph-Prompt}}, serving as a centralized resource for the latest advancements in graph prompt learning. This repository includes a list of research papers, benchmark datasets, and available codes, fostering an environment conducive to ongoing research in this dynamic field. Regular real-time updates ensure that the repository remains current with emerging papers and associated codes.

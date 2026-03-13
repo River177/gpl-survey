@@ -1,0 +1,154 @@
+\begin{table*}[ht]
+\centering
+\caption{Summary of existing representative works on graph prompt. $\mathcal{S}$: Subgraph. $V(\mathcal{S})$: Node set within subgraph $\mathcal{S}$. $\pi$: Pre-trained parameters. $\phi$: Task head parameters. $\theta$: Prompt parameters. $\tilde{\textbf{s}}$: Filled prompt.
+}
+\label{tab:graph_prompt_summary}
+\resizebox{0.99\textwidth}{!}{
+\begin{tabular}{@{}c|c|c|c|c|c|c|c|c|c|c|c@{}}
+\toprule
+                  & \multicolumn{3}{c|}{pre-training task}                                          
+                  & \multicolumn{3}{c|}{prompt design}
+                  & \multicolumn{3}{c|}{downstream tasks}   
+                  & \multicolumn{2}{c}{answering function}   \\ \midrule
+Paper             & \multicolumn{1}{c|}{node} & \multicolumn{1}{c|}{edge} & graph 
+                  & prompt components & inserting pattern  & prompt tuning 
+                  & \multicolumn{1}{c|}{node} & \multicolumn{1}{c|}{edge} & graph 
+                   & \multicolumn{1}{c|}{Preset} & \multicolumn{1}{c}{Learnable}
+                  \\ \midrule % Hand-crafted
+\makecell{GPPT \\(KDD 2022 \cite{sun2022gppt})} & \xmark &\cmark & \xmark & 
+\makecell{structure token: \\$\textbf{s}_v \in \mathbb{R}^d$ \\task token: \\$\textbf{c}_y \in \mathbb{R}^d$}& 
+\makecell{$\textbf{s}_{v_i} \leftarrow f_{\theta} (v_i)$  \\ $\tilde{\textbf{s}}_{y,v_i} \leftarrow [\textbf{c}_y, \textbf{s}_{v_i}]$}
+&% $\min_{\textbf{c}_y, \theta, \phi} \sum_{(y,v_i)} \textrm{CrossEntropy} \left ( p_{\phi} (\tilde{\textbf{s}}_{y,v_i}), \mathds{1}_{y_i = y} \right ) $ 
+Cross Entropy
+&  \cmark & \xmark & \xmark & \cmark & \xmark \\\midrule
+
+\makecell{GPF \\(arXiv \cite{fang2022prompt}) }& \cmark & \cmark & \cmark  
+& prompt feature $\textbf{p} \in \mathbb{R}^d$ 
+& $\tilde{\textbf{s}}_i \leftarrow \textbf{x}_i + \textbf{p}$  
+& \makecell{$\max_{\textbf{p}, \phi} \sum_{(y_i,\tilde{\textbf{s}}_i)}$\\$ p_{\pi, \phi} (y_i| \tilde{\textbf{s}}_i) $} 
+& \xmark   & \xmark  & \cmark & \xmark & \cmark \\ \midrule
+
+
+
+\makecell{All in One\\ (KDD 2023 \cite{sun2023all})} & \xmark & \xmark & \cmark  
+& \makecell{prompt token: \\$\mathcal{P}=\{ \textbf{p}_1, ..., \textbf{p}_{|\mathcal{P}|} \}$ \\token structure: \\$\{ (\textbf{p}_i, \textbf{p}_j) | \textbf{p}_i, \textbf{p}_j \in \mathcal{P} \}$}
+
+&\makecell{$w_{ik} \leftarrow \sigma(\textbf{p}_k \cdot \textbf{x}^T_i)$ \\ if $\sigma(\textbf{p}_k \cdot \textbf{x}^T_i) > \delta$ else $0$  \\$\tilde{\textbf{s}}_i \!\!\!\leftarrow \textbf{x}_i \!\!+ \sum^{|\mathcal{P}|}_{k=1} w_{ik} \textbf{p}_k $ }
+
+& % $\textrm{MetaLearning} (f_{\theta, \phi | \pi} )$  
+Meta-Learning
+&  \cmark   &\cmark & \cmark &\cmark &\cmark\\\midrule
+
+
+
+
+\makecell{GraphPrompt \\(WWW 2023\cite{liu2023graphprompt})} & \xmark & \cmark & \xmark 
+& \makecell{prompt token: \\$\textbf{p}_t \in \mathbb{R}^d, t \in \mathcal{T}$  \\structure token: $\textbf{s} \in \mathbb{R}^d$ \\task token: $\textbf{c}_y \in \mathbb{R}^d$}
+
+& \makecell{
+$\tilde{\textbf{s}}^t_i \leftarrow Readout(\{ \textbf{p}_t \odot f_{\pi} (v) | $\\$v \in V(\mathcal{S}_i) \})$ \\$\textbf{c}_y \leftarrow \textrm{Mean} (\{ \tilde{\textbf{s}}^t_j| y_j = y \}) $} 
+
+&\makecell{$\min_{\textbf{p}_t} - \sum_{(y_i, \mathcal{S}_i)}\ln$\\$  \frac{\exp ( \textrm{sim} (\tilde{\textbf{s}}_i^t , \textbf{c}_{y_i} ) / \tau )}{ \sum_{y \in Y} \exp ( \textrm{sim} (\tilde{\textbf{s}}_i^t , \textbf{c}_y) / \tau) } $ }
+&  \cmark   &\xmark  &\cmark & \cmark & \xmark \\  \midrule
+
+
+\makecell{PGCL \\(arXiv \cite{gong2023prompt})} & \xmark & \xmark & \cmark 
+& \makecell{semantic token: $\mathbf{p}^s\in \mathbb{R}^d$\\contextual token: $\mathbf{p}^c\in \mathbb{R}^d$}
+
+& \makecell{$z_x^{p s}=z_x^s\odot \mathbf{p}^s$\\$ z_x^{p c}=z_x^c \odot \mathbf{p}^c$
+} 
+
+&\makecell{$\min-\sum_{(v, a, b) \in \mathcal{T}} \log $\\$\frac{\exp \left(\operatorname{sim}\left(z_v^p, z_a^p\right) / \tau\right)}{\sum_{u \in\{x, y\}} \exp \left(\operatorname{sim}\left(z_v^p, z_u^p\right) / \tau\right)}$ }
+
+&  \cmark   &\cmark  &\cmark & \cmark & \xmark \\  \midrule
+
+
+
+\makecell{PRODIGY \\(NeurIPS 2023 \cite{huang2023prodigy}) }& \xmark & \cmark & \xmark & 
+\makecell{data graph: \\$\mathcal{G}^D \sim \oplus^k_{i=1} \mathcal{N} (\mathcal{V}_i,\mathcal{G)_i}$ \\task graph: $\mathcal{G}^T$}& 
+$\tilde{\textbf{s}}_i \leftarrow f^T_{\pi^T} (\mathcal{G}^T | f^D_{\pi^{D}} (\mathcal{G}^D))$  & 
+Fixed &  \cmark   & \cmark  & \cmark& \cmark & \xmark \\ \midrule
+
+\makecell{SGL-PT \\(arXiv \cite{zhu2023sglpt}) }& \cmark & \xmark & \cmark & 
+\makecell{prompt token: \\one vector for each graph}
+& 
+connect to all nodes in the graph  & 
+\makecell{contrastive loss and \\reconstruction loss} &  \cmark   & \xmark  & \xmark& \cmark & \xmark \\ \midrule
+
+
+\makecell{GPF-Plus \\(NeurIPS 2023 \cite{fang2023universal}) }& \cmark & \cmark & \cmark  
+
+& \makecell{prompt features\\ $\textbf{p}_1,\cdots,\textbf{p}_k  \in \mathbb{R}^d$} 
+
+& \makecell{$\tilde{\textbf{s}}_i \leftarrow \textbf{x}_i + \sigma(\textbf{p}_1,$\\$\cdots,\textbf{p}_k )$}  
+
+& \makecell{$\max_{\textbf{p}, \phi} \sum_{(y_i,\tilde{\textbf{s}}_i)}$\\$ p_{\pi, \phi} (y_i| \tilde{\textbf{s}}_i) $ }
+
+& \xmark   & \xmark  & \cmark & \xmark & \cmark \\ \midrule
+
+
+
+
+
+\makecell{DeepGPT\\(arXiv \cite{shirkavand2023deep})} & \cmark & \cmark & \cmark 
+& \makecell{prompt token: \\$\textbf{p} \in \mathbb{R}^d$ \\ prefix token: \\$\textbf{P} \in \mathbb{R}^{|\mathcal{P}| \times d}$ }
+
+& \makecell{ $\tilde{\textbf{x}}_i \leftarrow \textbf{x}_i + \textbf{p} $ \\ $\tilde{\textbf{s}}_i \leftarrow  f_{\textbf{P}, \pi}(G,  \tilde{\textbf{x}}_i) $}
+
+& \makecell{$\min_{\textbf{p}, \textbf{P}, \phi} \sum_{(y_i, v_i)}$\\$ \mathcal{L}( p_{\phi}(\tilde{\textbf{s}}_i), y_i )  $}
+
+& \xmark  & \xmark & \cmark & \xmark & \cmark \\ \midrule
+
+
+\makecell{ULTRA-DP \\(arXiv \cite{chen2023ultradp})}& \xmark & \cmark &\xmark  
+& \makecell{prompt token: \\$\textbf{p}_{i}=\textbf{p}^{\textrm{task}} + w^{\textrm{pos}}\textbf{p}_i^{\textrm{pos}}$, \\$\textbf{p}_i^{\textrm{pos}}$ denotes $v_i$'s \\positional embedding}
+
+& \makecell{create a virtual node \\$v_i^p$ for target node $v_i$,\\ 
+$G' \leftarrow ( \mathcal{V}\cup \{ v_i^p\},$  \\
+$ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
+}
+
+& \makecell{Multi-task-Learning} 
+
+&\cmark   & \xmark  & \xmark& \xmark & \cmark \\ \midrule
+
+
+\makecell{HetGPT \\(arXiv \cite{ma2023hetgpt})} & \xmark& \cmark & \xmark  
+& \makecell{prompt token: \\$\mathcal{F}= \{ \textbf{f}_i^A \}_{i=1}^K$ \\for $A \in \mathcal{A}$\\ task token: $\textbf{c}_y \in \mathbb{R}^d$}
+
+&  \makecell{$\tilde{\textbf{s}}_i^A \leftarrow \textbf{x}_i^A +$\\$ \sum_{k=1}^K w_{ik} \textbf{f}_k^A$, \\ $\textbf{z}_i = f_{\pi}(G, \tilde{\textbf{s}}_i^A)$}
+
+& \makecell{$  \min_{\textbf{C}, \mathcal{F}} -\sum_{(y_i, v_i)} \log $\\$  \frac{  \textrm{exp}( \textrm{sim} ( \textbf{z}_i, \textbf{c}_{y_i} )/\tau )  }{ \sum_{y \in \textbf{Y}}  \textrm{exp}( \textrm{sim} ( \textbf{z}_i, \textbf{c}_{y} ) /\tau )  }       $ }
+
+&\cmark   & \xmark  &\xmark & \cmark & \xmark \\ \midrule
+
+
+\makecell{SAP\\(arXiv \cite{ge2023enhancing})} & \cmark & \xmark & \xmark 
+& \makecell{task token: \\$\mathcal{P}= \{ \textbf{c}_y \}_{y \in \textbf{Y}}$ \\structure token: \\$\mathcal{W}= \{ (v_i, c_j) \}_{v_i \in \mathcal{V}, c_j \in \mathcal{P}}$ }
+
+& \makecell{$G' \leftarrow (\mathcal{V} \cup \mathcal{P}, \mathcal{E} \cup \mathcal{W})$ \\$\textbf{Z}^{(1)} = \textrm{MLP}_{\pi'}(\textbf{X})$ \\ $\textbf{Z}^{(2)} = \textrm{GNN}_{\pi''}( [ \textbf{X}, \textbf{P}], $\\$[\textbf{A}, \textbf{W}] )$}
+
+& \makecell{$\min_{\textbf{W}}  - \sum_{(y_i,v_i)} \log $\\$\frac{\textrm{exp}( \textrm{sim}( \textbf{z}_i^{(1)}, \textbf{z}_{y_i}^{(2)} ) / \tau )}{ \sum_{y \in \textbf{Y}} \textrm{exp}( \textrm{sim}( \textbf{z}_i^{(1)}, \textbf{z}_{y}^{(2)} ) / \tau ) }$}
+
+& \cmark  &\xmark& \cmark& \cmark & \xmark \\ \midrule
+
+
+
+\makecell{VNT\\(KDD 2023 \cite{tan2023virtual})} & \cmark & \cmark & \xmark 
+& \makecell{$\boldsymbol{P}=\left[\boldsymbol{p}_1 ; \ldots ; \boldsymbol{p}_P\right]$,\\$\boldsymbol{p}_p \in \mathbb{R}^F$ }
+
+& \makecell{$\left[E^1 \| Z^1\right]=L^1\left(\left[E^0 \| P\right]\right) $\\$\in \mathbb{R}^{(V+P) \times F}$}
+
+& \makecell{Cross Entropy} 
+
+& \cmark &\xmark& \xmark& \xmark & \cmark \\
+
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+
+
+
+

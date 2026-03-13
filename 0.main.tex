@@ -1,0 +1,103 @@
+\documentclass[10pt,journal,compsoc]{IEEEtran}
+
+
+\usepackage[usenames,svgnames]{xcolor}
+\usepackage[ruled,linesnumbered]{algorithm2e} 
+\usepackage{graphicx}  
+\usepackage{subfig} 
+\usepackage{amsfonts}
+\usepackage{ dsfont }
+% \usepackage[colorlinks,linkcolor=blue]{hyperref} 
+\usepackage{hyperref}
+\hypersetup{colorlinks,allcolors=black}
+
+\usepackage{ulem}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{bm}
+\usepackage{pifont}
+\usepackage{mydef}
+\usepackage{threeparttable} 
+\usepackage{ragged2e}
+\usepackage[numbers]{natbib}
+\usepackage{siunitx}
+\usepackage[edges]{forest}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand\red[1]{{\color{red}{#1}}}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\renewcommand{\justify}{\leftskip=0pt \rightskip=0pt plus 0cm}
+
+
+    
+\begin{document}
+
+
+\title{Graph Prompt Learning: A Comprehensive Survey and Beyond}
+
+\author{Xiangguo~Sun,
+        Jiawen Zhang,
+        Xixi Wu,
+        Hong~Cheng,
+        Yun Xiong,
+         Jia Li
+
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem Xiangguo~Sun, Hong~Cheng: Department of Systems Engineering and Engineering Management, and Shun Hing Institute of Advanced Engineering, The Chinese University of Hong Kong, Hong Kong SAR.  \\\{xgsun, hcheng\}@se.cuhk.edu.hk
+
+\IEEEcompsocthanksitem Jiawen Zhang, Jia Li: Hong Kong University of Science and Technology (Guangzhou), China. \\jzhang302@connect.hkust-gz.edu.cn,jialee@ust.hk
+
+\IEEEcompsocthanksitem Xixi Wu, Yun Xiong: Shanghai Key Laboratory of Data Science, School of Computer Science, Fudan University, China. \\ 21210240043@m.fudan.edu.cn, yunx@fudan.edu.cn
+}
+}
+
+
+
+\markboth{IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING}%
+{Xiangguo Sun \MakeLowercase{\textit{et al.}}: }
+
+\IEEEtitleabstractindextext{
+\begin{abstract}
+\justify{Artificial General Intelligence (AGI) has revolutionized numerous fields, yet its integration with graph data, a cornerstone in our interconnected world, remains nascent. This paper presents a pioneering survey on the emerging domain of graph prompts in AGI, addressing key challenges and opportunities in harnessing graph data for AGI applications. Despite substantial advancements in AGI across natural language processing and computer vision, the application to graph data is relatively underexplored. This survey critically evaluates the current landscape of AGI in handling graph data, highlighting the distinct challenges in cross-modality, cross-domain, and cross-task applications specific to graphs. Our work is the first to propose a unified framework for understanding graph prompt learning, offering clarity on prompt tokens, token structures, and insertion patterns in the graph domain. We delve into the intrinsic properties of graph prompts, exploring their flexibility, expressiveness, and interplay with existing graph models. A comprehensive taxonomy categorizes over 100 works in this field, aligning them with pre-training tasks across node-level, edge-level, and graph-level objectives. Additionally, we present, ProG, a Python library, and an accompanying website, to support and advance research in graph prompting. The survey culminates in a discussion of current challenges and future directions, offering a roadmap for research in graph prompting within AGI. Through this comprehensive analysis, we aim to catalyze further exploration and practical applications of AGI in graph data, underlining its potential to reshape AGI fields and beyond. 
+ProG and the website can be accessed by \url{https://github.com/WxxShirley/Awesome-Graph-Prompt}, and \url{https://github.com/sheldonresearch/ProG}, respectively.
+}
+
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+graph prompt, graph pre-training, graph learning, artificial general intelligence.
+\end{IEEEkeywords}}
+
+
+
+\maketitle
+
+
+
+\input{1.intro} 
+\input{2.methodology} 
+\input{3.Preliminaries}
+\input{4.Pre-training} 
+\input{5} 
+\input{6.Applications} 
+\input{7.ProG}
+\input{8.Discussion} 
+\input{9.Conclusion}
+\input{Ack}
+
+
+\normalem % disable auto underline
+\bibliographystyle{IEEEtranSN}
+\bibliography{zotero.bib}
+\input{author}
+
+\end{document}
+
