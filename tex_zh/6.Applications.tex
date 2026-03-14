@@ -1,0 +1,14 @@
+\section{潜在应用}\label{sec:app}
+随着网络作为一种数据建模结构被广泛用于刻画社会、自然与学术等领域中的多样关系信息，图提示机制在大量真实世界应用中展现出可观潜力。本节将探讨图提示在在线社交网络、推荐系统、知识管理与生物领域中的潜在应用。
+
+\textbf{在线社交网络。 }
+在线社交平台由用户构成，可将用户表示为节点、将社交关系表示为边，从而形成在线社交网络（Online Social Networks, OSNs）。已有研究探索了在 OSNs 中利用提示机制识别虚假新闻、抵御恶意攻击的潜力 \cite{wu2023promptandalign}。具体而言，这类方法采用作用于预训练语言模型（Pre-trained Language Models, PLMs）的文本提示，以蒸馏更一般的语义信息；再将该语义信号与社交网络中的信息传播动态相结合，从而获得更好的分类性能。尽管针对 PLMs 的定制化文本提示已被研究，但将\emph{图提示}机制直接引入社交网络结构中仍有待深入探索。展望未来，将提示调参技术直接应用于社交网络、并利用少样本标签完成虚假新闻检测或异常检测等任务 \cite{wen2023voucher, guo2023datacentric}，具有很强的应用前景——因为这些任务的标注过程通常昂贵、耗时且依赖领域专家。通过在社交网络中直接引入提示，该思路有望缓解标注稀缺问题，并提升在线社交网络的安全性与可信度。
+
+\textbf{推荐系统。 }
+电商平台为利用推荐系统提升在线服务质量提供了重要契机。尽管推荐系统中的提示调参研究相对有限，但其潜力显著 \cite{yi2023contrastive,yang2023empirical, wu2023personalized, hao2024motifbased}。在 \cite{yi2023contrastive} 中，图提示调参被用于跨域推荐场景以应对领域自适应挑战：当将预训练推荐模型迁移到目标域时，通过引入额外的提示节点，在保证效率的同时实现更有效的跨域推荐。与此同时，\citet{yang2023empirical} 提出个性化用户提示以弥合对比式预任务 \cite{wu2021selfsupervised, yu2022are} 与下游推荐任务之间的差距。他们设计了多种个性化提示形式，并与预训练用户嵌入结合以形成动态用户表征，从而得到更准确、更个性化的推荐结果。未来可进一步探索在推荐系统中引入图提示调参，以增强推荐性能、个性化程度以及跨域适应能力。
+
+\textbf{知识管理。 }
+围绕在知识图谱（Knowledge Graph, KG）上进行提示以提升知识管理能力，相关研究大体可分为两条路线。第一条路线是在预训练的 KG 模型上对 KG 进行直接提示，以促进知识迁移并提升对不同 KG 数据与任务的泛化能力 \cite{zhang2023structure}。第二条路线则探索将 KG 中的“落地知识”（grounded knowledge）与大语言模型（LLMs）的推理能力相结合 \cite{wang2023knowledge, tian2023graph, robinson2023leveraging, park2023graphguided, zhang2023benchmarking, pan2023unifying}，以提升下游任务性能。在第一条路线中，\citet{zhang2023structure} 提出结构预训练与提示调参相结合的方法以实现知识迁移：其首先设计特定的预训练目标以获得更强的 KG 模型，随后通过通用的提示调参技术促进任务特定 KG 与任务数据之间的知识迁移。在第二条路线中，提示调参用于将 KG 的可验证知识与 LLMs 融合，以提升下游任务表现。例如，在 \cite{tian2023graph} 中，作者提出一种新的图神经提示（graph neural prompting）方法，以时间与参数更高效的方式从 KG 中蒸馏有价值知识，从而适配 LLMs。未来可沿该趋势进一步研究更高效的图提示方法，以更充分地从 KG 中提取有益知识，辅助 LLMs 解决多样下游任务。
+
+\textbf{生物领域。 }
+分子可天然表示为图结构，其中原子为节点、化学键为边 \cite{rong2020selfsupervised}。这种建模方式为采用图表示学习方法进行分子性质预测等任务提供了基础，从而推动科学研究与发现 \cite{rong2020selfsupervised, liu2023molca, zhao2023gimlet, edwards2023synergpt}。以往分子领域的图表示学习多采用任务特定范式，即针对不同分子数据集分别训练模型 \cite{rong2020selfsupervised, sun2020infograph}，从而缺乏领域内的泛化能力。尽管也有工作尝试将 LLMs（或 LMs）作为理解分子的通用工具 \cite{qian2023can, liu2023one}，但这些方法往往依赖常规文本来描述分子，忽略了分子内部的图结构信息 \cite{zhang2023large}。与此同时，近期一些工作开始关注图与语言的协同建模，以同时保留结构依赖并提升跨任务、跨数据集的泛化能力，甚至在少样本或零样本设置下也能工作 \cite{liu2023gitmol, zhao2023gimlet, edwards2023synergpt}。例如在 \cite{liu2023gitmol} 中，作者采用 LoRA \cite{hu2021lora} 对下游任务进行高效适配。沿着这一方向，我们认为图提示技术同样有望用于分子领域，以实现更高效的任务适配与更强的领域内泛化能力。

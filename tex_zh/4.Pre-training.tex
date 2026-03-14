@@ -1,0 +1,31 @@
+\section{面向图提示学习的GNN预训练}\label{sec:pretrain_method}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.49\textwidth]{pic/pretraining.pdf}
+    \caption{图预训练方法。}
+    \label{fig:pretrain}
+\end{figure}
+
+图预训练是图表征学习中“预训练—提示—预测”范式的关键环节。该思路利用图数据中易于获取的结构与属性信息来编码内在的图结构规律，从而为多样化下游任务的泛化提供坚实基础。将这些预训练方法纳入整体工作流后，我们进一步考察其与后续提示（prompting）与预测（predicting）阶段之间的交互关系，从而揭示该整体式方案的优势与局限。
+这一独特视角使得本综述将图预训练定位为更广义图提示学习过程中的组成部分，而非一个孤立步骤。
+为更好地阐明提示范式的动机，我们首先在传统“预训练—微调”框架下讨论四类典型的图预训练策略。
+
+\subsection{节点级策略}\label{subsec:node_pre}
+节点级预训练策略旨在学习可迁移的局部结构表征，以支持后续下游任务。如图~\ref{fig:pretrain} 所示，这类策略通常包含对比学习与预测学习两条路线。在对比学习中，自监督信号往往来自对原始图结构或属性的扰动，其目标是最大化原始视图与自监督视图之间的互信息（Mutual Information, MI）。具有代表性的节点级对比方法包括~\cite{cheng2023wiener, zhu2021graph, jin2021multiscale, peng2020graph, jiang2021pretraining, wang2021selfsuperviseda}。另一方面，预测式方法侧重于利用未扰动数据的信息来重构被扰动的数据，如~\cite{hamilton2017inductive, hou2022graphmae, wang2017mgae,park2019symmetric,wang2021selfsupervised,hou2023graphmae2} 所示。然而，这类方法通常更偏向于捕捉部分语义的拓扑模式，从而在刻画高阶信息方面存在一定限制。
+
+\subsection{边级策略}\label{subsec:edge_pre}
+为提升链路预测等任务的性能，研究者提出了多种边级预训练策略。这类策略擅长刻画节点间交互关系，并已被广泛研究。其中一种思路是判别节点对之间是否存在边，可视为对比学习方法~\cite{jin2021node, long2022pretraining}。另一种思路是通过恢复邻接矩阵来重构被掩蔽的边~\cite{tan2023s2gae, li2023what, pan2018adversarially, hasanzadeh2019semiimplicit, kim2021how}。尽管边级预训练在与节点关系预测紧密相关的任务上表现出色，但其往往更关注结构信息、相对忽略节点属性的表征；因此在迁移到图级下游任务时可能面临困难。
+
+\subsection{图级策略}\label{subsec:graph_pre}
+面向子图相关下游任务提升图级表征的需求推动了图级预训练策略的发展。类似于节点级与边级策略，图级策略也可大体分为两类：图重构方法（对图的组成部分进行掩蔽并随后恢复）~\cite{xie2022selfsupervised, rong2020selfsupervised}，以及以最大化互信息为目标的对比方法。后者或关注局部节点特征补丁与全局图特征之间的互信息~\cite{velickovic2019deep, sun2020infograph, hassani2020contrastive, sun2021mocl, subramonian2021motifdriven}，或构造正负图对进行对比学习~\cite{you2020graph, suresh2021adversarial, thakoor2021bootstrapped,qiu2020gcc}。尽管这些方法能够有效编码全局信息并获得有价值的图级表征，但一个突出的挑战在于：从特定预任务向与之存在显著差异的下游任务迁移时可能出现较大的任务鸿沟，进而带来负迁移风险~\cite{rosenstein2005transfer}。这会限制预训练模型的适用性与可靠性，甚至可能导致效果不如从头训练。
+
+\subsection{多任务预训练}\label{subsec:multi_pre}
+多任务预训练通过同时优化多个目标来覆盖更广泛的图相关属性，从而提升泛化能力并缓解负迁移问题。这些目标可采用多种组合方式，例如同时进行节点属性重构与结构恢复~\cite{hu2020strategies, hu2020gptgnn, zhang2020graphbert,
+% kipf2016variational,
+fang2022geometryenhanced}。例如，Hu 等人~\cite{hu2020strategies} 在节点级与图级同时预训练 GNN，使模型能够同时学习局部与全局表征。此外，也有工作在不同层级上引入对比学习~\cite{jiang2021contrastive, xu2021infogcl}，或联合优化对比损失与图重构误差~\cite{li2023adaptergnn}。但需要注意的是，多任务预训练在优化层面可能更具挑战，可能导致各任务之间的折中效果不理想。因此，在提升单任务表现的同时抑制负迁移，仍是重要但尚未完全解决的问题。
+
+\subsection{进一步讨论} \label{subsec:pre-train-dis}
+值得庆幸的是，“提示—预测”范式为上述挑战提供了更为稳健的解决思路。该范式能够充分释放模型性能，并可与先进的 GNN 架构无缝结合。不同于通过目标工程将预训练 GNN 适配到下游任务的传统做法，该范式通过图提示将下游任务重表述为预训练阶段所解决的任务，从而在有效弥合预任务与下游任务差距的同时，避免因多任务权衡或目标不匹配带来的次优性能问题。进一步地，相比传统微调方法，提示范式展现出更强的灵活性，尤其适用于少样本甚至零样本学习场景，即在标注数据极少或缺失时快速适应新情境。在模型规模持续增长、下游任务不断扩展的当下，提示范式的兴起是一种不可忽视且具有变革意义的趋势。
+
+\input{table/graph_prompt_summary}

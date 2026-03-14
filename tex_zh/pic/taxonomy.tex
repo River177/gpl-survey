@@ -1,0 +1,82 @@
+\tikzstyle{leaf}=[draw=hiddendraw,
+    rounded corners, minimum height=1em,
+    fill=mygreen!40,text opacity=1,
+    fill opacity=.5,  text=black,align=left,font=\scriptsize,
+    inner xsep=3pt,
+    inner ysep=1pt,
+    ]
+\tikzstyle{middle}=[draw=hiddendraw,
+    rounded corners, minimum height=1em,
+    fill=output-white!40,text opacity=1,
+    fill opacity=.5,  text=black,align=center,font=\scriptsize,
+    inner xsep=7pt,
+    inner ysep=1pt,
+    ]
+\begin{figure*}[ht]
+\centering
+\begin{forest}
+  for tree={
+  forked edges,
+  grow=east,
+  reversed=true,
+  anchor=base west,
+  parent anchor=east,
+  child anchor=west,
+  base=middle,
+  font=\scriptsize,
+  rectangle,
+  line width=0.7pt,
+  draw=output-black,
+  rounded corners,align=left,
+  minimum width=2em, s sep=6pt, l sep=8pt,
+  },
+  where level=1{text width=0.2\linewidth}{},
+  where level=2{text width=0.2\linewidth,font=\scriptsize}{},
+  where level=3{font=\scriptsize}{},
+  where level=4{font=\scriptsize}{},
+  where level=5{font=\scriptsize}{},
+  [分类体系, middle,rotate=90,anchor=north,edge=output-black
+      [面向图提示的预训练策略\\( \secref{sec:pretrain_method}),middle,anchor=west,edge=output-black, text width=0.18\linewidth
+        [{节点级策略\\(\secref{subsec:node_pre})}, middle, text width=0.16\linewidth, edge=output-black
+             [\citet{cheng2023wiener, zhu2021graph, jin2021multiscale, peng2020graph}\\\citet{hamilton2017inductive,hou2022graphmae,wang2021selfsuperviseda,wang2017mgae,park2019symmetric}\\\citet{hou2023graphmae2,wang2021selfsuperviseda,jiang2021pretraining}, leaf, text width=0.46\linewidth, edge=output-black] ]
+        [{边级策略\\(\secref{subsec:edge_pre})}, middle, text width=0.16\linewidth, edge=output-black
+             [\citet{jin2021node, long2022pretraining,tan2023s2gae, li2023what,pan2018adversarially}\\\citet{ hasanzadeh2019semiimplicit, kim2021how}, leaf, text width=0.46\linewidth, edge=output-black] ]
+        [{图级策略\\(\secref{subsec:graph_pre})}, middle, text width=0.16\linewidth, edge=output-black
+             [\citet{xie2022selfsupervised, rong2020selfsupervised,velickovic2019deep, sun2020infograph}\\\citet{sun2021mocl, subramonian2021motifdriven,you2020graph,suresh2021adversarial}\\\citet{ thakoor2021bootstrapped,qiu2020gcc}, leaf, text width=0.46\linewidth, edge=output-black]]
+        [{多任务预训练\\(\secref{subsec:multi_pre})}, middle, text width=0.16\linewidth, edge=output-black
+             [\citet{hu2020strategies, hu2020gptgnn, zhang2020graphbert,fang2022geometryenhanced}, leaf, text width=0.46\linewidth, edge=output-black] ]]
+    [{面向图任务的提示设计\\(\secref{sec:ptask})}, middle,anchor=west,edge=output-black, text width=0.18\linewidth
+        [{提示token、结构与插入模式\\(\secref{subsec:pdesign})}, middle, text width=0.18\linewidth, edge=output-black
+            [提示作为token, middle, text width=0.1\linewidth, edge=output-black [\citet{zhu2023graphcontrol,fang2022prompt,fang2023universal}\\\citet{gong2023prompt,tan2023virtual,liu2023graphprompt}\\\citet{zhu2023sglpt,ma2023hetgpt,sun2022gppt}\\\citet{chen2023ultradp,shirkavand2023deep}, leaf, text width=0.3\linewidth, edge=output-black]]
+            [提示作为图, middle, text width=0.1\linewidth, edge=output-black
+                [\citet{sun2023all,huang2023prodigy,ge2023enhancing}, leaf, text width=0.3\linewidth, edge=output-black] ] ]
+        [通过回答函数对齐任务\\(\secref{subsec:align}), middle, text width=0.18\linewidth, edge=output-black
+             [处理不同层级任务, middle, text width=0.18\linewidth, edge=output-black
+             [\citet{sun2023all,huang2023prodigy}\\\citet{liu2023graphprompt,gong2023prompt}, leaf, text width=0.22\linewidth, edge=output-black] ]
+              [可学习的回答函数, middle, text width=0.18\linewidth, edge=output-black
+                [\citet{sun2023all,fang2022prompt}\\\citet{fang2023universal,tan2023virtual}, leaf, text width=0.22\linewidth, edge=output-black]]
+              [手工构造的回答函数, middle, text width=0.2\linewidth, edge=output-black [\citet{sun2023all,sun2022gppt}\\\citet{ma2023hetgpt,ge2023enhancing}\\\citet{huang2023prodigy,liu2023graphprompt}, leaf, text width=0.2\linewidth, edge=output-black ]]]
+        [{提示调参\\(\secref{subsec:pt})}, middle, text width=0.18\linewidth, edge=output-black
+             [元学习技术, middle, text width=0.2\linewidth, edge=output-black
+                [\citet{sun2023all}, leaf, text width=0.2\linewidth, edge=output-black ] ]
+             [任务特定调参, middle, text width=0.2\linewidth, edge=output-black
+                [\citet{fang2022prompt}, leaf, text width=0.2\linewidth, edge=output-black] ]
+             [与预任务一致的调参, middle, text width=0.2\linewidth, edge=output-black [\citet{liu2023graphprompt,sun2022gppt}\\\citet{tan2023virtual,ma2023hetgpt}\\\citet{ge2023enhancing,gong2023prompt}\\\citet{chen2023ultradp}, leaf, text width=0.2\linewidth, edge=output-black] ] ]
+        [{联系、优缺点\\(\secref{subsec:pdiscussion})}, middle, text width=0.18\linewidth, edge=output-black [\citet{fang2022prompt,fang2023universal,sun2023all,ma2023hetgpt,liu2023graphprompt}\\\citet{sun2022gppt,huang2023prodigy,chen2023ultradp,tan2023virtual}, leaf, text width=0.44\linewidth, edge=output-black] ] ]
+    [含图的多模态提示\\(\secref{subsec:multi_modal}),middle, anchor=west, edge=output-black, text width=0.18\linewidth
+         [带文本属性图中的提示, middle, text width=0.2\linewidth, edge=output-black
+            [\citet{wen2023augmenting,wen2023prompt,zhao2023gimlet,li2023promptbased}, leaf, text width=0.42\linewidth, edge=output-black] ]
+         [大语言模型在图数据处理中的应用, middle, text width=0.2\linewidth, edge=output-black
+           [\citet{chen2023exploring,fatemi2023talk,jin2023patton,wang2023knowledge}, leaf, text width=0.42\linewidth, edge=output-black ] ]
+         [图与提示的多模态融合, middle, text width=0.2\linewidth, edge=output-black
+           [\citet{edwards2023synergpt,li2023graphadapter,liu2023gitmol}, leaf, text width=0.42\linewidth, edge=output-black ] ]  ]
+    [基于提示的图领域自适应\\(\secref{subsec:pdomain}),middle, anchor=west, edge=output-black, text width=0.18\linewidth
+         [语义对齐, middle, text width=0.2\linewidth, edge=output-black [\citet{sun2023all,zhu2023graphcontrol,zhang2023structure,yi2023contrastive}\\\citet{liu2023one}, leaf, text width=0.42\linewidth, edge=output-black ]
+        ]
+        [结构对齐, middle, text width=0.2\linewidth, edge=output-black
+    [\citet{shirkavand2023deep,cao2023when,zhao2023graphglow}\\\citet{guo2023datacentric}, leaf, text width=0.42\linewidth, edge=output-black ] ] ]
+]
+\end{forest}
+\caption{本综述的分类体系及代表性工作。}
+\label{fig:Taxonomy}
+\end{figure*}
