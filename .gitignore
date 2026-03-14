@@ -7,3 +7,37 @@ build/
 *.toc
 *.fdb_latexmk
 *.fls
+
+# LaTeX / XeLaTeX extra intermediates
+*.synctex.gz
+*.synctex(busy)
+*.xdv
+*.dvi
+*.lof
+*.lot
+
+# Biber/biblatex (even if not currently used)
+*.bcf
+*.run.xml
+
+# Glossaries / indices
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.xdy
+*.idx
+*.ilg
+*.ind
+
+# Beamer / misc
+*.nav
+*.snm
+*.vrb
+
+# Minted / pygments
+_minted*
+*.pyg
