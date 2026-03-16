@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "arxiv-search": {
+      "source": "yorkeccak/scientific-skills",
+      "sourceType": "github",
+      "computedHash": "dbf9afcf79e59c54dc66f9cd17455f70fdde038c20ba4f3af3b359f40761a350"
+    }
+  }
+}

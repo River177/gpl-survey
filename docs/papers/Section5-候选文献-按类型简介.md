@@ -1,4 +1,4 @@
-# Section 5 候选文献（30篇）按类型简介
+# Section 5 候选文献（29篇）按类型简介
 
 > 目标：将候选池按文献类型整理，便于后续改写第5章时按需引用。  
 > 说明：每篇仅保留“1-2句用途导向简介”，强调它能补第5章哪个缺口。
@@ -8,7 +8,10 @@
 ## A. Benchmark（1篇）
 
 ### 1) ProG: A Graph Prompt Learning Benchmark (2024)
-- 链接：https://arxiv.org/abs/2406.05346
+
+- 链接：[https://arxiv.org/abs/2406.05346](https://arxiv.org/abs/2406.05346)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：图上的人工通用智能在多种应用中取得了显著进展，但传统“预训练-微调”范式在复杂任务与小样本场景下常面临低效与负迁移问题。图提示学习作为一种有前景的替代方案，通过轻量提示对数据进行操作，并将下游任务重构为预训练任务以弥合任务差距。然而，图提示领域仍存在关键挑战：如何统一多样的图提示模型、如何评价图提示质量、以及如何提升其可用性以支持更实际的比较与选型。为此，我们提出首个面向图提示学习的综合性基准，整合 6 种预训练方法与 5 种最新图提示技术，并在 15 个多样数据集上评测其性能、灵活性与效率。同时我们发布易用的开源库 ProG，用于统一运行各类图提示模型，便于客观评估；并给出统一框架，将现有方法归纳为两大类：将提示视作图（prompts as graphs）与将提示视作 token（prompts as tokens），以增强方法的可比性与适用性。
 - 简介：构建统一评测框架，重点解决不同 graph prompt 方法难以公平比较的问题。对第5章价值在于给“方法优劣比较”提供共同实验底座。
 
 ---
@@ -16,7 +19,10 @@
 ## B. Theory（1篇）
 
 ### 2) Does Graph Prompt Work? A Data Operation Perspective with Theoretical Analysis (2024)
-- 链接：https://arxiv.org/abs/2410.01635
+
+- 链接：[https://arxiv.org/abs/2410.01635](https://arxiv.org/abs/2410.01635)
+- 发表：ICML 2025（已接收，来源：arXiv comment）
+- 摘要（中译）：近年来，图提示（graph prompting）成为一条新兴方向：通过在原图上追加可学习的 token 或子图，而无需在不同应用上反复重训预训练图模型，即可实现下游适配。这种从“预训练-微调”转向“预训练-提示”的范式，在推荐、生物网络与图迁移等场景中取得了显著经验效果，但其理论基础仍相对薄弱。本文从“数据操作（data operation）”视角提出一套理论框架，对图提示为何有效、以及有效到什么程度进行严格分析。主要贡献包括：给出形式化保证，证明图提示具备逼近图变换算子的能力，从而连接上游与下游任务；推导单图与批量图数据下由图提示实现的数据操作误差上界；进一步分析误差分布，并将理论从线性图模型（如 GCN）推广到非线性图模型（如 GAT）。大量实验结果支持上述理论结论。
 - 简介：从数据操作/理论视角解释 graph prompt 生效机制与边界条件。可用于第5章讨论“为什么有效、什么时候失效”。
 
 ---
@@ -24,11 +30,17 @@
 ## C. Survey（2篇）
 
 ### 3) Graph Prompting for Graph Learning Models: Recent Advances and Future Directions (2025)
-- 链接：https://arxiv.org/abs/2506.08326
+
+- 链接：[https://arxiv.org/abs/2506.08326](https://arxiv.org/abs/2506.08326)
+- 发表：KDD 2025 Tutorial/Survey Track（已接收，来源：arXiv comment）
+- 摘要（中译）：图学习模型在多类真实场景中展现出从大规模图数据中学习表达性表示的强大能力。常见的“预训练-适配”策略先在无标注图数据上以自监督方式预训练，再适配到具体下游任务。在适配阶段，图提示（graph prompting）作为一种有前景的方法，通过学习可训练提示并保持预训练图模型参数不变，实现高效的下游迁移。本文系统回顾了图提示领域的最新进展：首先介绍作为图提示基础的代表性图预训练方法；随后梳理主流图提示技术，并讨论其如何设计可学习提示；进一步总结图提示在不同领域的应用；最后讨论现有研究中的若干开放挑战与未来方向。
 - 简介：面向 graph prompting 的阶段性综述，覆盖方法、应用与挑战。可用于第5章 related discussion 对照。
 
 ### 4) Towards Graph Prompt Learning: A Survey and Beyond (2024)
-- 链接：https://arxiv.org/abs/2408.14520
+
+- 链接：[https://arxiv.org/abs/2408.14520](https://arxiv.org/abs/2408.14520)
+- 发表：arXiv（作者注：暂时撤稿/修订中）
+- 摘要（中译）：大规模“预训练-提示学习（pre-train and prompt learning）”范式展现出卓越的可适配性，已广泛应用于问答、图像识别与多模态检索等任务。该范式充分释放大规模预训练模型潜力，降低下游数据需求与计算成本，并提升跨任务适用性。图作为刻画实体关系的通用数据结构，在社交网络分析、推荐系统与生物图等领域至关重要。尽管该范式在 NLP 与 CV 中已取得成功，但在图领域的应用仍处于早期阶段。图数据不仅节点/边特征分布差异显著，拓扑结构也高度多样，这会导致预训练与下游微调之间出现不兼容模式或“鸿沟”。本文旨在通过系统梳理缓解这些差异的方法来弥合该鸿沟，包括探索提示设计方法、比较相关技术、评估应用场景与数据集，并指出尚未解决的问题与挑战。该综述覆盖并分类了 100+ 相关工作，总结通用设计原则与最新应用（如文本属性图、分子、蛋白质与推荐系统等），为理解图提示学习提供基础性框架，期望对图挖掘社区乃至更广泛的 AGI 社区产生影响。
 - 简介：补充 2024 版本的综述视角，帮助对齐术语和分类口径。可用于检查第5章分类是否完整。
 
 ---
@@ -36,116 +48,188 @@
 ## D. Application（1篇）
 
 ### 5) GPT4Rec: Graph Prompt Tuning for Streaming Recommendation (2024)
-- 链接：https://arxiv.org/abs/2406.08229
+
+- 链接：[https://arxiv.org/abs/2406.08229](https://arxiv.org/abs/2406.08229)
+- 发表：SIGIR 2024（已发表，DOI: 10.1145/3626772.3657720；来源：arXiv comment/DOI）
+- 摘要（中译）：在个性化推荐中，如何适应不断演化的用户偏好以及新用户/新物品的持续涌入至关重要。传统模型多依赖静态的训练-测试流程，难以满足动态场景需求。面向流式推荐，持续图学习提供了一种新思路，但现有方法往往依赖历史数据回放（在严格隐私法规下越来越不可行）、难以有效解决“过度稳定（over-stability）”问题，或需要模型隔离与扩展等复杂策略。为此，本文提出 GPT4Rec：面向流式推荐的图提示调优方法。针对不断演化的用户-物品交互图，GPT4Rec 首先将交互模式解耦为多个视图；在不同视图中隔离特定交互关系后，使用轻量图提示在用户-物品图内高效引导模型适应不同交互模式。具体地，节点级提示用于适应节点属性变化，结构级提示用于适应更宏观的连接与关系模式，视图级提示用于促进多视图信息聚合。四个真实数据集上的实验验证了方法的有效性与效率。
 - 简介：将 graph prompt 用于流式推荐场景，强调动态数据下的可适配性。可作为第5章方法外延到真实场景的示例。
 
 ---
 
-## E. Method（25篇）
+## E. Method（24篇）
 
 ### 6) A Unified Graph Selective Prompt Learning for Graph Neural Networks (2024)
-- 链接：https://arxiv.org/abs/2406.10498
+
+- 链接：[https://arxiv.org/abs/2406.10498](https://arxiv.org/abs/2406.10498)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：近年来，图提示学习/调优被广泛用于将预训练模型适配到图表示学习下游任务。作为一种通用图提示方法，Graph Prompt Feature（GPF）通过冻结预训练 GNN 参数，在节点特征中注入可学习提示向量来修改输入图数据，以更好对齐小规模下游数据集。然而现有 GPF 主要存在两点局限：其一通常只关注节点提示而忽略对边的提示；其二对所有节点“一视同仁”地提示学习，难以体现节点重要性，且在噪声节点存在时容易敏感。为解决这些问题，本文提出统一的 Graph Selective Prompt Feature（GSPF）用于 GNN 微调：将节点与边的提示学习统一建模，并通过选择性机制聚焦于更关键的节点与边，从而得到更可靠、更紧凑的提示设计。大量基准数据集实验验证了该方法的有效性与优势。
 - 简介：提出选择性 prompt 机制，避免“一刀切”提示注入。补强第5章 token 设计分支。
 
 ### 7) Prompt Learning on Temporal Interaction Graphs (2024)
-- 链接：https://arxiv.org/abs/2402.06326
+
+- 链接：[https://arxiv.org/abs/2402.06326](https://arxiv.org/abs/2402.06326)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：时序交互图（Temporal Interaction Graphs, TIGs）广泛用于刻画真实系统。为在 TIG 上进行表示学习，已有多种 TIG 模型被提出，但在“预训练-预测（pre-train, predict）”范式下仍面临两类关键鸿沟：其一，预训练与推理数据在时间分布上的差异会显著削弱模型对遥远未来动态演化数据的预测适用性；其二，预任务与下游任务在语义上的偏离导致模型难以在不同应用场景中对齐其学习与预测能力。近期“预训练-提示（pre-train, prompt）”范式被视为一种轻量泛化机制，但将其迁移到 TIG 并不直接，因为静态图中的提示方法缺乏对时间敏感动态的刻画且表达能力不足。为此，本文提出 TIGPrompt：可无缝集成到 TIG 模型中的通用框架，用于同时弥合时间与语义鸿沟。方法通过时间提示生成器为不同任务提供时间感知提示，并以极简设计实现，仅需对提示生成器在少量监督数据上进行调优；同时提出扩展的“预训练-基于提示的微调”范式，以适配不同计算资源需求。大量实验表明 TIGPrompt 在性能与效率上均具备优势，并达到 SOTA。
 - 简介：面向时序交互图的 prompt 学习，强调时间维建模。补齐第5章对动态图的覆盖。
 
 ### 8) Prompt-Based Spatio-Temporal Graph Transfer Learning (2024)
-- 链接：https://arxiv.org/abs/2405.12452
+
+- 链接：[https://arxiv.org/abs/2405.12452](https://arxiv.org/abs/2405.12452)
+- 发表：CIKM 2024（已发表，来源：PDF 元数据）
+- 摘要（中译）：时空图神经网络在城市计算任务（如预测、克里金插值）中能够有效捕获复杂依赖，但其性能往往受限于“为某个特定任务训练所需的大量数据”，从而限制了其对新城市域与多样任务需求的适应能力。迁移学习可通过跨域知识复用缓解该问题，但在时空图迁移学习中，跨任务泛化由于缺乏统一框架仍研究不足。为弥合该差距，本文提出时空图提示框架 STGP，用于在数据稀缺域上适配多样任务。具体地，首先将不同任务统一到同一模板中，并引入与该模板对齐的任务无关网络结构，以捕获跨任务共享依赖；其次通过两阶段提示流水线使用可学习提示实现域迁移与任务迁移，使提示能有效刻画域知识与任务特性。大量实验表明 STGP 在预测、插值与外推三类任务上优于现有方法，最高可提升 10.7%。
 - 简介：针对时空图迁移场景，讨论 prompt 在跨域适配中的作用。可用于第5章 transferability 讨论。
 
 ### 9) SGPT: Few-Shot Prompt Tuning for Signed Graphs (2024)
-- 链接：https://arxiv.org/abs/2412.12155
+
+- 链接：[https://arxiv.org/abs/2412.12155](https://arxiv.org/abs/2412.12155)
+- 发表：CIKM 2025（已发表，DOI: 10.1145/3746252.3761079；来源：arXiv comment/DOI）
+- 摘要（中译）：有符号图神经网络（Signed GNN, SGNN）能为有符号图学习表达性表示，但通常需要大量任务相关标注，从而限制其在标签稀缺的工业场景中应用。相比之下，无符号图结构更为丰富，可用于预训练 GNN，以降低下游有符号图任务的监督需求。然而，由于预训练与下游阶段在图类型与任务目标上的根本差异，将无符号知识迁移到有符号图并不容易。为此，本文提出 Signed Graph Prompt Tuning（SGPT）：将预训练的无符号 GNN 适配到少样本有符号图任务的图提示框架。方法基于平衡理论设计图模板，用于解耦负链接引入的混合关系以缓解结构不匹配；并提出任务模板，将多种下游有符号任务统一重构为链接预测目标，从而与预训练目标对齐；进一步引入特征提示用于对齐下游语义空间与预训练特征空间，并用语义提示以任务感知方式注入边符号语义。七个有符号图基准数据集上的实验表明，SGPT 显著优于现有 SOTA，提供了强且可泛化的少样本有符号图学习方案。
 - 简介：聚焦 signed graph 的少样本提示调优。补充第5章在特殊图结构上的方法可迁移性。
 
 ### 10) Instance-Aware Graph Prompt Learning (2024)
-- 链接：https://arxiv.org/abs/2411.17676
+
+- 链接：[https://arxiv.org/abs/2411.17676](https://arxiv.org/abs/2411.17676)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：GNN 作为主流图表示学习方法具备强表达能力，但其端到端性能高度依赖高质量标签，因此“预训练-微调”范式被用于降低标注成本。随之而来的预任务与下游任务差距推动了图提示学习：在原图数据中插入少量提示参数即可保持较强性能。然而现有工作多学习固定的任务特定提示，难以覆盖同一任务内部的多样实例分布，泛化能力受限。本文提出 Instance-Aware Graph Prompt Learning（IA-GPL），为不同输入实例生成差异化提示：使用轻量结构为每个实例生成中间提示，并通过可训练码本向量对提示进行量化；同时结合指数滑动平均（EMA）以稳定训练。多数据集、多设定的大量实验显示 IA-GPL 优于现有 SOTA 基线。
 - 简介：引入实例感知提示，强调样本个体差异。适合放在第5章 prompt token/structure 的进化脉络里。
 
 ### 11) Reliable and Compact Graph Fine-tuning via GraphSparse Prompting (2024)
-- 链接：https://arxiv.org/abs/2410.21749
+
+- 链接：[https://arxiv.org/abs/2410.21749](https://arxiv.org/abs/2410.21749)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：图提示学习被广泛用于将预训练 GNN 适配到下游任务，但现有方法往往对图中所有要素（节点、边、属性等）进行提示操作，既冗余也并非最优。本文提出基于稀疏表示理论的 Graph Sparse Prompting（GSP），用于自适应、稀疏地选择最优元素（例如某些节点属性）以实现紧凑提示。具体地，提出两类模型：Graph Sparse Feature Prompting（GSFP）与 Graph Sparse multi-Feature Prompting（GSmFP），为任意预训练 GNN 提供通用调优方案，可同时实现属性选择与紧凑提示学习，并给出简洁有效的求解算法。16 个常用基准数据集实验验证了方法的有效性与优势。
 - 简介：用稀疏提示提升参数效率与可靠性。可补第5章“效率 vs 性能”的平衡讨论。
 
 ### 12) Against Multifaceted Graph Heterogeneity via Asymmetric Federated Prompt Learning (2024)
-- 链接：https://arxiv.org/abs/2411.02003
+
+- 链接：[https://arxiv.org/abs/2411.02003](https://arxiv.org/abs/2411.02003)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：联邦图学习（FGL）旨在在不同任务、不同数据分布的参与方之间协同且隐私地优化图模型。其核心挑战是在多维度图异质性下实现既有效又高效的联邦优化，以提升各方性能。然而现有 FGL 工作多聚焦图数据异质性，对图任务异质性处理不足。为此，本文提出 Federated Graph Prompt Learning（FedGPL）框架，通过提示实现多异质参与方之间的非对称图知识迁移。整体上，方法建立分裂式联邦框架，分别保留通用与领域特定图知识；并提出两项关键机制来缓解任务与数据异质性：其一，分层定向迁移聚合器（HiDTA）依据定向可迁移性分层蒸馏跨任务有益知识；其二，虚拟提示图（VPG）自适应生成图结构，通过识别主导子图并中和冗余子图来提升数据效用。理论分析与大规模联邦图数据集实验表明，FedGPL 在精度与效率上均显著优于现有 SOTA。
 - 简介：联邦+异构设定下的 prompt 学习。可补第5章跨域异质场景的实证支撑。
 
 ### 13) RELIEF: Reinforcement Learning Empowered Graph Feature Prompt Tuning (2024)
-- 链接：https://arxiv.org/abs/2408.03195
+
+- 链接：[https://arxiv.org/abs/2408.03195](https://arxiv.org/abs/2408.03195)
+- 发表：KDD 2025（已接收，camera-ready；来源：arXiv comment）
+- 摘要（中译）：预训练-提示范式在 NLP 成功后，近来也扩展到图表示学习。早期图提示调优往往依赖特定预训练策略（如边预测）设计专用提示函数，适用性受限；另一条路线提出在输入图的特征空间中添加提示的“通用提示”，以摆脱对预训练策略的依赖。但“是否必须对所有节点都添加特征提示”仍是开放问题。受 NLP 中提示调优研究启发（强大的预训练模型往往只需更少的条件信号即可实现期望行为），本文主张只对部分节点策略性地添加必要且轻量的特征提示，以提升下游性能。这引出组合优化问题：决定 1）提示哪些节点；2）为其附加什么提示。为此，本文将提示注入过程建模为序列决策问题，提出 RELIEF：使用强化学习（RL）进行优化。每一步 RL agent 选择一个节点（离散动作）并决定提示内容（连续动作），目标是最大化累计性能增益。多种预训练策略下、少样本场景的图级与节点级任务实验表明，RELIEF 在分类性能与数据效率上均优于微调与其他提示方法；并开源代码。
 - 简介：将 RL 引入 prompt 调优策略，强调策略层学习。可补第5章 prompt tuning 方法维度。
 
 ### 14) Inductive Graph Alignment Prompt: Bridging the Gap ... from Spectral Perspective (2024)
-- 链接：https://arxiv.org/abs/2402.13556
+
+- 链接：[https://arxiv.org/abs/2402.13556](https://arxiv.org/abs/2402.13556)
+- 发表：WWW 2024（已发表，DOI: 10.1145/3589334.3645620；来源：PDF 元数据/DOI）
+- 摘要（中译）：图预训练-微调范式通过在无标注数据上学习通用知识显著提升了 GNN，但由于预训练与微调阶段在数据与任务上的巨大差异，模型性能仍受限制。受 NLP 中提示微调启发，图领域已出现多种尝试以弥合该差距，但多数方法仅将下游任务重写为预训练任务形式，并假设预训练图与微调图兼容，通常工作在传导（transductive）设置。为将图预训练推广到更具挑战的归纳（inductive）场景（微调图可能与预训练图显著不同），本文提出 Inductive Graph Alignment Prompt（IGAP）。作者首先统一主流图预训练框架，并从图谱理论角度分析图预训练的本质；随后指出归纳设置中的两类数据鸿沟来源：（i）图信号鸿沟与（ii）图结构鸿沟，并据此在谱空间中用可学习提示分别弥合两种鸿沟。理论分析保证方法有效性。最后在节点分类与图分类任务下的传导、半归纳与归纳设置中进行大量实验，结果表明 IGAP 能在不同设置下有效缓解数据鸿沟。
 - 简介：从谱域角度桥接 pre-train 与 inductive fine-tune。可用于第5章任务对齐机制补强。
 
 ### 15) DAGPrompT: Distribution-aware Graph Prompt Tuning (2025)
-- 链接：https://arxiv.org/abs/2501.15142
+
+- 链接：[https://arxiv.org/abs/2501.15142](https://arxiv.org/abs/2501.15142)
+- 发表：WWW 2025（已发表，DOI: 10.1145/3696410.3714917；来源：arXiv comment/DOI）
+- 摘要（中译）：预训练后微调通过无标注预训练捕获通用知识推动了 GNN 发展，但预训练与下游任务之间的目标差距限制了其效果。近期图提示方法通过任务重构与可学习提示来缩小差距，但在异配（heterophily）等复杂图上仍表现不佳：冻结编码器会削弱提示作用，简单提示也难以处理跨跳（hop）层面的分布多样性。本文指出复杂图适配面临两大挑战：（1）在下游任务中适应新的分布以缓解由异配导致的预训练/微调差异；（2）为不同跳数的节点需求定制提示。为此提出 Distribution-aware Graph Prompt Tuning（DAGPrompT）：引入 GLoRA 模块，通过低秩适配优化 GNN 编码器投影矩阵与消息传递结构；并加入 hop-specific 提示以刻画不同 hop 的结构与分布差异。在 10 个数据集、14 个基线的评测中，DAGPrompT 在节点/图分类任务上最高提升 4.79 的准确率，同时保持效率。
 - 简介：强调分布感知的提示优化，面向分布偏移问题。补第5章泛化稳定性。
 
 ### 16) CLEAR: Cluster-based Prompt Learning on Heterogeneous Graphs (2025)
-- 链接：https://arxiv.org/abs/2502.08918
+
+- 链接：[https://arxiv.org/abs/2502.08918](https://arxiv.org/abs/2502.08918)
+- 发表：PAKDD 2025（已接收，来源：arXiv comment）
+- 摘要（中译）：提示学习在图领域被用于弥合预任务与下游任务差距。现有异构图提示方法多采用特征提示来修改节点特征以适配特定下游任务，往往忽略异构图的结构信息，也忽视了元路径（meta-path）所承载的高阶语义。为此，本文提出 CLEAR：面向异构图的聚类式提示学习模型。方法通过 cluster prompts 将下游任务重构为“异构图重建”，使预任务与下游共享同一训练目标；同时将提示注入元路径，使提示学习过程能显式利用元路径带来的高阶语义信息。下游任务实验表明 CLEAR 持续优于现有 SOTA，在节点分类上 F1 最高提升约 5%。
 - 简介：以聚类结构辅助异构图 prompt 学习。补第5章 hetero graph 分支。
 
 ### 17) Edge Prompt Tuning for Graph Neural Networks (2025)
-- 链接：https://arxiv.org/abs/2503.00750
+
+- 链接：[https://arxiv.org/abs/2503.00750](https://arxiv.org/abs/2503.00750)
+- 发表：ICLR 2025（已接收，来源：arXiv comment）
+- 摘要（中译）：近年来，以自监督方式在无标注图数据上预训练强大的 GNN 已成为重要方向，但预训练与下游任务之间往往存在不可避免的目标差距。图提示调优通过操控输入图或将下游任务重构为预训练任务，在不微调预训练 GNN 的情况下实现适配。尽管已有图提示方法有效，但多忽略了“边”在提示设计中的关键作用，而边信息会显著影响下游任务的表示质量。本文提出 EdgePrompt：从边的视角进行简单而有效的提示调优。不同于仅在节点特征上设计提示向量，EdgePrompt 通过为边学习额外提示向量来操控输入图，并在预训练 GNN 的消息传递过程中融合边提示，从而更好注入结构信息。方法兼容多种预训练策略与常见 GNN 架构，且适用于不同下游任务；并给出面向节点分类与图分类的理论分析。10 个数据集、4 种预训练策略的实验表明 EdgePrompt 优于多种基线；并开源代码。
 - 简介：将提示从节点扩展到边，丰富插入模式。可直接扩展第5章 inserting pattern 小节。
 
-### 18) DP-GPL: Differentially Private Graph Prompt Learning (2025)
-- 链接：https://arxiv.org/abs/2503.10544
-- 简介：在 graph prompt 中引入差分隐私约束。适合放在第5章风险与约束讨论。
+### 18) GraphPrompter: Multi-stage Adaptive Prompt Optimization for Graph In-Context Learning (2025)
 
-### 19) GraphPrompter: Multi-stage Adaptive Prompt Optimization for Graph In-Context Learning (2025)
-- 链接：https://arxiv.org/abs/2505.02027
+- 链接：[https://arxiv.org/abs/2505.02027](https://arxiv.org/abs/2505.02027)
+- 发表：ICDE 2025（已接收，来源：arXiv comment）
+- 摘要（中译）：图 in-context learning 旨在无需更新任何参数，就能将预训练图模型适配到新颖且多样的下游图；其关键在于利用选定的提示样例对下游图进行条件化。现有方法常随机选取子图或边作为提示，导致提示噪声大、性能不佳；同时由于预训练图与测试图存在差异，当测试图类别数远大于训练时，in-context 能力会明显退化。为应对这些挑战，本文提出 GraphPrompter：多阶段自适应提示优化方法，系统优化图提示的生成、选择与使用过程以提升 in-context 能力。首先，Prompt Generator 通过重构层突出信息量最大的边并减少无关噪声；其次在选择阶段，Prompt Selector 结合 kNN 与预训练选择层动态选取合适样本，降低无关提示影响；最后，Prompt Augmenter 采用带缓存替换策略的增强机制，提高模型在新数据集上的泛化能力。大量实验显示 GraphPrompter 显著提升图模型的 in-context 学习效果，平均相对 SOTA 基线提升超过 8%；并提供开源实现。
 - 简介：面向 graph ICL 的多阶段自适应优化。可补第5章 answering/tuning 的新范式。
 
-### 20) One Prompt Fits All: Universal Graph Adaptation for Pretrained Models (2025)
-- 链接：https://arxiv.org/abs/2509.22416
+### 19) One Prompt Fits All: Universal Graph Adaptation for Pretrained Models (2025)
+
+- 链接：[https://arxiv.org/abs/2509.22416](https://arxiv.org/abs/2509.22416)
+- 发表：NeurIPS 2025（已接收，来源：arXiv comment）
+- 摘要（中译）：图提示学习（GPL）被视为连接图预训练模型与下游场景的有前景范式，可降低标注依赖并缓解上游预训练与下游任务的不匹配。然而尽管已有研究探索了多种提示策略，其有效性与内在机理仍不清晰。本文指出两点关键限制：（1）机制缺乏共识：不同 GPL 策略在模型的不同空间介入（输入级、层内、表示级），尚不清楚提示与预训练模型如何交互；（2）场景适配有限：多数方法难以在分布迁移下泛化（例如同配到异配图）。作者从理论上分析现有 GPL，并揭示表示级提示本质上等价于对一个简单下游分类器进行微调；据此提出 GPL 应聚焦释放预训练模型能力，而由分类器适应下游场景。基于上述洞见，本文提出 UniPrompt：在保持输入图不变的前提下适配任意预训练模型，以释放其能力。实验表明该方法可与多种预训练模型有效结合，并在域内与跨域场景中获得强性能。
 - 简介：探索统一提示跨任务/跨域适配。补第5章 transferable prompt 议题。
 
-### 21) GraphTOP: Graph Topology-Oriented Prompting for Graph Neural Networks (2025)
-- 链接：https://arxiv.org/abs/2510.22451
+### 20) GraphTOP: Graph Topology-Oriented Prompting for Graph Neural Networks (2025)
+
+- 链接：[https://arxiv.org/abs/2510.22451](https://arxiv.org/abs/2510.22451)
+- 发表：NeurIPS 2025（已接收，来源：arXiv comment）
+- 摘要（中译）：GNN 通过从海量图数据学习表达性表示推动了图学习发展；常见“预训练-适配”范式先在无标注数据上预训练，再适配到下游任务。在适配阶段，图提示通过在冻结预训练 GNN 的前提下，用可学习提示修改输入图数据，是一种有效策略。现有研究主要聚焦“特征导向”的提示（作用于节点特征或隐藏表示），但常忽视“拓扑导向”提示（通过修改图拓扑来适配），从而导致性能不够理想。本文首次系统研究拓扑导向图提示，提出 GraphTOP 框架以有效适配预训练 GNN。具体而言，将拓扑提示重构为多跳局部子图内的“边重连（edge rewiring）”问题，并通过重参数化将其松弛到连续概率空间，同时保证松弛紧致且保持图稀疏性。5 个图数据集、4 种预训练策略的实验表明 GraphTOP 在多个节点分类数据集上优于多种基线；并开源代码。
 - 简介：拓扑导向提示设计，突出结构先验。补第5章 graph-based prompt 设计路径。
 
-### 22) MAGPrompt: Message-Adaptive Graph Prompt Tuning for Graph Neural Networks (2026)
-- 链接：https://arxiv.org/abs/2602.05567
+### 21) MAGPrompt: Message-Adaptive Graph Prompt Tuning for Graph Neural Networks (2026)
+
+- 链接：[https://arxiv.org/abs/2602.05567](https://arxiv.org/abs/2602.05567)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：预训练 GNN 具备较强迁移能力，但由于预训练目标与下游任务需求不匹配，适配仍然具有挑战。图提示调优提供了比全量微调更参数高效的替代方案，但多数方法只修改输入或表示，而保持消息传递不变，因而难以充分适配邻域交互。本文提出消息自适应的图提示调优：将可学习提示注入消息传递步骤，在聚合时对邻居消息进行重加权，并加入任务特定的提示向量，同时保持骨干 GNN 冻结不变。该方法兼容常见 GNN 骨干与预训练策略，可用于多种下游设置。多样节点级与图级数据集实验显示，在少样本设置下相较既有图提示方法有稳定增益，并在全量样本下达到与微调相当的性能。
 - 简介：消息自适应提示与 message passing 深度耦合。代表最新一批方法演进。
 
-### 23) GP2F: Cross-Domain Graph Prompting with Adaptive Fusion of Pre-trained GNNs (2026)
-- 链接：https://arxiv.org/abs/2602.11629
+### 22) GP2F: Cross-Domain Graph Prompting with Adaptive Fusion of Pre-trained GNNs (2026)
+
+- 链接：[https://arxiv.org/abs/2602.11629](https://arxiv.org/abs/2602.11629)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：图提示学习（GPL）被用于在不匹配的预训练目标与下游任务之间实现高效适配。近期研究从域内场景扩展到更贴近真实世界的跨域场景：预训练源域与下游目标域在分布上可能差异显著。然而，GPL 为何在域迁移下仍有效尚缺乏解释。经验上，作者观察到代表性 GPL 方法在跨域设置下与两个简单基线（全量微调 FT、线性探测 LP）具有竞争力，从而促使进一步理解提示机制。本文给出理论分析，证明联合利用“保留预训练知识”和“任务特定适配”这两条互补分支，相比单独使用任一分支具有更小的估计误差，从而形式化解释跨域 GPL 的收益来源。基于此提出 GP2F：显式构造双分支 GPL（冻结分支保留预训练知识；适配分支用轻量 adapter 进行任务适配），并在拓扑约束下通过对比损失与拓扑一致性损失进行自适应融合。跨域少样本的节点/图分类实验表明该方法优于现有方法。
 - 简介：跨域融合多个预训练 GNN 并用 prompt 适配。补第5章 domain transfer 机制。
 
-### 24) Robust Graph Fine-Tuning with Adversarial Graph Prompting (2026)
-- 链接：https://arxiv.org/abs/2601.00229
+### 23) Robust Graph Fine-Tuning with Adversarial Graph Prompting (2026)
+
+- 链接：[https://arxiv.org/abs/2601.00229](https://arxiv.org/abs/2601.00229)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：参数高效微调（PEFT）已成为将预训练 GNN 适配到下游任务的主流范式，但现有 PEFT 方法对图拓扑与节点属性/特征上的噪声与攻击通常较为脆弱。为此，本文首次将对抗学习引入图提示，提出 Adversarial Graph Prompting（AGP）框架以实现鲁棒的图微调。AGP 包含两方面：一是将问题形式化为 min-max 优化，并采用交替优化求解；在内层最大化中提出联合投影梯度下降（JointPGD）生成强对抗噪声，在外层最小化中学习最优节点提示以抵消对抗扰动。二是从理论上说明 AGP 可同时应对图拓扑噪声与节点噪声，从而具备跨多种噪声类型的通用鲁棒性。该方法可与多种预训练 GNN 集成以提升下游鲁棒性。多基准任务实验验证了 AGP 相较 SOTA 方法的鲁棒性与有效性。
 - 简介：在对抗场景下评估 prompt 微调鲁棒性。补第5章 robustness 维度。
 
-### 25) When Prompting Meets Spiking: Graph Sparse Prompting via Spiking Graph Prompt Learning (2026)
-- 链接：https://arxiv.org/abs/2601.02662
+### 24) When Prompting Meets Spiking: Graph Sparse Prompting via Spiking Graph Prompt Learning (2026)
+
+- 链接：[https://arxiv.org/abs/2601.02662](https://arxiv.org/abs/2601.02662)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：Graph Prompt Feature（GPF）常用于将预训练 GNN 适配到下游任务：先引入若干提示原子（prompt atoms），再用原子的线性组合为每个节点学习最优提示向量。但现有 GPF 通常在节点所有特征维度上进行提示注入，既冗余又对特征噪声敏感。为此，本文首次利用脉冲神经元机制学习稀疏图提示，提出 Spiking Graph Prompt Feature（SpikingGPF）。动机来自脉冲神经元能以低成本处理信息并产生稀疏输出，天然契合稀疏提示需求。方法包含两点：其一，利用脉冲神经元架构为每个节点学习稀疏提示向量，只在选择性特征上进行提示，从而更轻量且更抗噪；其二，提出基于稀疏表示理论的提示表示学习模型，将每个节点提示表示为提示原子的稀疏组合，以获得更紧凑表示并提升计算效率。多基准实验表明 SpikingGPF 的有效性与鲁棒性。
 - 简介：结合脉冲机制与稀疏提示，探索新型计算范式。可作为前沿探索方向。
 
-### 26) Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs (2024)
-- 链接：https://arxiv.org/abs/2407.15431
+### 25) Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs (2024)
+
+- 链接：[https://arxiv.org/abs/2407.15431](https://arxiv.org/abs/2407.15431)
+- 发表：KDD 2024（已发表，DOI: 10.1145/3637528.3671952；来源：arXiv comment/DOI）
+- 摘要（中译）：文本属性图（Text-Attributed Graph, TAG）是重要的真实图数据类型，每个节点关联原始文本。针对 TAG 的少样本节点分类，传统方法通常直接在预处理后的节点特征上训练，未利用原始文本信息，性能高度依赖特征预处理方式。本文提出 P2TAG：面向 TAG 少样本节点分类的“图预训练 + 提示”框架。P2TAG 先在 TAG 上以自监督损失同时预训练语言模型（LM）与图神经网络（GNN）；为充分利用 LM 能力，框架对掩码语言建模目标进行适配。随后在少样本分类阶段，采用混合提示方法同时融合文本与图信息。作者在 6 个真实 TAG 数据集（论文引用网络、商品共购网络等）上实验，结果显示相较现有图少样本学习方法取得约 +18.98% 到 +35.98% 的提升。
 - 简介：文本属性图少样本分类中的预训练+提示框架。补第5章 text-attributed graph 过渡场景。
 
-### 27) Prompt-Driven Continual Graph Learning (2025)
-- 链接：https://arxiv.org/abs/2502.06327
+### 26) Prompt-Driven Continual Graph Learning (2025)
+
+- 链接：[https://arxiv.org/abs/2502.06327](https://arxiv.org/abs/2502.06327)
+- 发表：仅 arXiv 预印本
+- 摘要（中译）：持续图学习（Continual Graph Learning, CGL）旨在在不断演化的图数据上接纳新任务，同时避免遗忘旧知识。主流方法多采用记忆回放（memory replay）：缓存旧任务代表性数据并用于再训练，但该策略在持续演化的大图上存在可扩展性问题，也带来隐私风险。受提示学习进展启发，本文提出 PROMPTCGL：为每个到来的新任务学习独立提示，并保持底层 GNN 固定不变，从而自然避免灾难性遗忘。方法进一步提出分层提示，从特征层与拓扑层共同指导模型应对动态持续学习中任务图的变化；并设计个性化提示生成器，为每个节点生成定制提示，同时尽量减少提示数量，使得内存开销与图规模无关、保持常数级。四个基准实验表明 PROMPTCGL 相较现有 CGL 方法性能更优，且显著降低内存消耗；并开源代码。
 - 简介：持续学习场景下的 prompt 机制。补第5章对增量任务的适配能力。
 
-### 28) Event-Aware Prompt Learning for Dynamic Graphs (2025)
-- 链接：https://arxiv.org/abs/2510.11339
+### 27) Event-Aware Prompt Learning for Dynamic Graphs (2025)
+
+- 链接：[https://arxiv.org/abs/2510.11339](https://arxiv.org/abs/2510.11339)
+- 发表：arXiv（审稿中，来源：arXiv comment）
+- 摘要（中译）：真实世界图通常通过一系列事件演化，用于刻画跨领域对象之间的动态交互。针对动态图学习，动态图神经网络（DGNN）是常用方案，近期也出现了在动态图上引入提示学习的方法。但现有方法多关注节点与时间的关系，忽略历史事件对当前建模的影响。为此，本文提出 EVP：事件感知的动态图提示学习框架，可作为插件增强现有方法对历史事件知识的利用。具体包括：为每个节点提取历史事件序列，并通过事件适配机制将事件的细粒度特征与下游任务对齐；再通过事件聚合机制将历史知识有效整合进节点表示。作者在 4 个公开数据集上进行大量实验以评估与分析 EVP。
 - 简介：动态事件图中的事件感知提示设计。补第5章 dynamic answering 方向。
 
-### 29) Learning and Editing Universal Graph Prompt Tuning via Reinforcement Learning (2025)
-- 链接：https://arxiv.org/abs/2512.08763
+### 28) Learning and Editing Universal Graph Prompt Tuning via Reinforcement Learning (2025)
+
+- 链接：[https://arxiv.org/abs/2512.08763](https://arxiv.org/abs/2512.08763)
+- 发表：KDD 2026（已接收，来源：arXiv comment）
+- 摘要（中译）：早期图提示调优常为特定预训练策略设计任务特定方案，适配性有限；另一条路线提出“通用图提示调优”，直接在输入图特征空间操作，并建立理论基础：通用提示可实现任意提示函数的等效效果，从而摆脱对预训练策略的依赖。近期工作提出基于选择性节点的通用提示以追求更理想提示，但本文认为这种选择性节点提示不可避免地削弱了通用提示的理论基础。为此，作者在更严格约束下强化通用提示的理论基础，证明“对所有节点添加提示”是实现提示通用性的必要条件。在此基础上提出 LEAP：Learning and Editing Universal GrAph Prompt Tuning，新模型与新范式在保留通用提示理论基础的同时追求更理想提示。方法先构建基础通用提示以保证理论前提，再使用 actor-critic 强化学习选择节点并对提示进行编辑。多种预训练策略下、全量与少样本场景的图级与节点级实验表明，LEAP 持续优于微调与其他提示方法。
 - 简介：强调“可编辑”的通用 prompt，并用 RL 优化。补第5章 prompt lifecycle 视角。
 
-### 30) Graph Your Own Prompt (2025)
-- 链接：https://arxiv.org/abs/2509.23373
+### 29) Graph Your Own Prompt (2025)
+
+- 链接：[https://arxiv.org/abs/2509.23373](https://arxiv.org/abs/2509.23373)
+- 发表：NeurIPS 2025（已接收，来源：arXiv comment）
+- 摘要（中译）：本文提出 Graph Consistency Regularization（GCR）框架，将由模型预测构造的关系图结构注入学习过程，以促进具有类别意识、语义更一致的特征表示。GCR 可视作一种“自提示（self-prompting）”：模型利用自身输出反过来约束/修正内部结构。尽管深度网络能学习丰富表示，但表示中常包含与预测语义相矛盾的噪声类间相似性。GCR 通过在任意深度引入无参数的 Graph Consistency Layer（GCL）来解决该问题：每个 GCL 构建批次级特征相似图，并将其与全局的、类别感知的掩码预测图对齐；该预测图由 softmax 预测相似度结合类内指示进行调制得到。对齐约束使得特征层关系能反映类别一致的预测行为，从而在训练各层起到语义正则作用。不同于以往工作，GCR 还提出多层、跨空间图对齐并带自适应加权机制：依据图差异大小学习各层重要性，从而优先利用语义更可靠的层并抑制噪声层，在不修改网络结构与训练流程的前提下提升特征质量。实验表明 GCR 可带来更干净的特征结构、更强的类内凝聚与更好的泛化能力。
 - 简介：提出自定义结构化 prompt 构造思路。可用于扩展第5章 graph-form prompt 讨论。
 
 ---
 
 ## 使用建议（给后续改稿）
+
 - **正文优先引用**：Method 主干 + Benchmark + Theory（15篇内收敛）；
 - **讨论区引用**：Survey + Application + 隐私/鲁棒/联邦类；
 - **避免堆砌**：每个小节控制 3–5 篇代表作，保留“演进线”而非“列表线”。
