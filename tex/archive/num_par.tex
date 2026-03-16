@@ -1,0 +1,19 @@
+\begin{table}[h]
+\centering %%\vspace{-0.05in}
+\caption{Tunable Parameters Comparison. RED (\%): average reduction of the prompt method to Graph Transformer (GT).}%\vspace{-0.15in}
+\label{tab:num_par}
+\resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{@{}c|ccc|c@{}}
+\toprule
+Methods           & Cora & CiteSeer &  Amazon & RED (\%)\\ \midrule
+GT &  $\sim$ 615K  &  $\sim$ 1.52M      &  $\sim$ 349K   &  -- \\
+ \midrule
+KDD 23    &  $\sim$ 7K    &  $\sim$ 19K          &  $\sim$ 4K      &  98.8$\downarrow$\\ 
+GPPT    &  $\sim$ 7K    &  $\sim$ 19K          &  $\sim$ 4K      &    98.8$\downarrow$\\ 
+WWW    &  $\sim$ 7K    &  $\sim$ 19K          &  $\sim$ 4K      &   98.8$\downarrow$\\ 
+arXiv    &  $\sim$ 7K    &  $\sim$ 19K          &  $\sim$ 4K      &   98.8$\downarrow$\\ 
+method5    &  $\sim$ 7K    &  $\sim$ 19K          &  $\sim$ 4K      &   98.8$\downarrow$\\ 
+\bottomrule
+\end{tabular}%
+}%\vspace{-0.15in}
+\end{table}

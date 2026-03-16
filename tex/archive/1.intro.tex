@@ -1,0 +1,67 @@
+\section{Introduction}\label{sec:intro}
+\note{Recent years have witness the rise of ChatGPT blablabal}
+
+\vspace*{2\baselineskip} 
+
+
+\note{Why prompting the large language model so popular? Advatanges, xxx}
+
+
+\vspace*{2\baselineskip} 
+
+\note{Similarity between NLP and graph, graph is more powerful data structure, graph learning also meet similar problems, pre-trainig graph is very similar to language, why can't we introduce the similar prompting idea in graph? it is promsing to solve these problems. }
+
+
+\vspace*{2\baselineskip} 
+
+\red{challenges: 
+\begin{itemize}
+    \item How to organize them and insert them into the original graph, both of which are undefined problems.
+    \item Reconciling downstream problems to the pre-training task is tough. 
+    \item Learning a reliable prompt is more difficult in the multi-task setting
+\end{itemize}
+}
+
+\vspace*{2\baselineskip} 
+\note{Recently there has been some work on graph prompting, however, they are very different, no matter the perspective, methodology and target tasks, we urgently need a unified framework to analyze these work to support further progress. }
+
+
+\vspace*{2\baselineskip} 
+
+
+\note{Besides, there are still exist many unclear question for us to further understand graph prompting. for example, (1) how effective is these graph prompt (2) how efficient w.r.t parameter complexity and training burden? (3) how powerful / flexible do these prompts manipulate the original graph?}
+
+
+\vspace*{2\baselineskip} 
+
+\note{With the above demand, we wish to push this area further by delivering this survey. XXXX }
+
+
+
+
+
+
+\note{connection to prior survey: If there already been some surveys on graph prompting, we need to claim the differences here {ignore this paragraph if no one}}
+
+
+
+
+\red{key contribution and highlights of this survey.
+
+\begin{itemize}
+    \item We propose a unified framework to analyze graph prompt learning work. This higher view treats the graph prompt into prompt tokens, token structures, and inserting patterns, which is more XXXX. To the best of our knowledge, this is the 1st survey on graph prompting that analyze these work in one framework.
+    \item We propose a new perspective based on flexibility and expressiveness to analyze the correlations between prompt and existing graph models. As a general learning framework, most prompt learning surveys in NLP usually analyzed the relationship between prompt and pre-training. However, we found that the prompt and the graph model also exist throughout connections, which might help the reader further understand why prompt learning is promising in the graph domain. To the best of our knowledge, this is the first work to try to consider the inner correlations between graph prompts and graph models.
+    \item We carefully studied more than XXX latest work on graph prompt and answered three key questions in both quanti/quali-tative ways: (1) how effective is these graph prompt (2) how efficient w.r.t parameter complexity and training burden? (3) how to evaluate the prompt quality (powerful / flexible do these prompts manipulate the original graph?) In particular, to answer Q3, we propsose a measrements named augmentation simulation error bound.
+    \item We develop a unified python library to support graph prompting, and we also built a website to collect SOTA graph prompt work.
+    \item We carefully discuss existing work, and also propose challenges and future direction.
+\end{itemize}
+
+
+}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=8.5cm]{pic/Taxonomy} 
+    \caption{The Most Frequently Problems towards Artificial General Intelligence. (Left) Cross-modalities, (Middle) Cross-domains, (Right) Cross-tasks. \red{(Xiangguo) This is a very initial figure, you need to draw a new one taking up the same page length later!}}
+    \label{fig:prototype}
+\end{figure}

@@ -1,0 +1,108 @@
+
+
+% \noindent \red{\textbf{ASSIGNMENTS:}}
+
+% \textbf{XIANGGUO} in charge of:
+% \begin{itemize}
+%     \item 
+% \end{itemize}
+
+% \jiawen{\textbf{JIAWEN in charge of:}
+% \begin{itemize}
+%     \item 
+% \end{itemize}
+% }
+
+% \hrule\vspace*{\baselineskip} 
+
+
+
+
+\noindent \red{\textbf{TIMELINE: (Aug.-Oct. Clear within 3 Months)}}
+{\color{gray}{
+\begin{enumerate}
+    \item Aug: collect and analyze papers; start to prepare for section 7.4 (Xiangguo will contact Mr. Chenyi ZI for further details)
+    \item Sep: 1st draft finished, open-source finished
+    \item Oct: 2nd version finished, open-source polished, submit by the end of Oct. 
+\end{enumerate}
+}}
+
+\hrule\vspace*{\baselineskip} 
+
+\noindent \red{\textbf{ROADMAP:}}
+
+\noindent \%cutline of the colors:
+\begin{itemize}
+    \item \jwxg{work done by}
+    \item \jiawen{work done by}
+    \item work done by (Xiangguo)
+    \item \red{Red Color: highlight of our survey}
+\end{itemize}
+
+
+\begin{enumerate}[1]
+    \item Introduction
+    \item Survey Methodology
+    \begin{enumerate}[2.1]
+        \item Research Questions
+        \item Taxonomy
+        \item Literature Overview
+    \end{enumerate}
+\item Preliminaries
+\begin{enumerate}[3.1]
+    \item \jiawen{Graph Neural Networks}
+    \item \jiawen{Pre-training, and Fine-tuning}
+    \item \jiawen{A Brief History of Prompt Learning}
+    \item \red{Why Prompt? A New Perspective upon Flexibility and Expressiveness.}: \note{Xiangguo in charge of this}
+\end{enumerate}
+\item \jiawen{Pre-training Methods on Graph Domains}
+\begin{enumerate}[4.1]
+    \item \jiawen{node-level strategies}
+    \item \jiawen{edge-level strategies}
+    \item \jiawen{graph-level strategies}
+    \item \jiawen{multi-task pre-training}
+    \item \jwxg{Further Discussion:} \\\note{Jiawen writes the content. Xiangguo supplements anything insightful here. } limitation and discussion, correlation to the prompting performance. 
+\end{enumerate}
+\item \jwxg{Prompting Methods for Graph Models}\\
+\note{Jiawen help to find ``food'', and supplement anything insightful; Xiangguo writes the main content}
+\begin{enumerate}[5.1]
+    \item Prompt Design for Graph Tasks
+    \begin{enumerate}[5.1.1]
+        \item [5.1.1] Graph Prompt for Node-level Tasks
+        \item [5.1.2] Graph Prompt for Edge-level Tasks
+        \item [5.1.3] Graph Prompt for Graph-level Tasks
+        \item [5.1.4] Multi-task Prompting on Graphs
+    \end{enumerate}
+    \item Multi-model Prompting using Graphs: \\\note{TBD: this section can be also moved to the Application section}
+    \begin{enumerate}[5.2.1]
+        \item Text-Graph: \note{also include knowledge graph}
+        \item More: \note{multi-modal prompting with graph}
+    \end{enumerate}
+    \item \red{Discussion in the Unified Framework}: 
+    \note{I will analyze the above work using our proposed framework: prompt tokens, token structure, inserting patterns} 
+\end{enumerate}
+\item \jiawen{Applications}
+\\\note{No need to find prompt-based work (it would be better if you can find any prompt-based work, although), just discuss potential applications that might be integrated with a prompt in the future} e.g.: Medicine (TBD),  Biology (TBD), Knowledge management (TBD), Online Social Networks (TBD)... Each application corresponds to one subsection
+\item \jwxg{Discussion}
+\\\note{Jiawen supplements anything insightful here; Jiawen finishes section 7.1 and 7.4; Xiangguo writes the rest and polishes the whole content}
+\begin{enumerate}[7.1]
+    \item \jiawen{Summary of this paper}
+    \item Current Challenges: each paragraph to each challenge
+    \item Future Directions
+    \begin{enumerate}[7.3.1]
+        \item finding knowledge from large graph models (LGMs) like LLMs: we are still waiting for the era of LGMs because currently, the parameters of most graph models are far from heavy than LLMs.
+        \item using a prompt for more transferable learning.
+        \item well theoretical work on the effectiveness of graph prompt
+        \item multi-task pre-training to multi-task prompting
+        \item explainable and understandable prompt design for graph
+    \end{enumerate}
+    \item \jiawen{Resources }
+    \begin{enumerate}[7.4.1]
+        \item \jiawen{ProG: A Unified Library for Graph Prompting}
+        \item \jiawen{Website collecting literature, datasets, and available codes.}
+    \end{enumerate}
+\end{enumerate}
+\item Conclusion
+\end{enumerate}
+\clearpage
+

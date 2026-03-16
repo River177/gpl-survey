@@ -1,0 +1,27 @@
+
+\begin{table}[h]
+\centering %\vspace{-0.1in}
+\caption{Error bound (MSE Loss). 
+RED (\%): average reduction of each method to the original error.}%\vspace{-0.15in}
+\label{tab:error}
+\resizebox{0.45\textwidth}{!}{%
+\begin{tabular}{@{}p{0.14\textwidth}<{\centering}c|ccc|c@{}}
+\toprule
+\makecell[c]{Prompt Solutions} & \makecell[c]{Token\\ Number} & \makecell[c]{Drop \\Nodes} & \makecell[c]{Drop \\Edges} & \makecell[c]{Mask \\Features} & RED (\%) \\ \midrule
+\makecell[c]{Original Error \\(without prompt)} & 0        & 0.9917    & 2.6330    & 6.8209  &  -   \\\midrule
+\makecell[c]{arXiv \\ (feature prompt)} & 1       & 0.8710    & 0.5241    & 2.0835  &  66.70$\downarrow$   \\\midrule
+\multirow{3}{*}{\makecell[c]{KDD 23\\ (with token, structure,\\ and inserting patterns)}} & 3         & 0.0875    & 0.2337    & 0.6542  & 90.66$\downarrow$    \\
+& 5         & 0.0685    & 0.1513    & 0.4372  & 93.71$\downarrow$    \\
+& 10        & 0.0859    & 0.1144    & 0.2600  & 95.59$\downarrow$    \\ 
+\midrule
+\multirow{3}{*}{\makecell[c]{GPPT\\ (with token, and\\ inserting patterns)}} & 3         & 0.0875    & 0.2337    & 0.6542  & 90.66$\downarrow$    \\
+& 5         & 0.0685    & 0.1513    & 0.4372  & 93.71$\downarrow$    \\
+& 10        & 0.0859    & 0.1144    & 0.2600  & 95.59$\downarrow$    \\ 
+\midrule
+\multirow{3}{*}{\makecell[c]{WWW\\ (with token, and\\ inserting patterns)}} & 3         & 0.0875    & 0.2337    & 0.6542  & 90.66$\downarrow$    \\
+& 5         & 0.0685    & 0.1513    & 0.4372  & 93.71$\downarrow$    \\
+& 10        & 0.0859    & 0.1144    & 0.2600  & 95.59$\downarrow$    \\ 
+\bottomrule
+\end{tabular}%
+}%\vspace{-0.15in}
+\end{table}

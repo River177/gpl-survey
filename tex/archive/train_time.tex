@@ -1,0 +1,20 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+% \usepackage{graphicx}
+\begin{table}[]
+\caption{Training Time Comparison (unit: second)}
+\label{tab:train_time}
+\resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{@{}l|rrrrr@{}}
+\toprule
+Graph size       & 100   & 500    & 900    & 1,500  & 10,000  \\ \midrule
+Supervised       & \SI{4.74}{\second} & \SI{13.43}{\second} & \SI{28.09}{\second} & \SI{42.33}{\second} & \SI{698.22}{\second} \\
+KDD23 & \SI{0.59}{\second} & \SI{0.61}{\second}  & \SI{0.58}{\second}  & \SI{0.57}{\second}  & \SI{0.70}{\second}   \\
+GPPT             &  \SI{0.00}{\second}  &\SI{0.00}{\second}  &\SI{0.00}{\second}   & \SI{0.00}{\second} & \SI{0.00}{\second}   \\
+WWW             &  \SI{0.00}{\second}  &\SI{0.00}{\second}  &\SI{0.00}{\second}   & \SI{0.00}{\second} & \SI{0.00}{\second}   \\
+arXiv        &  \SI{0.00}{\second}  &\SI{0.00}{\second}  &\SI{0.00}{\second}   & \SI{0.00}{\second} & \SI{0.00}{\second}   \\
+method5        &  \SI{0.00}{\second}  &\SI{0.00}{\second}  &\SI{0.00}{\second}   & \SI{0.00}{\second} & \SI{0.00}{\second}   \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

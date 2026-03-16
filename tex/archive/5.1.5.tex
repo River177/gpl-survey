@@ -1,0 +1,29 @@
+\subsubsection{Experimental Findings}\label{subsec:exp}
+\red{(Xiangguo:) Xiangguo needs to conduct some brief experiments to evaluate, compare some of these works w.r.t parameters complexity (on different datasets), running time (including tuning time and inference time), and error bound to manipulating data (node feature mask, node drop, edge drop), you might need several tables here}
+
+\noindent \textbf{a. Parameter Efficiency:}
+
+\input{table/num_par}
+
+\vspace*{3\baselineskip} 
+
+\noindent \textbf{b. Running Time Analysis:}
+% The following content is copied from your openreview rebuttal in your KDD 23 paper (All in One...)
+% \vspace*{\baselineskip} 
+The training time evaluation is conducted on some simulated induced graphs provided by \verb|torch_geometric.datasets.FakeDataset|, the size of which ranges from 100 to 10,000 with 1,000 feature dimensions and 10 average node degrees. The backbone graph model is derived from Graph Transformer with 10 layers (a very common number used in many works [1]). The prompt graph has 10 prompt tokens with the same dimension as the graph nodes. From the results, we can find that our framework is efficient in the training stage and the time cost does not increase much as the graph size increases. This is because the number of our trainable parameters is far smaller than that of traditional methods, making the training stage very efficient. Please see section 3.5.3 for a more detailed analysis.
+https://blog.csdn.net/xovee/article/details/104996350
+
+\input{table/train_time}
+
+Inference Time: Our inference time is a little longer than the benchmark. This is because our prompt graph is added to the original graph and then sent to the pre-trained graph model. However, as we mentioned in section 3.5.3, in most cases, the prompt sizes are far smaller than the original graphs. The additional time cost in the inference stage is very marginal.
+
+\input{table/infer_time}
+
+[1] Kreuzer D, Beaini D, Hamilton W, et al. Rethinking graph transformers with spectral attention[J]. Advances in Neural Information Processing Systems, 2021, 34: 21618-21629.
+
+
+\noindent \textbf{c. Capability in Data Reformulation:}
+
+\input{table/error}
+
+\vspace*{3\baselineskip} 

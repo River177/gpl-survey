@@ -1,0 +1,26 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+% \usepackage{multirow}
+% \usepackage{graphicx}
+\begin{table}[]
+\caption{Inference Time Comparison (unit: second)}
+\label{tab:infer_time}
+\resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{@{}cc|rrrrr@{}}
+\toprule
+\multicolumn{2}{c|}{Graph size}          & 100    & 500    & 900    & 1,500  & 10,000 \\ \midrule
+\multicolumn{2}{c|}{GNN}                 & \SI{0.138}{\second} & \SI{0.537}{\second} & \SI{1.179}{\second} & \SI{2.191}{\second} & \SI{2.276}{\second} \\ \midrule
+\multirow{2}{*}{KDD23} & GNN+Prompt      & \SI{0.168}{\second} & \SI{0.562}{\second} & \SI{1.206}{\second} & \SI{2.219}{\second} & \SI{2.292}{\second} \\
+                       & Additional Cost & \SI{0.03}{\second}  & \SI{0.025}{\second} & \SI{0.027}{\second} & \SI{0.028}{\second} & \SI{0.016}{\second} \\ \midrule
+\multirow{2}{*}{KDD23} & GNN+Prompt      & \SI{0.168}{\second} & \SI{0.562}{\second} & \SI{1.206}{\second} & \SI{2.219}{\second} & \SI{2.292}{\second} \\
+                       & Additional Cost & \SI{0.03}{\second}  & \SI{0.025}{\second} & \SI{0.027}{\second} & \SI{0.028}{\second} & \SI{0.016}{\second} \\ \midrule
+\multirow{2}{*}{KDD23} & GNN+Prompt      & \SI{0.168}{\second} & \SI{0.562}{\second} & \SI{1.206}{\second} & \SI{2.219}{\second} & \SI{2.292}{\second} \\
+                       & Additional Cost & \SI{0.03}{\second}  & \SI{0.025}{\second} & \SI{0.027}{\second} & \SI{0.028}{\second} & \SI{0.016}{\second} \\ \midrule
+\multirow{2}{*}{KDD23} & GNN+Prompt      & \SI{0.168}{\second} & \SI{0.562}{\second} & \SI{1.206}{\second} & \SI{2.219}{\second} & \SI{2.292}{\second} \\
+                       & Additional Cost & \SI{0.03}{\second}  & \SI{0.025}{\second} & \SI{0.027}{\second} & \SI{0.028}{\second} & \SI{0.016}{\second} \\ \midrule
+\multirow{2}{*}{KDD23} & GNN+Prompt      & \SI{0.168}{\second} & \SI{0.562}{\second} & \SI{1.206}{\second} & \SI{2.219}{\second} & \SI{2.292}{\second} \\
+                       & Additional Cost & \SI{0.03}{\second}  & \SI{0.025}{\second} & \SI{0.027}{\second} & \SI{0.028}{\second} & \SI{0.016}{\second} \\ 
+\bottomrule
+\end{tabular}%
+}
+\end{table}

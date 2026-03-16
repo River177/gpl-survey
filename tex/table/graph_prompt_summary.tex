@@ -46,7 +46,7 @@ Meta-Learning
 & \makecell{prompt token: \\$\textbf{p}_t \in \mathbb{R}^d, t \in \mathcal{T}$  \\structure token: $\textbf{s} \in \mathbb{R}^d$ \\task token: $\textbf{c}_y \in \mathbb{R}^d$}
 
 & \makecell{
-$\tilde{\textbf{s}}^t_i \leftarrow Readout(\{ \textbf{p}_t \odot f_{\pi} (v) | $\\$v \in V(\mathcal{S}_i) \})$ \\$\textbf{c}_y \leftarrow \textrm{Mean} (\{ \tilde{\textbf{s}}^t_j| y_j = y \}) $} 
+$\tilde{\textbf{s}}^t_i \leftarrow \textrm{Readout}(\{ \textbf{p}_t \odot f_{\pi} (v) | $\\$v \in V(\mathcal{S}_i) \})$ \\$\textbf{c}_y \leftarrow \textrm{Mean} (\{ \tilde{\textbf{s}}^t_j| y_j = y \}) $} 
 
 &\makecell{$\min_{\textbf{p}_t} - \sum_{(y_i, \mathcal{S}_i)}\ln$\\$  \frac{\exp ( \textrm{sim} (\tilde{\textbf{s}}_i^t , \textbf{c}_{y_i} ) / \tau )}{ \sum_{y \in Y} \exp ( \textrm{sim} (\tilde{\textbf{s}}_i^t , \textbf{c}_y) / \tau) } $ }
 &  \cmark   &\xmark  &\cmark & \cmark & \xmark \\  \midrule
