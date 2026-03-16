@@ -39,15 +39,25 @@ brown2020language}。例如，BERT \cite{devlin2019bert} 与GPT-3 \cite{brown202
 
 
 
-在近期AGI技术的核心位置，提示学习（prompt learning）展现出解决上述问题的巨大潜力，并在NLP与CV应用中取得了显著成功 \cite{qin2021learning, tsimpoukelli2021multimodal, liu2023pretrain}。提示学习的本质是设计信息充分的提示（prompt），以操控输入数据并驱动预训练基础模型完成任务。图\ref{fig:PromptExample}给出了一个文本格式提示用于预训练语言模型直接完成下游推理任务的示例。通过将下游任务重表述为预训练任务，该方法能够避免对模型进行大规模调参，从而更高效地提取模型已保存的知识 \cite{brown2020language, jiang2020how}。由于其在数据操控、任务重构以及关键信息提取方面的强大能力，提示学习有望以一种统一的方式应对前述跨模态、跨领域与跨任务挑战。与大模型参数规模相比，提示通常更轻量，能够减少对大模型反复微调带来的高昂算力开销，从而更高效地获得可迁移知识 \cite{lester2021power, shin2020autoprompt}。从直觉上看，文本与图像可视作更一般的图数据结构的特殊情形：例如，句子可被视为一条图路径，其中词为节点；图像可被视为网格图，每个像素对应一个节点。这一洞见启发我们探索将文本领域中成功的提示技术迁移到图学习领域，以应对类似的挑战与诉求。
-
+在近期AGI技术的核心位置，提示学习（prompt learning）展现出解决上述问题的巨大潜力，并在NLP与CV应用中取得了显著成功 \cite{qin2021learning, tsimpoukelli2021multimodal, liu2023pretrain}。提示学习的本质是设计信息充分的提示（prompt），以操控输入数据并驱动预训练基础模型完成任务。图\ref{fig:PromptExample}展示了一个典型例子：通过向预训练语言模型加入文本格式提示，可以直接完成新的下游推理任务。通过将下游任务重表述为预训练任务，该方法能够避免对模型进行大规模调参，从而更高效地提取模型已保存的知识 \cite{brown2020language, jiang2020how}。由于其在数据操控、任务重构以及关键信息提取方面的强大能力，提示学习有望以一种统一的方式应对前述跨模态、跨领域与跨任务挑战。与大模型参数规模相比，提示通常更轻量，能够减少对大模型反复微调带来的高昂算力开销，从而更高效地获得可迁移知识 \cite{lester2021power, shin2020autoprompt}。
 
 \begin{figure}[!t]
-    \centering
-    \includegraphics[width=0.45\textwidth]{pic/PromptExample.pdf}
-    \caption{语言提示示例：设计一个文本提示，使预训练的大语言模型完成多选问答任务。}
-    \label{fig:PromptExample}
+\centering
+\subfloat[语言提示]{
+\label{fig:intro_lang_prompt}
+\includegraphics[width=0.36\textwidth]{pic/PromptExample.pdf}%
+} \\
+\subfloat[图提示与图微调对比]{
+\label{fig:intro_graph_prompt}
+\includegraphics[width=0.44\textwidth]{pic/pt.pdf}%
+}
+\caption{语言提示与图提示示意。通过在原始输入上附加文本提示，可以让预训练大语言模型直接完成新任务（如多选问答）；受此启发，图提示也可被用于图数据，以更轻量的方式适配预训练图模型。}\vspace{-3ex}
+\label{fig:PromptExample}
 \end{figure}
+
+
+
+从直觉上看，文本和图像等线性结构数据也可被视为更一般的非线性图结构的特殊情形。例如，句子可以被看作一条图路径，其中词语是节点；图像也可以被视为网格图，其中每个像素对应一个节点。这样的洞见启发研究者尝试将在线性数据上取得成功的提示技术迁移到图学习领域，以应对相似的适配与泛化问题 \cite{sun2022gppt, liu2023graphprompt, sun2023all, fang2023universal, zhu2023sglpt, ma2023hetgpt, guo2023datacentric, chen2023ultradp, gong2023prompt}。
 
 
 

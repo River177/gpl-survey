@@ -4,6 +4,11 @@
 % Minimal Chinese support for XeLaTeX (zh version only)
 % Compile with: xelatex
 \usepackage[UTF8]{ctex}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{Latin Modern Mono}
+\emergencystretch=2em
+\hfuzz=1pt
 
 % Ensure LaTeX can find local style files (e.g., mydef.sty) in this folder
 \makeatletter
@@ -24,6 +29,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{url}
+\usepackage{xurl}
 \usepackage{enumerate}
 \usepackage{multirow}
 \usepackage{booktabs}

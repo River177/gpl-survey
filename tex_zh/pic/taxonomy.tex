@@ -1,15 +1,15 @@
 \tikzstyle{leaf}=[draw=hiddendraw,
     rounded corners, minimum height=1em,
     fill=mygreen!40,text opacity=1,
-    fill opacity=.5,  text=black,align=left,font=\scriptsize,
-    inner xsep=3pt,
+    fill opacity=.5,  text=black,align=left,font=\fontsize{6.2}{7.0}\selectfont,
+    inner xsep=2pt,
     inner ysep=1pt,
     ]
 \tikzstyle{middle}=[draw=hiddendraw,
     rounded corners, minimum height=1em,
     fill=output-white!40,text opacity=1,
-    fill opacity=.5,  text=black,align=center,font=\scriptsize,
-    inner xsep=7pt,
+    fill opacity=.5,  text=black,align=center,font=\fontsize{6.2}{7.0}\selectfont,
+    inner xsep=5pt,
     inner ysep=1pt,
     ]
 \begin{figure*}[ht]
@@ -23,18 +23,18 @@
   parent anchor=east,
   child anchor=west,
   base=middle,
-  font=\scriptsize,
+  font=\fontsize{6.2}{7.0}\selectfont,
   rectangle,
   line width=0.7pt,
   draw=output-black,
   rounded corners,align=left,
-  minimum width=2em, s sep=6pt, l sep=8pt,
+  minimum width=2em, s sep=5pt, l sep=7pt,
   },
-  where level=1{text width=0.2\linewidth}{},
-  where level=2{text width=0.2\linewidth,font=\scriptsize}{},
-  where level=3{font=\scriptsize}{},
-  where level=4{font=\scriptsize}{},
-  where level=5{font=\scriptsize}{},
+  where level=1{text width=0.19\linewidth}{},
+  where level=2{text width=0.19\linewidth,font=\fontsize{6.2}{7.0}\selectfont}{},
+  where level=3{font=\fontsize{6.2}{7.0}\selectfont}{},
+  where level=4{font=\fontsize{6.2}{7.0}\selectfont}{},
+  where level=5{font=\fontsize{6.2}{7.0}\selectfont}{},
   [分类体系, middle,rotate=90,anchor=north,edge=output-black
       [面向图提示的预训练策略\\( \secref{sec:pretrain_method}),middle,anchor=west,edge=output-black, text width=0.18\linewidth
         [{节点级策略\\(\secref{subsec:node_pre})}, middle, text width=0.16\linewidth, edge=output-black
@@ -65,16 +65,16 @@
         [{联系、优缺点\\(\secref{subsec:pdiscussion})}, middle, text width=0.18\linewidth, edge=output-black [\citet{fang2022prompt,fang2023universal,sun2023all,ma2023hetgpt,liu2023graphprompt}\\\citet{sun2022gppt,huang2023prodigy,chen2023ultradp,tan2023virtual}, leaf, text width=0.44\linewidth, edge=output-black] ] ]
     [含图的多模态提示\\(\secref{subsec:multi_modal}),middle, anchor=west, edge=output-black, text width=0.18\linewidth
          [带文本属性图中的提示, middle, text width=0.2\linewidth, edge=output-black
-            [\citet{wen2023augmenting,wen2023prompt,zhao2023gimlet,li2023promptbased}, leaf, text width=0.42\linewidth, edge=output-black] ]
+            [\citet{wen2023augmenting,wen2023prompt,zhao2023gimlet,li2023promptbased}, leaf, text width=0.4\linewidth, edge=output-black] ]
          [大语言模型在图数据处理中的应用, middle, text width=0.2\linewidth, edge=output-black
-           [\citet{chen2023exploring,fatemi2023talk,jin2023patton,wang2023knowledge}, leaf, text width=0.42\linewidth, edge=output-black ] ]
+           [\citet{chen2023exploring,fatemi2023talk,jin2023patton,wang2023knowledge}, leaf, text width=0.4\linewidth, edge=output-black ] ]
          [图与提示的多模态融合, middle, text width=0.2\linewidth, edge=output-black
-           [\citet{edwards2023synergpt,li2023graphadapter,liu2023gitmol}, leaf, text width=0.42\linewidth, edge=output-black ] ]  ]
+           [\citet{edwards2023synergpt,li2023graphadapter,liu2023gitmol}, leaf, text width=0.4\linewidth, edge=output-black ] ]  ]
     [基于提示的图领域自适应\\(\secref{subsec:pdomain}),middle, anchor=west, edge=output-black, text width=0.18\linewidth
-         [语义对齐, middle, text width=0.2\linewidth, edge=output-black [\citet{sun2023all,zhu2023graphcontrol,zhang2023structure,yi2023contrastive}\\\citet{liu2023one}, leaf, text width=0.42\linewidth, edge=output-black ]
+         [语义对齐, middle, text width=0.2\linewidth, edge=output-black [\citet{sun2023all,zhu2023graphcontrol,zhang2023structure,yi2023contrastive}\\\citet{liu2023one}, leaf, text width=0.4\linewidth, edge=output-black ]
         ]
         [结构对齐, middle, text width=0.2\linewidth, edge=output-black
-    [\citet{shirkavand2023deep,cao2023when,zhao2023graphglow}\\\citet{guo2023datacentric}, leaf, text width=0.42\linewidth, edge=output-black ] ] ]
+    [\citet{shirkavand2023deep,cao2023when,zhao2023graphglow}\\\citet{guo2023datacentric}, leaf, text width=0.4\linewidth, edge=output-black ] ] ]
 ]
 \end{forest}
 \caption{本综述的分类体系及代表性工作。}
