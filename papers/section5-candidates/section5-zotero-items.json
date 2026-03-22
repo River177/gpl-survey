@@ -1,0 +1,1325 @@
+[
+  {
+    "id": "2402.06326",
+    "title": "Prompt Learning on Temporal Interaction Graphs",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Xi",
+        "lastName": "Chen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Siwei",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yun",
+        "lastName": "Xiong"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xixi",
+        "lastName": "Wu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jiawei",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xiangguo",
+        "lastName": "Sun"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yao",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Feng",
+        "lastName": "Zhao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yulin",
+        "lastName": "Kang"
+      }
+    ],
+    "abstractNote": "Temporal Interaction Graphs (TIGs) are widely utilized to represent real-world systems. To facilitate representation learning on TIGs, researchers have proposed a series of TIG models. However, these models are still facing two tough gaps between the pre-training and downstream predictions in their ``pre-train, predict'' training paradigm. First, the temporal discrepancy between the pre-training and inference data severely undermines the models' applicability in distant future predictions on the dynamically evolving data. Second, the semantic divergence between pretext and downstream tasks hinders their practical applications, as they struggle to align with their learning and prediction capabilities across application scenarios. Recently, the ``pre-train, prompt'' paradigm has emerged as a lightweight mechanism for model generalization. Applying this paradigm is a potential solution to solve the aforementioned challenges. However, the adaptation of this paradigm to TIGs is not straightforward. The application of prompting in static graph contexts falls short in temporal settings due to a lack of consideration for time-sensitive dynamics and a deficiency in expressive power. To address this issue, we introduce Temporal Interaction Graph Prompting (TIGPrompt), a versatile framework that seamlessly integrates with TIG models, bridging both the temporal and semantic gaps. In detail, we propose a temporal prompt generator to offer temporally-aware prompts for different tasks. These prompts stand out for their minimalistic design, relying solely on the tuning of the prompt generator with very little supervision data. To cater to varying computational resource demands, we propose an extended ``pre-train, prompt-based fine-tune'' paradigm, offering greater flexibility. Through extensive experiments, the TIGPrompt demonstrates the SOTA performance and remarkable efficiency advantages.",
+    "date": "2024",
+    "url": "https://arxiv.org/abs/2402.06326",
+    "extra": "Primary Class: cs.AI\narXiv: 2402.06326",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2402.06326",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2402.06326v2.pdf"
+  },
+  {
+    "id": "2402.13556",
+    "title": "Inductive Graph Alignment Prompt: Bridging the Gap between Graph Pre-training and Inductive Fine-tuning From Spectral Perspective",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Yuchen",
+        "lastName": "Yan"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Peiyan",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zheng",
+        "lastName": "Fang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Qingqing",
+        "lastName": "Long"
+      }
+    ],
+    "abstractNote": "The \"Graph pre-training and fine-tuning\" paradigm has significantly improved Graph Neural Networks(GNNs) by capturing general knowledge without manual annotations for downstream tasks. However, due to the immense gap of data and tasks between the pre-training and fine-tuning stages, the model performance is still limited. Inspired by prompt fine-tuning in Natural Language Processing(NLP), many endeavors have been made to bridge the gap in graph domain. But existing methods simply reformulate the form of fine-tuning tasks to the pre-training ones. With the premise that the pre-training graphs are compatible with the fine-tuning ones, these methods typically operate in transductive setting. In order to generalize graph pre-training to inductive scenario where the fine-tuning graphs might significantly differ from pre-training ones, we propose a novel graph prompt based method called Inductive Graph Alignment Prompt(IGAP). Firstly, we unify the mainstream graph pre-training frameworks and analyze the essence of graph pre-training from graph spectral theory. Then we identify the two sources of the data gap in inductive setting: (i) graph signal gap and (ii) graph structure gap. Based on the insight of graph pre-training, we propose to bridge the graph signal gap and the graph structure gap with learnable prompts in the spectral space. A theoretical analysis ensures the effectiveness of our method. At last, we conduct extensive experiments among nodes classification and graph classification tasks under the transductive, semi-inductive and inductive settings. The results demonstrate that our proposed method can successfully bridge the data gap under different settings.",
+    "date": "2024",
+    "url": "https://doi.org/10.1145/3589334.3645620",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the ACM Web Conference 2024",
+    "DOI": "10.1145/3589334.3645620",
+    "publisher": "ACM",
+    "pages": "4328-4339",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2402.13556v1.pdf"
+  },
+  {
+    "id": "2405.12452",
+    "title": "Prompt-Based Spatio-Temporal Graph Transfer Learning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Junfeng",
+        "lastName": "Hu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xu",
+        "lastName": "Liu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zhencheng",
+        "lastName": "Fan"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yifang",
+        "lastName": "Yin"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Shili",
+        "lastName": "Xiang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Savitha",
+        "lastName": "Ramasamy"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Roger",
+        "lastName": "Zimmermann"
+      }
+    ],
+    "abstractNote": "Spatio-temporal graph neural networks have proven efficacy in capturing complex dependencies for urban computing tasks such as forecasting and kriging. Yet, their performance is constrained by the reliance on extensive data for training on a specific task, thereby limiting their adaptability to new urban domains with varied task demands. Although transfer learning has been proposed to remedy this problem by leveraging knowledge across domains, the cross-task generalization still remains under-explored in spatio-temporal graph transfer learning due to the lack of a unified framework. To bridge the gap, we propose Spatio-Temporal Graph Prompting (STGP), a prompt-based framework capable of adapting to multi-diverse tasks in a data-scarce domain. Specifically, we first unify different tasks into a single template and introduce a task-agnostic network architecture that aligns with this template. This approach enables capturing dependencies shared across tasks. Furthermore, we employ learnable prompts to achieve domain and task transfer in a two-stage prompting pipeline, facilitating the prompts to effectively capture domain knowledge and task-specific properties. Our extensive experiments demonstrate that STGP outperforms state-of-the-art baselines in three tasks-forecasting, kriging, and extrapolation-achieving an improvement of up to 10.7%.",
+    "date": "2024",
+    "url": "https://doi.org/10.1145/3627673.3679554",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the 33rd ACM International Conference on Information and Knowledge Management",
+    "DOI": "10.1145/3627673.3679554",
+    "publisher": "ACM",
+    "pages": "890-899",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2405.12452v2.pdf"
+  },
+  {
+    "id": "2406.05346",
+    "title": "ProG: A Graph Prompt Learning Benchmark",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Chenyi",
+        "lastName": "Zi"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Haihong",
+        "lastName": "Zhao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xiangguo",
+        "lastName": "Sun"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yiqing",
+        "lastName": "Lin"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Hong",
+        "lastName": "Cheng"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jia",
+        "lastName": "Li"
+      }
+    ],
+    "abstractNote": "Artificial general intelligence on graphs has shown significant advancements across various applications, yet the traditional 'Pre-train & Fine-tune' paradigm faces inefficiencies and negative transfer issues, particularly in complex and few-shot settings. Graph prompt learning emerges as a promising alternative, leveraging lightweight prompts to manipulate data and fill the task gap by reformulating downstream tasks to the pretext. However, several critical challenges still remain: how to unify diverse graph prompt models, how to evaluate the quality of graph prompts, and to improve their usability for practical comparisons and selection. In response to these challenges, we introduce the first comprehensive benchmark for graph prompt learning. Our benchmark integrates SIX pre-training methods and FIVE state-of-the-art graph prompt techniques, evaluated across FIFTEEN diverse datasets to assess performance, flexibility, and efficiency. We also present 'ProG', an easy-to-use open-source library that streamlines the execution of various graph prompt models, facilitating objective evaluations. Additionally, we propose a unified framework that categorizes existing graph prompt methods into two main approaches: prompts as graphs and prompts as tokens. This framework enhances the applicability and comparison of graph prompt techniques. The code is available at: https://github.com/sheldonresearch/ProG.",
+    "date": "2024",
+    "url": "https://doi.org/10.52202/079017-3023",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Advances in Neural Information Processing Systems 37",
+    "DOI": "10.52202/079017-3023",
+    "publisher": "Neural Information Processing Systems Foundation, Inc. (NeurIPS)",
+    "pages": "95406-95437",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2406.05346v2.pdf"
+  },
+  {
+    "id": "2406.08229",
+    "title": "GPT4Rec: Graph Prompt Tuning for Streaming Recommendation",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Peiyan",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yuchen",
+        "lastName": "Yan"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xi",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Liying",
+        "lastName": "Kang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Chaozhuo",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Feiran",
+        "lastName": "Huang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Senzhang",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Sunghun",
+        "lastName": "Kim"
+      }
+    ],
+    "abstractNote": "In the realm of personalized recommender systems, the challenge of adapting to evolving user preferences and the continuous influx of new users and items is paramount. Conventional models, typically reliant on a static training-test approach, struggle to keep pace with these dynamic demands. Streaming recommendation, particularly through continual graph learning, has emerged as a novel solution. However, existing methods in this area either rely on historical data replay, which is increasingly impractical due to stringent data privacy regulations; or are inability to effectively address the over-stability issue; or depend on model-isolation and expansion strategies. To tackle these difficulties, we present GPT4Rec, a Graph Prompt Tuning method for streaming Recommendation. Given the evolving user-item interaction graph, GPT4Rec first disentangles the graph patterns into multiple views. After isolating specific interaction patterns and relationships in different views, GPT4Rec utilizes lightweight graph prompts to efficiently guide the model across varying interaction patterns within the user-item graph. Firstly, node-level prompts are employed to instruct the model to adapt to changes in the attributes or properties of individual nodes within the graph. Secondly, structure-level prompts guide the model in adapting to broader patterns of connectivity and relationships within the graph. Finally, view-level prompts are innovatively designed to facilitate the aggregation of information from multiple disentangled views. These prompt designs allow GPT4Rec to synthesize a comprehensive understanding of the graph, ensuring that all vital aspects of the user-item interactions are considered and effectively integrated. Experiments on four diverse real-world datasets demonstrate the effectiveness and efficiency of our proposal.",
+    "date": "2024",
+    "url": "https://doi.org/10.1145/3626772.3657720",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+    "DOI": "10.1145/3626772.3657720",
+    "publisher": "ACM",
+    "pages": "1774-1784",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2406.08229v2.pdf"
+  },
+  {
+    "id": "2406.10498",
+    "title": "A Unified Graph Selective Prompt Learning for Graph Neural Networks",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Bo",
+        "lastName": "Jiang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Hao",
+        "lastName": "Wu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Ziyan",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Beibei",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jin",
+        "lastName": "Tang"
+      }
+    ],
+    "abstractNote": "In recent years, graph prompt learning/tuning has garnered increasing attention in adapting pre-trained models for graph representation learning. As a kind of universal graph prompt learning method, Graph Prompt Feature (GPF) has achieved remarkable success in adapting pre-trained models for Graph Neural Networks (GNNs). By fixing the parameters of a pre-trained GNN model, the aim of GPF is to modify the input graph data by adding some (learnable) prompt vectors into graph node features to better align with the downstream tasks on the smaller dataset. However, existing GPFs generally suffer from two main limitations. First, GPFs generally focus on node prompt learning which ignore the prompting for graph edges. Second, existing GPFs generally conduct the prompt learning on all nodes equally which fails to capture the importances of different nodes and may perform sensitively w.r.t noisy nodes in aligning with the downstream tasks. To address these issues, in this paper, we propose a new unified Graph Selective Prompt Feature learning (GSPF) for GNN fine-tuning. The proposed GSPF integrates the prompt learning on both graph node and edge together, which thus provides a unified prompt model for the graph data. Moreover, it conducts prompt learning selectively on nodes and edges by concentrating on the important nodes and edges for prompting which thus make our model be more reliable and compact. Experimental results on many benchmark datasets demonstrate the effectiveness and advantages of the proposed GSPF method.",
+    "date": "2024",
+    "url": "https://arxiv.org/abs/2406.10498",
+    "extra": "Primary Class: cs.LG\narXiv: 2406.10498",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2406.10498",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2406.10498v1.pdf"
+  },
+  {
+    "id": "2407.15431",
+    "title": "Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Huanjing",
+        "lastName": "Zhao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Beining",
+        "lastName": "Yang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yukuo",
+        "lastName": "Cen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Junyu",
+        "lastName": "Ren"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Chenhui",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yuxiao",
+        "lastName": "Dong"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Evgeny",
+        "lastName": "Kharlamov"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Shu",
+        "lastName": "Zhao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jie",
+        "lastName": "Tang"
+      }
+    ],
+    "abstractNote": "The text-attributed graph (TAG) is one kind of important real-world graph-structured data with each node associated with raw texts. For TAGs, traditional few-shot node classification methods directly conduct training on the pre-processed node features and do not consider the raw texts. The performance is highly dependent on the choice of the feature pre-processing method. In this paper, we propose P2TAG, a framework designed for few-shot node classification on TAGs with graph pre-training and prompting. P2TAG first pre-trains the language model (LM) and graph neural network (GNN) on TAGs with self-supervised loss. To fully utilize the ability of language models, we adapt the masked language modeling objective for our framework. The pre-trained model is then used for the few-shot node classification with a mixed prompt method, which simultaneously considers both text and graph information. We conduct experiments on six real-world TAGs, including paper citation networks and product co-purchasing networks. Experimental results demonstrate that our proposed framework outperforms existing graph few-shot learning methods on these datasets with +18.98% ~ +35.98% improvements.",
+    "date": "2024",
+    "url": "https://doi.org/10.1145/3637528.3671952",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining",
+    "DOI": "10.1145/3637528.3671952",
+    "publisher": "ACM",
+    "pages": "4467-4478",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2407.15431v1.pdf"
+  },
+  {
+    "id": "2408.03195",
+    "title": "RELIEF: Reinforcement Learning Empowered Graph Feature Prompt Tuning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Jiapeng",
+        "lastName": "Zhu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zichen",
+        "lastName": "Ding"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jianxiang",
+        "lastName": "Yu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jiaqi",
+        "lastName": "Tan"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xiang",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Weining",
+        "lastName": "Qian"
+      }
+    ],
+    "abstractNote": "The advent of the \"pre-train, prompt\" paradigm has recently extended its generalization ability and data efficiency to graph representation learning, following its achievements in Natural Language Processing (NLP). Initial graph prompt tuning approaches tailored specialized prompting functions for Graph Neural Network (GNN) models pre-trained with specific strategies, such as edge prediction, thus limiting their applicability. In contrast, another pioneering line of research has explored universal prompting via adding prompts to the input graph's feature space, thereby removing the reliance on specific pre-training strategies. However, the necessity to add feature prompts to all nodes remains an open question. Motivated by findings from prompt tuning research in the NLP domain, which suggest that highly capable pre-trained models need less conditioning signal to achieve desired behaviors, we advocate for strategically incorporating necessary and lightweight feature prompts to certain graph nodes to enhance downstream task performance. This introduces a combinatorial optimization problem, requiring a policy to decide 1) which nodes to prompt and 2) what specific feature prompts to attach. We then address the problem by framing the prompt incorporation process as a sequential decision-making problem and propose our method, RELIEF, which employs Reinforcement Learning (RL) to optimize it. At each step, the RL agent selects a node (discrete action) and determines the prompt content (continuous action), aiming to maximize cumulative performance gain. Extensive experiments on graph and node-level tasks with various pre-training strategies in few-shot scenarios demonstrate that our RELIEF outperforms fine-tuning and other prompt-based approaches in classification performance and data efficiency. The code is available at https://github.com/JasonZhujp/RELIEF.",
+    "date": "2025",
+    "url": "https://doi.org/10.1145/3690624.3709252",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.1",
+    "DOI": "10.1145/3690624.3709252",
+    "publisher": "ACM",
+    "pages": "2159-2170",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2408.03195v3.pdf"
+  },
+  {
+    "id": "2408.14520",
+    "title": "Towards Graph Prompt Learning: A Survey and Beyond",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Qingqing",
+        "lastName": "Long"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yuchen",
+        "lastName": "Yan"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Peiyan",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Chen",
+        "lastName": "Fang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Wentao",
+        "lastName": "Cui"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zhiyuan",
+        "lastName": "Ning"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Meng",
+        "lastName": "Xiao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Ning",
+        "lastName": "Cao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xiao",
+        "lastName": "Luo"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Lingjun",
+        "lastName": "Xu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Shiyue",
+        "lastName": "Jiang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zheng",
+        "lastName": "Fang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Chong",
+        "lastName": "Chen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xian-Sheng",
+        "lastName": "Hua"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yuanchun",
+        "lastName": "Zhou"
+      }
+    ],
+    "abstractNote": "Large-scale \"pre-train and prompt learning\" paradigms have demonstrated remarkable adaptability, enabling broad applications across diverse domains such as question answering, image recognition, and multimodal retrieval. This approach fully leverages the potential of large-scale pre-trained models, reducing downstream data requirements and computational costs while enhancing model applicability across various tasks. Graphs, as versatile data structures that capture relationships between entities, play pivotal roles in fields such as social network analysis, recommender systems, and biological graphs. Despite the success of pre-train and prompt learning paradigms in Natural Language Processing (NLP) and Computer Vision (CV), their application in graph domains remains nascent. In graph-structured data, not only do the node and edge features often have disparate distributions, but the topological structures also differ significantly. This diversity in graph data can lead to incompatible patterns or gaps between pre-training and fine-tuning on downstream graphs. We aim to bridge this gap by summarizing methods for alleviating these disparities. This includes exploring prompt design methodologies, comparing related techniques, assessing application scenarios and datasets, and identifying unresolved problems and challenges. This survey categorizes over 100 relevant works in this field, summarizing general design principles and the latest applications, including text-attributed graphs, molecules, proteins, and recommendation systems. Through this extensive review, we provide a foundational understanding of graph prompt learning, aiming to impact not only the graph mining community but also the broader Artificial General Intelligence (AGI) community.",
+    "date": "2024",
+    "url": "https://arxiv.org/abs/2408.14520",
+    "extra": "Primary Class: cs.LG\narXiv: 2408.14520",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2408.14520",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2408.14520v2-Towards-Graph-Prompt-Learning-A-Survey-and-Beyond.pdf"
+  },
+  {
+    "id": "2410.01635",
+    "title": "Does Graph Prompt Work? A Data Operation Perspective with Theoretical Analysis",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Qunzhong",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xiangguo",
+        "lastName": "Sun"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Hong",
+        "lastName": "Cheng"
+      }
+    ],
+    "abstractNote": "In recent years, graph prompting has emerged as a promising research direction, enabling the learning of additional tokens or subgraphs appended to the original graphs without requiring retraining of pre-trained graph models across various applications. This novel paradigm, shifting from the traditional pretraining and finetuning to pretraining and prompting has shown significant empirical success in simulating graph data operations, with applications ranging from recommendation systems to biological networks and graph transferring. However, despite its potential, the theoretical underpinnings of graph prompting remain underexplored, raising critical questions about its fundamental effectiveness. The lack of rigorous theoretical proof of why and how much it works is more like a dark cloud over the graph prompt area to go further. To fill this gap, this paper introduces a theoretical framework that rigorously analyzes graph prompting from a data operation perspective. Our contributions are threefold: First, we provide a formal guarantee theorem, demonstrating graph prompts capacity to approximate graph transformation operators, effectively linking upstream and downstream tasks. Second, we derive upper bounds on the error of these data operations by graph prompts for a single graph and extend this discussion to batches of graphs, which are common in graph model training. Third, we analyze the distribution of data operation errors, extending our theoretical findings from linear graph models (e.g., GCN) to non-linear graph models (e.g., GAT). Extensive experiments support our theoretical results and confirm the practical implications of these guarantees.",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2410.01635",
+    "extra": "Primary Class: cs.LG\narXiv: 2410.01635",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2410.01635",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2410.01635v2.pdf"
+  },
+  {
+    "id": "2410.21749",
+    "title": "Reliable and Compact Graph Fine-tuning via GraphSparse Prompting",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Bo",
+        "lastName": "Jiang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Hao",
+        "lastName": "Wu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Beibei",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jin",
+        "lastName": "Tang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Bin",
+        "lastName": "Luo"
+      }
+    ],
+    "abstractNote": "Recently, graph prompt learning has garnered increasing attention in adapting pre-trained GNN models for downstream graph learning tasks. However, existing works generally conduct prompting over all graph elements (e.g., nodes, edges, node attributes, etc.), which is suboptimal and obviously redundant. To address this issue, we propose exploiting sparse representation theory for graph prompting and present Graph Sparse Prompting (GSP). GSP aims to adaptively and sparsely select the optimal elements (e.g., certain node attributes) to achieve compact prompting for downstream tasks. Specifically, we propose two kinds of GSP models, termed Graph Sparse Feature Prompting (GSFP) and Graph Sparse multi-Feature Prompting (GSmFP). Both GSFP and GSmFP provide a general scheme for tuning any specific pre-trained GNNs that can achieve attribute selection and compact prompt learning simultaneously. A simple yet effective algorithm has been designed for solving GSFP and GSmFP models. Experiments on 16 widely-used benchmark datasets validate the effectiveness and advantages of the proposed GSFPs.",
+    "date": "2024",
+    "url": "https://arxiv.org/abs/2410.21749",
+    "extra": "Primary Class: cs.LG\narXiv: 2410.21749",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2410.21749",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2410.21749v1.pdf"
+  },
+  {
+    "id": "2411.02003",
+    "title": "Against Multifaceted Graph Heterogeneity via Asymmetric Federated Prompt Learning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Zhuoning",
+        "lastName": "Guo"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Ruiqian",
+        "lastName": "Han"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Hao",
+        "lastName": "Liu"
+      }
+    ],
+    "abstractNote": "Federated Graph Learning (FGL) aims to collaboratively and privately optimize graph models on divergent data for different tasks. A critical challenge in FGL is to enable effective yet efficient federated optimization against multifaceted graph heterogeneity to enhance mutual performance. However, existing FGL works primarily address graph data heterogeneity and perform incapable of graph task heterogeneity. To address the challenge, we propose a Federated Graph Prompt Learning (FedGPL) framework to efficiently enable prompt-based asymmetric graph knowledge transfer between multifaceted heterogeneous federated participants. Generally, we establish a split federated framework to preserve universal and domain-specific graph knowledge, respectively. Moreover, we develop two algorithms to eliminate task and data heterogeneity for advanced federated knowledge preservation. First, a Hierarchical Directed Transfer Aggregator (HiDTA) delivers cross-task beneficial knowledge that is hierarchically distilled according to the directional transferability. Second, a Virtual Prompt Graph (VPG) adaptively generates graph structures to enhance data utility by distinguishing dominant subgraphs and neutralizing redundant ones. We conduct theoretical analyses and extensive experiments to demonstrate the significant accuracy and efficiency effectiveness of FedGPL against multifaceted graph heterogeneity compared to state-of-the-art baselines on large-scale federated graph datasets.",
+    "date": "2024",
+    "url": "https://arxiv.org/abs/2411.02003",
+    "extra": "Primary Class: cs.LG\narXiv: 2411.02003",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2411.02003",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2411.02003v1.pdf"
+  },
+  {
+    "id": "2411.17676",
+    "title": "Instance-Aware Graph Prompt Learning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Jiazheng",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jundong",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Chuxu",
+        "lastName": "Zhang"
+      }
+    ],
+    "abstractNote": "Graph neural networks stand as the predominant technique for graph representation learning owing to their strong expressive power, yet the performance highly depends on the availability of high-quality labels in an end-to-end manner. Thus the pretraining and fine-tuning paradigm has been proposed to mitigate the label cost issue. Subsequently, the gap between the pretext tasks and downstream tasks has spurred the development of graph prompt learning which inserts a set of graph prompts into the original graph data with minimal parameters while preserving competitive performance. However, the current exploratory works are still limited since they all concentrate on learning fixed task-specific prompts which may not generalize well across the diverse instances that the task comprises. To tackle this challenge, we introduce Instance-Aware Graph Prompt Learning (IA-GPL) in this paper, aiming to generate distinct prompts tailored to different input instances. The process involves generating intermediate prompts for each instance using a lightweight architecture, quantizing these prompts through trainable codebook vectors, and employing the exponential moving average technique to ensure stable training. Extensive experiments conducted on multiple datasets and settings showcase the superior performance of IA-GPL compared to state-of-the-art baselines.",
+    "date": "2024",
+    "url": "https://arxiv.org/abs/2411.17676",
+    "extra": "Primary Class: cs.LG\narXiv: 2411.17676",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2411.17676",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2411.17676v1.pdf"
+  },
+  {
+    "id": "2412.12155",
+    "title": "SGPT: Few-Shot Prompt Tuning for Signed Graphs",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Zian",
+        "lastName": "Zhai"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Sima",
+        "lastName": "Qing"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xiaoyang",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Wenjie",
+        "lastName": "Zhang"
+      }
+    ],
+    "abstractNote": "Signed Graph Neural Networks (SGNNs) are effective in learning expressive representations for signed graphs but typically require substantial task-specific labels, limiting their applicability in label-scarce industrial scenarios. In contrast, unsigned graph structures are abundant and can be readily leveraged to pre-train Graph Neural Networks (GNNs), offering a promising solution to reduce supervision requirements in downstream signed graph tasks. However, transferring knowledge from unsigned to signed graphs is non-trivial due to the fundamental discrepancies in graph types and task objectives between pre-training and downstream phases. To address this challenge, we propose Signed Graph Prompt Tuning (SGPT), a novel graph prompting framework that adapts pre-trained unsigned GNNs to few-shot signed graph tasks. We first design a graph template based on balance theory to disentangle mixed node relationships introduced by negative links, mitigating the structural mismatches between unsigned and signed graphs. We further introduce a task template that reformulates downstream signed tasks into a unified link prediction objective, aligning their optimization goals with the pre-training task. Furthermore, we develop feature prompts that align downstream semantic spaces with the feature spaces learned during pre-training, and semantic prompts to integrate link sign semantics in a task-aware manner. We conduct extensive experiments on seven benchmark signed graph datasets, demonstrating that SGPT significantly outperforms existing state-of-the-art methods, establishing a powerful and generalizable solution for few-shot signed graph learning.",
+    "date": "2025",
+    "url": "https://doi.org/10.1145/3746252.3761079",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the 34th ACM International Conference on Information and Knowledge Management",
+    "DOI": "10.1145/3746252.3761079",
+    "publisher": "ACM",
+    "pages": "4045-4055",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2412.12155v2.pdf"
+  },
+  {
+    "id": "2501.15142",
+    "title": "DAGPrompT: Pushing the Limits of Graph Prompting with a Distribution-aware Graph Prompt Tuning Approach",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Qin",
+        "lastName": "Chen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Liang",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Bo",
+        "lastName": "Zheng"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Guojie",
+        "lastName": "Song"
+      }
+    ],
+    "abstractNote": "The pre-train then fine-tune approach has advanced GNNs by enabling general knowledge capture without task-specific labels. However, an objective gap between pre-training and downstream tasks limits its effectiveness. Recent graph prompting methods aim to close this gap through task reformulations and learnable prompts. Despite this, they struggle with complex graphs like heterophily graphs. Freezing the GNN encoder can reduce the impact of prompting, while simple prompts fail to handle diverse hop-level distributions. This paper identifies two key challenges in adapting graph prompting methods for complex graphs: (1) adapting the model to new distributions in downstream tasks to mitigate pre-training and fine-tuning discrepancies from heterophily and (2) customizing prompts for hop-specific node requirements. To overcome these challenges, we propose Distribution-aware Graph Prompt Tuning (DAGPrompT), which integrates a GLoRA module for optimizing the GNN encoder's projection matrix and message-passing schema through low-rank adaptation. DAGPrompT also incorporates hop-specific prompts accounting for varying graph structures and distributions among hops. Evaluations on 10 datasets and 14 baselines demonstrate that DAGPrompT improves accuracy by up to 4.79 in node and graph classification tasks, setting a new state-of-the-art while preserving efficiency. Codes are available at GitHub.",
+    "date": "2025",
+    "url": "https://doi.org/10.1145/3696410.3714917",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the ACM on Web Conference 2025",
+    "DOI": "10.1145/3696410.3714917",
+    "publisher": "ACM",
+    "pages": "4346-4358",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2501.15142v1.pdf"
+  },
+  {
+    "id": "2502.06327",
+    "title": "Prompt-Driven Continual Graph Learning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Qi",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Tianfei",
+        "lastName": "Zhou"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Ye",
+        "lastName": "Yuan"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Rui",
+        "lastName": "Mao"
+      }
+    ],
+    "abstractNote": "Continual Graph Learning (CGL), which aims to accommodate new tasks over evolving graph data without forgetting prior knowledge, is garnering significant research interest. Mainstream solutions adopt the memory replay-based idea, ie, caching representative data from earlier tasks for retraining the graph model. However, this strategy struggles with scalability issues for constantly evolving graphs and raises concerns regarding data privacy. Inspired by recent advancements in the prompt-based learning paradigm, this paper introduces a novel prompt-driven continual graph learning (PROMPTCGL) framework, which learns a separate prompt for each incoming task and maintains the underlying graph neural network model fixed. In this way, PROMPTCGL naturally avoids catastrophic forgetting of knowledge from previous tasks. More specifically, we propose hierarchical prompting to instruct the model from both feature- and topology-level to fully address the variability of task graphs in dynamic continual learning. Additionally, we develop a personalized prompt generator to generate tailored prompts for each graph node while minimizing the number of prompts needed, leading to constant memory consumption regardless of the graph scale. Extensive experiments on four benchmarks show that PROMPTCGL achieves superior performance against existing CGL approaches while significantly reducing memory consumption. Our code is available at https://github.com/QiWang98/PromptCGL.",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2502.06327",
+    "extra": "Primary Class: cs.LG\narXiv: 2502.06327",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2502.06327",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2502.06327v1.pdf"
+  },
+  {
+    "id": "2502.08918",
+    "title": "CLEAR: Cluster-based Prompt Learning on Heterogeneous Graphs",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Feiyang",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zhongbao",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Junda",
+        "lastName": "Ye"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Li",
+        "lastName": "Sun"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jianzhong",
+        "lastName": "Qi"
+      }
+    ],
+    "abstractNote": "Prompt learning has attracted increasing attention in the graph domain as a means to bridge the gap between pretext and downstream tasks. Existing studies on heterogeneous graph prompting typically use feature prompts to modify node features for specific downstream tasks, which do not concern the structure of heterogeneous graphs. Such a design also overlooks information from the meta-paths, which are core to learning the high-order semantics of the heterogeneous graphs. To address these issues, we propose CLEAR, a Cluster-based prompt LEARNING model on heterogeneous graphs. We present cluster prompts that reformulate downstream tasks as heterogeneous graph reconstruction. In this way, we align the pretext and downstream tasks to share the same training objective. Additionally, our cluster prompts are also injected into the meta-paths such that the prompt learning process incorporates high-order semantic information entailed by the meta-paths. Extensive experiments on downstream tasks confirm the superiority of CLEAR. It consistently outperforms state-of-the-art models, achieving up to 5% improvement on the F1 metric for node classification.",
+    "date": "2025",
+    "url": "https://doi.org/10.1007/978-981-96-8173-0_21",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Lecture Notes in Computer Science",
+    "DOI": "10.1007/978-981-96-8173-0_21",
+    "publisher": "Springer Nature Singapore",
+    "pages": "264-276",
+    "volume": "",
+    "issue": "",
+    "series": "Lecture Notes in Computer Science",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2502.08918v1.pdf"
+  },
+  {
+    "id": "2503.00750",
+    "title": "Edge Prompt Tuning for Graph Neural Networks",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Xingbo",
+        "lastName": "Fu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yinhan",
+        "lastName": "He"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jundong",
+        "lastName": "Li"
+      }
+    ],
+    "abstractNote": "Pre-training powerful Graph Neural Networks (GNNs) with unlabeled graph data in a self-supervised manner has emerged as a prominent technique in recent years. However, inevitable objective gaps often exist between pre-training and downstream tasks. To bridge this gap, graph prompt tuning techniques design and learn graph prompts by manipulating input graphs or reframing downstream tasks as pre-training tasks without fine-tuning the pre-trained GNN models. While recent graph prompt tuning methods have proven effective in adapting pre-trained GNN models for downstream tasks, they overlook the crucial role of edges in graph prompt design, which can significantly affect the quality of graph representations for downstream tasks. In this study, we propose EdgePrompt, a simple yet effective graph prompt tuning method from the perspective of edges. Unlike previous studies that design prompt vectors on node features, EdgePrompt manipulates input graphs by learning additional prompt vectors for edges and incorporates the edge prompts through message passing in the pre-trained GNN models to better embed graph structural information for downstream tasks. Our method is compatible with prevalent GNN architectures pre-trained under various pre-training strategies and is universal for different downstream tasks. We provide comprehensive theoretical analyses of our method regarding its capability of handling node classification and graph classification as downstream tasks. Extensive experiments on ten graph datasets under four pre-training strategies demonstrate the superiority of our proposed method against six baselines. Our code is available at https://github.com/xbfu/EdgePrompt.",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2503.00750",
+    "extra": "Primary Class: cs.LG\narXiv: 2503.00750",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2503.00750",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2503.00750v1.pdf"
+  },
+  {
+    "id": "2505.02027",
+    "title": "GraphPrompter: Multi-stage Adaptive Prompt Optimization for Graph In-Context Learning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Rui",
+        "lastName": "Lv"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zaixi",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Kai",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Qi",
+        "lastName": "Liu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Weibo",
+        "lastName": "Gao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jiawei",
+        "lastName": "Liu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jiaxia",
+        "lastName": "Yan"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Linan",
+        "lastName": "Yue"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Fangzhou",
+        "lastName": "Yao"
+      }
+    ],
+    "abstractNote": "Graph In-Context Learning, with the ability to adapt pre-trained graph models to novel and diverse downstream graphs without updating any parameters, has gained much attention in the community. The key to graph in-context learning is to perform downstream graphs conditioned on chosen prompt examples. Existing methods randomly select subgraphs or edges as prompts, leading to noisy graph prompts and inferior model performance. Additionally, due to the gap between pre-training and testing graphs, when the number of classes in the testing graphs is much greater than that in the training, the in-context learning ability will also significantly deteriorate. To tackle the aforementioned challenges, we develop a multi-stage adaptive prompt optimization method GraphPrompter, which optimizes the entire process of generating, selecting, and using graph prompts for better in-context learning capabilities. Firstly, Prompt Generator introduces a reconstruction layer to highlight the most informative edges and reduce irrelevant noise for graph prompt construction. Furthermore, in the selection stage, Prompt Selector employs the $k$-nearest neighbors algorithm and pre-trained selection layers to dynamically choose appropriate samples and minimize the influence of irrelevant prompts. Finally, we leverage a Prompt Augmenter with a cache replacement strategy to enhance the generalization capability of the pre-trained model on new datasets. Extensive experiments show that GraphPrompter effectively enhances the in-context learning ability of graph models. On average across all the settings, our approach surpasses the state-of-the-art baselines by over 8%. Our code is released at https://github.com/karin0018/GraphPrompter.",
+    "date": "2025",
+    "url": "https://doi.org/10.1109/icde65448.2025.00292",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "2025 IEEE 41st International Conference on Data Engineering (ICDE)",
+    "DOI": "10.1109/icde65448.2025.00292",
+    "publisher": "IEEE",
+    "pages": "3917-3930",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2505.02027v1.pdf"
+  },
+  {
+    "id": "2506.08326",
+    "title": "Graph Prompting for Graph Learning Models: Recent Advances and Future Directions",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Xingbo",
+        "lastName": "Fu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zehong",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zihan",
+        "lastName": "Chen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jiazheng",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yaochen",
+        "lastName": "Zhu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zhenyu",
+        "lastName": "Lei"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Cong",
+        "lastName": "Shen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yanfang",
+        "lastName": "Ye"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Chuxu",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jundong",
+        "lastName": "Li"
+      }
+    ],
+    "abstractNote": "Graph learning models have demonstrated great prowess in learning expressive representations from large-scale graph data in a wide variety of real-world scenarios. As a prevalent strategy for training powerful graph learning models, the \"pre-training, adaptation\" scheme first pre-trains graph learning models on unlabeled graph data in a self-supervised manner and then adapts them to specific downstream tasks. During the adaptation phase, graph prompting emerges as a promising approach that learns trainable prompts while keeping the pre-trained graph learning models unchanged. In this paper, we present a systematic review of recent advancements in graph prompting. First, we introduce representative graph pre-training methods that serve as the foundation step of graph prompting. Next, we review mainstream techniques in graph prompting and elaborate on how they design learnable prompts for graph prompting. Furthermore, we summarize the real-world applications of graph prompting from different domains. Finally, we discuss several open challenges in existing studies with promising future directions in this field.",
+    "date": "2025",
+    "url": "https://doi.org/10.1145/3711896.3736566",
+    "extra": "",
+    "tags": [],
+    "itemType": "conferencePaper",
+    "proceedingsTitle": "Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2",
+    "DOI": "10.1145/3711896.3736566",
+    "publisher": "ACM",
+    "pages": "6010-6020",
+    "volume": "",
+    "issue": "",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2506.08326v1-Graph-Prompting-for-Graph-Learning-Models-Recent-Advances-and-Future-Directions.pdf"
+  },
+  {
+    "id": "2509.22416",
+    "title": "One Prompt Fits All: Universal Graph Adaptation for Pretrained Models",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Yongqi",
+        "lastName": "Huang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jitao",
+        "lastName": "Zhao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Dongxiao",
+        "lastName": "He"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xiaobao",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yawen",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yuxiao",
+        "lastName": "Huang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Di",
+        "lastName": "Jin"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zhiyong",
+        "lastName": "Feng"
+      }
+    ],
+    "abstractNote": "Graph Prompt Learning (GPL) has emerged as a promising paradigm that bridges graph pretraining models and downstream scenarios, mitigating label dependency and the misalignment between upstream pretraining and downstream tasks. Although existing GPL studies explore various prompt strategies, their effectiveness and underlying principles remain unclear. We identify two critical limitations: (1) Lack of consensus on underlying mechanisms: Despite current GPLs have advanced the field, there is no consensus on how prompts interact with pretrained models, as different strategies intervene at varying spaces within the model, i.e., input-level, layer-wise, and representation-level prompts. (2) Limited scenario adaptability: Most methods fail to generalize across diverse downstream scenarios, especially under data distribution shifts (e.g., homophilic-to-heterophilic graphs). To address these issues, we theoretically analyze existing GPL approaches and reveal that representation-level prompts essentially function as fine-tuning a simple downstream classifier, proposing that graph prompt learning should focus on unleashing the capability of pretrained models, and the classifier should adapt to downstream scenarios. Based on our findings, we propose UniPrompt, a novel GPL method that adapts any pretrained models, unleashing the capability of pretrained models while preserving the input graph. Extensive experiments demonstrate that our method can effectively integrate with various pretrained models and achieve strong performance across in-domain and cross-domain scenarios.",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2509.22416",
+    "extra": "Primary Class: cs.LG\narXiv: 2509.22416",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2509.22416",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2509.22416v2.pdf"
+  },
+  {
+    "id": "2509.23373",
+    "title": "Graph Your Own Prompt",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Xi",
+        "lastName": "Ding"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Lei",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Piotr",
+        "lastName": "Koniusz"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yongsheng",
+        "lastName": "Gao"
+      }
+    ],
+    "abstractNote": "We propose Graph Consistency Regularization (GCR), a novel framework that injects relational graph structures, derived from model predictions, into the learning process to promote class-aware, semantically meaningful feature representations. Functioning as a form of self-prompting, GCR enables the model to refine its internal structure using its own outputs. While deep networks learn rich representations, these often capture noisy inter-class similarities that contradict the model's predicted semantics. GCR addresses this issue by introducing parameter-free Graph Consistency Layers (GCLs) at arbitrary depths. Each GCL builds a batch-level feature similarity graph and aligns it with a global, class-aware masked prediction graph, derived by modulating softmax prediction similarities with intra-class indicators. This alignment enforces that feature-level relationships reflect class-consistent prediction behavior, acting as a semantic regularizer throughout the network. Unlike prior work, GCR introduces a multi-layer, cross-space graph alignment mechanism with adaptive weighting, where layer importance is learned from graph discrepancy magnitudes. This allows the model to prioritize semantically reliable layers and suppress noisy ones, enhancing feature quality without modifying the architecture or training procedure. GCR is model-agnostic, lightweight, and improves semantic structure across various networks and datasets. Experiments show that GCR promotes cleaner feature structure, stronger intra-class cohesion, and improved generalization, offering a new perspective on learning from prediction structure. [Project website](https://darcyddx.github.io/gcr/) [Code](https://github.com/Darcyddx/graph-prompt)",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2509.23373",
+    "extra": "Primary Class: cs.LG\narXiv: 2509.23373",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2509.23373",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2509.23373v2.pdf"
+  },
+  {
+    "id": "2510.11339",
+    "title": "Event-Aware Prompt Learning for Dynamic Graphs",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Xingtong",
+        "lastName": "Yu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Ruijuan",
+        "lastName": "Liang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Xinming",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yuan",
+        "lastName": "Fang"
+      }
+    ],
+    "abstractNote": "Real-world graph typically evolve via a series of events, modeling dynamic interactions between objects across various domains. For dynamic graph learning, dynamic graph neural networks (DGNNs) have emerged as popular solutions. Recently, prompt learning methods have been explored on dynamic graphs. However, existing methods generally focus on capturing the relationship between nodes and time, while overlooking the impact of historical events. In this paper, we propose EVP, an event-aware dynamic graph prompt learning framework that can serve as a plug-in to existing methods, enhancing their ability to leverage historical events knowledge. First, we extract a series of historical events for each node and introduce an event adaptation mechanism to align the fine-grained characteristics of these events with downstream tasks. Second, we propose an event aggregation mechanism to effectively integrate historical knowledge into node representations. Finally, we conduct extensive experiments on four public datasets to evaluate and analyze EVP.",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2510.11339",
+    "extra": "Primary Class: cs.LG\narXiv: 2510.11339",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2510.11339",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2510.11339v1.pdf"
+  },
+  {
+    "id": "2510.22451",
+    "title": "GraphTOP: Graph Topology-Oriented Prompting for Graph Neural Networks",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Xingbo",
+        "lastName": "Fu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zhenyu",
+        "lastName": "Lei"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zihan",
+        "lastName": "Chen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Binchi",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Chuxu",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jundong",
+        "lastName": "Li"
+      }
+    ],
+    "abstractNote": "Graph Neural Networks (GNNs) have revolutionized the field of graph learning by learning expressive graph representations from massive graph data. As a common pattern to train powerful GNNs, the \"pre-training, adaptation\" scheme first pre-trains GNNs over unlabeled graph data and subsequently adapts them to specific downstream tasks. In the adaptation phase, graph prompting is an effective strategy that modifies input graph data with learnable prompts while keeping pre-trained GNN models frozen. Typically, existing graph prompting studies mainly focus on *feature-oriented* methods that apply graph prompts to node features or hidden representations. However, these studies often achieve suboptimal performance, as they consistently overlook the potential of *topology-oriented* prompting, which adapts pre-trained GNNs by modifying the graph topology. In this study, we conduct a pioneering investigation of graph prompting in terms of graph topology. We propose the first **Graph** **T**opology-**O**riented **P**rompting (GraphTOP) framework to effectively adapt pre-trained GNN models for downstream tasks. More specifically, we reformulate topology-oriented prompting as an edge rewiring problem within multi-hop local subgraphs and relax it into the continuous probability space through reparameterization while ensuring tight relaxation and preserving graph sparsity. Extensive experiments on five graph datasets under four pre-training strategies demonstrate that our proposed GraphTOP outshines six baselines on multiple node classification datasets. Our code is available at https://github.com/xbfu/GraphTOP.",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2510.22451",
+    "extra": "Primary Class: cs.LG\narXiv: 2510.22451",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2510.22451",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2510.22451v1.pdf"
+  },
+  {
+    "id": "2512.08763",
+    "title": "Learning and Editing Universal Graph Prompt Tuning via Reinforcement Learning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Jinfeng",
+        "lastName": "Xu"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Zheyu",
+        "lastName": "Chen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Shuo",
+        "lastName": "Yang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jinze",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Hewei",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yijie",
+        "lastName": "Li"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Edith C. H.",
+        "lastName": "Ngai"
+      }
+    ],
+    "abstractNote": "Early graph prompt tuning approaches relied on task-specific designs for Graph Neural Networks (GNNs), limiting their adaptability across diverse pre-training strategies. In contrast, another promising line of research has investigated universal graph prompt tuning, which operates directly in the input graph's feature space and builds a theoretical foundation that universal graph prompt tuning can theoretically achieve an equivalent effect of any prompting function, eliminating dependence on specific pre-training strategies. Recent works propose selective node-based graph prompt tuning to pursue more ideal prompts. However, we argue that selective node-based graph prompt tuning inevitably compromises the theoretical foundation of universal graph prompt tuning. In this paper, we strengthen the theoretical foundation of universal graph prompt tuning by introducing stricter constraints, demonstrating that adding prompts to all nodes is a necessary condition for achieving the universality of graph prompts. To this end, we propose a novel model and paradigm, Learning and Editing Universal GrAph Prompt Tuning (LEAP), which preserves the theoretical foundation of universal graph prompt tuning while pursuing more ideal prompts. Specifically, we first build the basic universal graph prompts to preserve the theoretical foundation and then employ actor-critic reinforcement learning to select nodes and edit prompts. Extensive experiments on graph- and node-level tasks across various pre-training strategies in both full-shot and few-shot scenarios show that LEAP consistently outperforms fine-tuning and other prompt-based approaches.",
+    "date": "2025",
+    "url": "https://arxiv.org/abs/2512.08763",
+    "extra": "Primary Class: cs.LG\narXiv: 2512.08763",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2512.08763",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2512.08763v1.pdf"
+  },
+  {
+    "id": "2601.00229",
+    "title": "Robust Graph Fine-Tuning with Adversarial Graph Prompting",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Ziyan",
+        "lastName": "Zhang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Bo",
+        "lastName": "Jiang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jin",
+        "lastName": "Tang"
+      }
+    ],
+    "abstractNote": "Parameter-Efficient Fine-Tuning (PEFT) method has emerged as a dominant paradigm for adapting pre-trained GNN models to downstream tasks. However, existing PEFT methods usually exhibit significant vulnerability to various noise and attacks on graph topology and node attributes/features. To address this issue, for the first time, we propose integrating adversarial learning into graph prompting and develop a novel Adversarial Graph Prompting (AGP) framework to achieve robust graph fine-tuning. Our AGP has two key aspects. First, we propose the general problem formulation of AGP as a min-max optimization problem and develop an alternating optimization scheme to solve it. For inner maximization, we propose Joint Projected Gradient Descent (JointPGD) algorithm to generate strong adversarial noise. For outer minimization, we employ a simple yet effective module to learn the optimal node prompts to counteract the adversarial noise. Second, we demonstrate that the proposed AGP can theoretically address both graph topology and node noise. This confirms the versatility and robustness of our AGP fine-tuning method across various graph noise. Note that, the proposed AGP is a general method that can be integrated with various pre-trained GNN models to enhance their robustness on the downstream tasks. Extensive experiments on multiple benchmark tasks validate the robustness and effectiveness of AGP method compared to state-of-the-art methods.",
+    "date": "2026",
+    "url": "https://arxiv.org/abs/2601.00229",
+    "extra": "Primary Class: cs.LG\narXiv: 2601.00229",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2601.00229",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2601.00229v1.pdf"
+  },
+  {
+    "id": "2601.02662",
+    "title": "When Prompting Meets Spiking: Graph Sparse Prompting via Spiking Graph Prompt Learning",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Bo",
+        "lastName": "Jiang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Weijun",
+        "lastName": "Zhao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Beibei",
+        "lastName": "Wang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jin",
+        "lastName": "Tang"
+      }
+    ],
+    "abstractNote": "Graph Prompt Feature (GPF) learning has been widely used in adapting pre-trained GNN model on the downstream task. GPFs first introduce some prompt atoms and then learns the optimal prompt vector for each graph node using the linear combination of prompt atoms. However, existing GPFs generally conduct prompting over node's all feature dimensions which is obviously redundant and also be sensitive to node feature noise. To overcome this issue, for the first time, this paper proposes learning sparse graph prompts by leveraging the spiking neuron mechanism, termed Spiking Graph Prompt Feature (SpikingGPF). Our approach is motivated by the observation that spiking neuron can perform inexpensive information processing and produce sparse outputs which naturally fits the task of our graph sparse prompting. Specifically, SpikingGPF has two main aspects. First, it learns a sparse prompt vector for each node by exploiting a spiking neuron architecture, enabling prompting on selective node features. This yields a more compact and lightweight prompting design while also improving robustness against node noise. Second, SpikingGPF introduces a novel prompt representation learning model based on sparse representation theory, i.e., it represents each node prompt as a sparse combination of prompt atoms. This encourages a more compact representation and also facilitates efficient computation. Extensive experiments on several benchmarks demonstrate the effectiveness and robustness of SpikingGPF.",
+    "date": "2026",
+    "url": "https://arxiv.org/abs/2601.02662",
+    "extra": "Primary Class: cs.LG\narXiv: 2601.02662",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2601.02662",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2601.02662v1.pdf"
+  },
+  {
+    "id": "2602.05567",
+    "title": "MAGPrompt: Message-Adaptive Graph Prompt Tuning for Graph Neural Networks",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Long D.",
+        "lastName": "Nguyen"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Binh P.",
+        "lastName": "Nguyen"
+      }
+    ],
+    "abstractNote": "Pre-trained graph neural networks (GNNs) transfer well, but adapting them to downstream tasks remains challenging due to mismatches between pre-training objectives and task requirements. Graph prompt tuning offers a parameter-efficient alternative to fine-tuning, yet most methods only modify inputs or representations and leave message passing unchanged, limiting their ability to adapt neighborhood interactions. We propose message-adaptive graph prompt tuning, which injects learnable prompts into the message passing step to reweight incoming neighbor messages and add task-specific prompt vectors during message aggregation, while keeping the backbone GNN frozen. The approach is compatible with common GNN backbones and pre-training strategies, and applicable across downstream settings. Experiments on diverse node- and graph-level datasets show consistent gains over prior graph prompting methods in few-shot settings, while achieving performance competitive with fine-tuning in full-shot regimes.",
+    "date": "2026",
+    "url": "https://arxiv.org/abs/2602.05567",
+    "extra": "Primary Class: cs.LG\narXiv: 2602.05567",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2602.05567",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2602.05567v1.pdf"
+  },
+  {
+    "id": "2602.11629",
+    "title": "GP2F: Cross-Domain Graph Prompting with Adaptive Fusion of Pre-trained Graph Neural Networks",
+    "creators": [
+      {
+        "creatorType": "author",
+        "firstName": "Dongxiao",
+        "lastName": "He"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Wenxuan",
+        "lastName": "Sun"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Yongqi",
+        "lastName": "Huang"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Jitao",
+        "lastName": "Zhao"
+      },
+      {
+        "creatorType": "author",
+        "firstName": "Di",
+        "lastName": "Jin"
+      }
+    ],
+    "abstractNote": "Graph Prompt Learning (GPL) has recently emerged as a promising paradigm for downstream adaptation of pre-trained graph models, mitigating the misalignment between pre-training objectives and downstream tasks. Recently, the focus of GPL has shifted from in-domain to cross-domain scenarios, which is closer to the real world applications, where the pre-training source and downstream target often differ substantially in data distribution. However, why GPLs remain effective under such domain shifts is still unexplored. Empirically, we observe that representative GPL methods are competitive with two simple baselines in cross-domain settings: full fine-tuning (FT) and linear probing (LP), motivating us to explore a deeper understanding of the prompting mechanism. We provide a theoretical analysis demonstrating that jointly leveraging these two complementary branches yields a smaller estimation error than using either branch alone, formally proving that cross-domain GPL benefits from the integration between pre-trained knowledge and task-specific adaptation. Based on this insight, we propose GP2F, a dual-branch GPL method that explicitly instantiates the two extremes: (1) a frozen branch that retains pre-trained knowledge, and (2) an adapted branch with lightweight adapters for task-specific adaptation. We then perform adaptive fusion under topology constraints via a contrastive loss and a topology-consistent loss. Extensive experiments on cross-domain few-shot node and graph classification demonstrate that our method outperforms existing methods.",
+    "date": "2026",
+    "url": "https://arxiv.org/abs/2602.11629",
+    "extra": "Primary Class: cs.LG\narXiv: 2602.11629",
+    "tags": [],
+    "itemType": "preprint",
+    "archiveID": "2602.11629",
+    "repository": "arXiv",
+    "libraryCatalog": "arXiv",
+    "_pdfPath": "D:\\GPL\\gpl-survey\\papers\\section5-candidates\\2602.11629v1.pdf"
+  }
+]

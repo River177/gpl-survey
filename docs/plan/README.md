@@ -9,3 +9,7 @@
 - 命令与运行环境
 - 验收标准
 - 阻塞项
+
+## 当前计划索引
+
+- `2026-03-22-graph-prompt-survey-revision-plan.md`：Graph Prompt Survey 综述更新计划，包含执行清单与 checkpoints。
