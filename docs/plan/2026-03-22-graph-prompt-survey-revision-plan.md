@@ -63,11 +63,11 @@
 - Create: `docs/papers/2026-03-22-recent-graph-prompt-paper-pool.md`
 - Update: `tex/zotero.bib`
 
-- [ ] Collect candidate papers from 2024-2026 focused on graph prompt learning, graph prompt tuning, graph prompt transfer, graph-LLM prompt interfaces, and application-driven graph prompting.
-- [ ] For each paper, record venue, year, task type, prompt type, and a one-sentence contribution summary.
-- [ ] Exclude papers that are only about graph foundation models, general graph-LLM surveys, or application systems with no meaningful prompt component.
-- [ ] Mark each paper as `core taxonomy`, `applications overflow`, `discussion/trend`, or `discard`.
-- [ ] Add missing BibTeX entries for retained papers into `tex/zotero.bib`, but defer in-text citation insertion until mapping is complete.
+- [x] Collect candidate papers from 2024-2026 focused on graph prompt learning, graph prompt tuning, graph prompt transfer, graph-LLM prompt interfaces, and application-driven graph prompting.
+- [x] For each paper, record venue, year, task type, prompt type, and a one-sentence contribution summary.
+- [x] Exclude papers that are only about graph foundation models, general graph-LLM surveys, or application systems with no meaningful prompt component.
+- [x] Mark each paper as `core taxonomy`, `applications overflow`, `discussion/trend`, or `discard`.
+- [x] Add missing BibTeX entries for retained papers into `tex/zotero.bib`, but defer in-text citation insertion until mapping is complete.
 
 **Checkpoint CP1**
 
@@ -83,11 +83,11 @@
 - Read: `tex/6.Applications.tex`
 - Read: `tex/8.Discussion.tex`
 
-- [ ] Create a mapping table with columns: paper, venue/year, main contribution, current taxonomy bucket, target manuscript section, and rationale.
-- [ ] Force every retained paper into one of three destinations: existing taxonomy subsection, Applications overflow, or Discussion trend analysis.
-- [ ] Identify current taxonomy leaves that genuinely received meaningful recent work and should be expanded.
-- [ ] Identify current taxonomy leaves that have seen little follow-up and should remain mostly historical.
-- [ ] Mark any papers that are borderline fits and document why they should not trigger a taxonomy redesign.
+- [x] Create a mapping table with columns: paper, venue/year, main contribution, current taxonomy bucket, target manuscript section, and rationale.
+- [x] Force every retained paper into one of three destinations: existing taxonomy subsection, Applications overflow, or Discussion trend analysis.
+- [x] Identify current taxonomy leaves that genuinely received meaningful recent work and should be expanded.
+- [x] Identify current taxonomy leaves that have seen little follow-up and should remain mostly historical.
+- [x] Mark any papers that are borderline fits and document why they should not trigger a taxonomy redesign.
 
 **Checkpoint CP2**
 
