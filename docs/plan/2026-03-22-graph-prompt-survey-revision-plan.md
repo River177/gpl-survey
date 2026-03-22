@@ -24,7 +24,45 @@
 - Recent papers are added systematically rather than ad hoc.
 - The taxonomy chapter still reads as the center of the survey.
 - Overflow methods are handled explicitly in Applications instead of silently omitted.
+- ProG is described accurately as a published benchmark/toolkit paper rather than an unpublished companion artifact.
+- Overly old methods are selectively compressed or replaced when they no longer serve the updated survey narrative.
 - The full manuscript compiles cleanly with resolved references and bibliography.
+
+## Main Workstreams
+
+### Workstream 1: ProG Positioning Refresh
+
+- Update all ProG-related wording so that ProG is described consistently as a published benchmark/toolkit paper rather than merely an internal library or companion artifact.
+- Check the abstract, introduction, methodology, Applications, and `tex/7.ProG.tex` for terminology, claims, and citation consistency.
+
+### Workstream 2: Core Survey Refresh with Better Representative Methods
+
+- Update the taxonomy-centered review with representative work from 2024-2026 while keeping the existing taxonomy structure unchanged.
+- Compress, demote, or replace overly old methods when they no longer provide strong coverage of the current field, while preserving a necessary historical backbone.
+
+### Workstream 3: Optional Ecosystem Extension
+
+- Optionally sync recent papers into `Awesome-Graph-Prompt`.
+- Optionally update ProG with newly collected codebases, benchmarks, or wrappers for recent representative methods.
+- Optionally evaluate whether `ProG-V2` should be planned as a separate scoped follow-up project.
+
+## Current Execution State
+
+- **Completed checkpoints:** `CP0`, `CP1`, `CP2`, `CP3`
+- **Current focus:** `Task 5 / CP4`, namely updating `tex/5.tex` with recent representative methods while preserving the existing taxonomy structure.
+- **Key completed outputs:**
+  - `docs/research/2026-03-22-manuscript-baseline.md`
+  - `docs/papers/2026-03-22-recent-graph-prompt-paper-pool.md`
+  - `docs/research/2026-03-22-taxonomy-mapping.md`
+- **Positioning updates already completed:**
+  - stale submission-note and novelty-claim cleanup in front matter
+  - `Connection to Existing Work` refreshed with post-2023 graph-prompt surveys
+  - academic tone unified across abstract, introduction, and methodology
+- **New planning requirements incorporated:**
+  - revise ProG-related wording to reflect its published benchmark-paper status
+  - replace some overly old methods with more representative recent methods where appropriate
+  - keep ecosystem refresh tasks such as `Awesome-Graph-Prompt` updates and `ProG-V2` as optional follow-up work
+- **Latest verification:** `pdflatex -interaction=nonstopmode -halt-on-error 0.main.tex` completed successfully on `2026-03-22`
 
 ## Checkpoints Overview
 
@@ -100,16 +138,19 @@
 - Modify: `tex/1.intro.tex`
 - Modify: `tex/2.methodology.tex`
 
-- [ ] Remove the red rejection/submission note from `tex/0.main.tex`.
-- [ ] Rewrite stale novelty claims in the abstract and introduction so they are accurate for a 2026 submission.
-- [ ] Update wording such as `first`, `pioneering`, or `recent` where they are no longer defensible.
-- [ ] Update paper counts and time windows in the methodology section to reflect the expanded corpus.
-- [ ] Keep the original research questions and narrative arc, but rephrase any sentence that implies the field is still at its 2023 scale.
-- [ ] Verify that abstract, introduction, and methodology use the same year range and paper-count framing.
+- [x] Remove the red rejection/submission note from `tex/0.main.tex`.
+- [x] Rewrite stale novelty claims in the abstract and introduction so they are accurate for a 2026 submission.
+- [x] Update wording such as `first`, `pioneering`, or `recent` where they are no longer defensible.
+- [x] Update paper counts and time windows in the methodology section to reflect the expanded corpus.
+- [x] Keep the original research questions and narrative arc, but rephrase any sentence that implies the field is still at its 2023 scale.
+- [x] Verify that abstract, introduction, and methodology use the same year range and paper-count framing.
+- [x] Update `Connection to Existing Work` with graph-prompt surveys published after 2023 and demote broader but less directly related surveys to background references.
+- [x] Unify the academic tone across abstract, introduction, and methodology by removing revision-trace wording and procedural phrasing.
+- [ ] Revisit all ProG-related wording in the front matter and survey positioning so that ProG is described consistently as a published benchmark/toolkit paper rather than only as an internally developed library.
 
 **Checkpoint CP3**
 
-- Exit criteria: front matter is free of stale claims, internally consistent, and aligned with the new revision scope.
+- Exit criteria: front matter is free of stale claims, internally consistent, aligned with the new revision scope, and written in a formal survey tone.
 
 ### Task 5: Update the Core Taxonomy Chapter Without Restructuring It
 
@@ -120,6 +161,7 @@
 - [ ] Review each existing subsection in `tex/5.tex` and decide whether to add 0, 1, or several recent representative papers.
 - [ ] Insert recent papers under the existing categories only: prompt-as-tokens, prompt-as-graphs, answering functions, prompt tuning, multimodal prompting, and domain adaptation.
 - [ ] For each added paper, explain it through the current taxonomy language instead of introducing new category names.
+- [ ] Identify legacy methods that are now too old, too isolated, or too weakly representative, and compress or replace them with stronger recent exemplars while keeping necessary historical anchors.
 - [ ] Update summary tables so newly cited papers are visible in the structured comparison, not only in paragraph text.
 - [ ] Keep paragraph ordering stable where possible; append recent work near the end of each existing block unless a local rewrite is necessary.
 - [ ] Add short transition sentences where needed to clarify that the taxonomy remains valid despite newer variants.
@@ -138,6 +180,7 @@
 - [ ] Keep the existing application domains, but update their representative citations where recent work materially changes the picture.
 - [ ] Add discussion text in `tex/8.Discussion.tex` for trends that are too broad for taxonomy placement, such as graph-LLM integration patterns, evaluation fragmentation, prompt interpretability, or cross-domain transfer issues.
 - [ ] Make the handoff explicit: if a paper is not in the taxonomy chapter, the Applications or Discussion section should say why it matters.
+- [ ] Update the ProG-related discussion so that the survey reflects its published benchmark status and clarifies how it relates to the broader graph prompting ecosystem.
 
 **Checkpoint CP5**
 
@@ -173,6 +216,7 @@
 - [ ] Run a final pass for tense consistency, year phrasing, and overly strong novelty claims.
 - [ ] Check that Applications contains all overflow methods identified in the mapping file.
 - [ ] Check that no taxonomy change slipped in unintentionally.
+- [ ] Run a final consistency check on ProG references, terminology, and claims across the abstract, introduction, methodology, Applications, and `tex/7.ProG.tex`.
 - [ ] Record the final unresolved issues, if any, in a short release note under `docs/research/2026-03-22-revision-closeout.md`.
 
 **Checkpoint CP7**
@@ -181,10 +225,10 @@
 
 ## Editing Order Recommendation
 
-- [ ] Task 1 first
-- [ ] Task 2 second
-- [ ] Task 3 before any major manuscript edits
-- [ ] Task 4 before Task 5
+- [x] Task 1 first
+- [x] Task 2 second
+- [x] Task 3 before any major manuscript edits
+- [x] Task 4 before Task 5
 - [ ] Task 5 before Task 6
 - [ ] Task 7 after the main text updates
 - [ ] Task 8 last
@@ -195,6 +239,24 @@
 - Do not expand the survey into a general graph foundation model or graph-LLM survey.
 - Do not add new top-level sections unless a hard submission requirement appears.
 - Do not force every recent paper into the taxonomy if the fit is poor.
+
+## Optional Extension Track
+
+### Task 9: Ecosystem Refresh Beyond the Manuscript
+
+**Files / Repositories:**
+- Optional update: `Awesome-Graph-Prompt`
+- Optional update: `ProG`
+- Optional planning note if needed: `docs/research/2026-03-22-ecosystem-extension.md`
+
+- [ ] Sync the most recent accepted and high-value preprint papers into `Awesome-Graph-Prompt`.
+- [ ] Update ProG to include newly collected codebases, benchmarks, or wrappers for recent representative methods where implementation quality is sufficient.
+- [ ] Evaluate whether a `ProG-V2` release is warranted, including scope, migration cost, benchmark coverage, and maintenance burden.
+- [ ] If `ProG-V2` is pursued, write a separate scoped plan rather than folding it into the survey-editing tasks.
+
+**Optional Checkpoint OP1**
+
+- Exit criteria: ecosystem-side updates are either completed or explicitly deferred with rationale, and any `ProG-V2` work has a separate scope definition.
 
 ## Practical Completion Definition
 
