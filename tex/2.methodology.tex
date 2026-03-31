@@ -2,19 +2,19 @@
 
 \subsection{Research Objectives}
 
-This survey introduces graph prompting from the broader perspective of artificial general intelligence (AGI). We first present three fundamental problems towards AGI in Table \ref{tab:rqs}. Prompt learning has been demonstrated as a promising solution to these problems in many linear data such as text \cite{brown2020language, gao2021making}, images \cite{
-% radford2021learning, 
-wang2023chatvideo}, etc. However, whether the prompt technique can still solve these problems in the graph area, is not clearly discussed. Through this survey, we wish to figure out how the graph prompt potentially helps graph models to be more general across various tasks and domains, and how it generalizes the foundation models to interact with other modalities (e.g. text, image, etc). Beyond the above common problems of AGI in NLP, CV, and graph areas, graph prompting is usually very different from its counterparts in NLP and CV areas, leading to many detailed questions as shown in Table \ref{tab:rqs}. 
+This survey introduces graph prompting from the broader perspective of artificial general intelligence (AGI). We first present three fundamental problems towards AGI in Table \ref{tab:rqs}. Prompt learning has been shown to be a promising solution to these problems in many linear data such as text \cite{brown2020language, gao2021making}, images \cite{
+% radford2021learning,
+wang2023chatvideo}, etc. However, whether prompting can address these problems equally well in graph learning is still unclear. Through this survey, we examine how graph prompts may help graph models generalize across tasks and domains, and how they may help foundation models interact with other modalities (e.g. text and image). Beyond the common AGI problems shared across NLP, CV, and graph learning, graph prompting also differs from its counterparts in NLP and CV, leading to the detailed questions shown in Table \ref{tab:rqs}.
 
-% the following content can be removed 
+% the following content can be removed
 % By answering these detailed questions, we wish to achieve the following objectives:
 
 % \begin{itemize}
 %     \item Unifying Diverse Approaches for Understanding Existing Work. A unified framework to consolidate varied approaches in graph prompting is needed so that we can facilitate a comprehensive understanding of existing methodologies.
 %     \item Diving into the Purpose of Prompts in the Graph Learning. To achieve this goal, we need to explore the inherent nature and strategic roles of prompts in graphs, which are mostly not as straightforward as the ones in the language area.
-%     \item Designing Effective Graph Prompts. By summarizing the most representative works in graph prompts, we wish to find a fundamental creation in the design of graph prompts, focusing on creating efficient, versatile, and context-sensitive prompts that cater to specific requirements of graph-based tasks. 
+%     \item Designing Effective Graph Prompts. By summarizing the most representative works in graph prompts, we wish to find a fundamental creation in the design of graph prompts, focusing on creating efficient, versatile, and context-sensitive prompts that cater to specific requirements of graph-based tasks.
 %     % \item Assessing the Effectiveness of Graph Prompts. Currently, there are no widely accepted criteria for evaluating the effectiveness and efficiency of graph prompts, including their adaptability and scalability in different application scenarios. Proposing a comprehensive evaluation framework is a pressing need to further accelerate this research area.
-%     \item  Implementing Graph Prompts in Real-World Scenarios. We need to provide a general programming tool to facilitate the practical implications of graph prompts in real-world settings, assessing their implementation challenges, and highlighting successful case studies. 
+%     \item  Implementing Graph Prompts in Real-World Scenarios. We need to provide a general programming tool to facilitate the practical implications of graph prompts in real-world settings, assessing their implementation challenges, and highlighting successful case studies.
 %     \item Identifying Challenges, Limitations and the Future of Graph Prompting. Currently, graph prompt research is very primitive and nascent, leaving many tough problems to be solved. By summarizing current challenges and future directions, we wish to push forward this research area to achieve more impact on related applications.
 % \end{itemize}
 
@@ -25,24 +25,24 @@ wang2023chatvideo}, etc. However, whether the prompt technique can still solve t
 
 \subsection{Taxonomy}
 
-The taxonomy of this survey is presented in \figref{fig:Taxonomy}, which is intricately designed to categorize graph prompts based on their specific applications and functionalities, providing a structured approach to understanding their role in AGI. 
+The taxonomy of this survey is presented in \figref{fig:Taxonomy}. It categorizes graph prompts by their applications and functionalities and provides a structured view of their role in AGI.
 
 
 
 \textbf{(1) Pre-training Strategies for Graph Prompt.}
 
-Since prompting techniques mostly seek to reformulate downstream tasks to the pre-training tasks, they are highly customized for detailed pre-training approaches, thus we briefly discuss the representative pre-training work in the graph area before we formally introduce graph prompt content. We split existing pre-training approaches into node-level, edge-level, graph-level, and multi-task pre-training strategies. Next, we present how different prompting ideas reformulate various downstream tasks to the corresponding pre-training tasks in the graph area. By revisiting existing pre-training literature, we will be more clear about the role of graph prompts in the whole "pre-training and prompting" framework.
+Since prompting techniques mostly seek to reformulate downstream tasks into pre-training tasks, they are closely tied to specific pre-training approaches. We therefore briefly discuss representative pre-training work in graph learning before formally introducing graph prompting. We divide existing pre-training approaches into node-level, edge-level, graph-level, and multi-task strategies. We then present how different prompting ideas reformulate downstream tasks into corresponding pre-training tasks in graph learning. Revisiting this literature helps clarify the role of graph prompts in the whole "pre-training and prompting" framework.
 
 
 
-\textbf{(2) Prompting Methods in Graph Areas.} 
+\textbf{(2) Prompting Methods in Graph Areas.}
 
 Aiming at the three foundation problems mentioned in the research objectives (P1-P3 in \tabref{tab:rqs}), we analyze graph prompting from three aspects: \romannumeral1. prompt design for graph tasks (\secref{sec:ptask}); \romannumeral2. multi-modal prompting with graphs (\secref{subsec:pmodal}); and \romannumeral3. graph domain adaptation with prompting techniques (\secref{subsec:pdomain}). Within each aspect, we present a detailed discussion related to the five specific problems in the graph prompt area (Q1-Q5 in \tabref{tab:rqs}).
 
 \textit{\romannumeral1. Prompt Design for Graph Tasks.} In this section, we propose a unified framework to analyze existing works on graph prompt design. Our framework treats existing graph prompts with three key components: \textit{prompt tokens}, which preserve prompt content as vectors; \textit{token structures}, which indicate how multiple tokens are organized; and \textit{inserting patterns}, which define how to combine graph prompt with the original graphs. Beyond that, we also carefully analyze how these works design the prompt answering function, which means how they get results for the downstream tasks from their  prompts. We also summarize three representative methods to learn appropriate prompts, including meta-learning techniques, task-specific tuning, and tuning in line with pretext. In the end, we further discuss these works in \secref{subsec:pdiscussion} to see their intrinsic connections with pros and cons.
 
 
-\textit{\romannumeral2. Multi-modal Prompting with Graphs.} In this section, we briefly present how graph prompts work in a text-attributed graph, which can be seen as the fusion of text and graph modalities. With the progress of large language models (LLMs), the fusion of text and graph data has become easier and has aroused a lot of work on this topic. Since the topic of integrating LLMs with graphs has been well summarized in \cite{li2023survey}, we won't present too much in this survey. Instead, we only briefly discuss some representative works in this area that focus on the prompt area. 
+\textit{\romannumeral2. Multi-modal Prompting with Graphs.} In this section, we briefly present how graph prompts work in text-attributed graphs, which can be viewed as a fusion of text and graph modalities. With the progress of large language models (LLMs), combining text and graph data has become easier and has attracted substantial recent work. Since the topic of integrating LLMs with graphs has already been well summarized in \cite{li2023survey}, we do not repeat that discussion here. Instead, we briefly discuss representative works in this area that focus on prompting.
 
 
 
@@ -53,16 +53,16 @@ Aiming at the three foundation problems mentioned in the research objectives (P1
 % \resizebox{0.48\textwidth}{!}{%
 \begin{tabular}{@{}l|l@{}}
 \toprule
-\multirow{3}{*}{\makecell[c]{Foundamental \\Problems\\ towards AGI}}  
-        & \makecell[l]{P1: How to Make the Model General for Different\\ Modalities? (\secref{subsec:multi_modal}) } \\\cmidrule(l){2-2} 
-        & \makecell[l]{P2: How to Make the Model General for Different \\Domains? (\secref{subsec:pdomain})} \\\cmidrule(l){2-2} 
+\multirow{3}{*}{\makecell[c]{Fundamental \\Problems\\ towards AGI}}
+        & \makecell[l]{P1: How to Make the Model General for Different\\ Modalities? (\secref{subsec:multi_modal}) } \\\cmidrule(l){2-2}
+        & \makecell[l]{P2: How to Make the Model General for Different \\Domains? (\secref{subsec:pdomain})} \\\cmidrule(l){2-2}
         & \makecell[l]{P3: How to Make the Model General for Different \\Tasks?  (\secref{sec:ptask}) }  \\ \midrule
-\multirow{5}{*}{\makecell[c]{Detailed \\Questions of\\ Graph Prompt}} 
-        & \makecell[l]{Q1: How to Understand Existing Work with a \\Unified Framework? (\secref{subsec:pdesign})} \\\cmidrule(l){2-2} 
-        & \makecell[l]{Q2: What's the Nature of Graph Prompt? \\(\secref{subsec:why_prompt}, \secref{subsec:pdiscussion})}   \\\cmidrule(l){2-2} 
-        & \makecell[l]{Q3: How to Design Graph Prompts? (\secref{sec:ptask}) } \\\cmidrule(l){2-2} 
-        % & \makecell[l]{How to Evaluate the Quality \\of Graph Prompts?     }    \\\cmidrule(l){2-2} 
-        & \makecell[l]{Q4: How to Deploy Graph Prompts in Real-world \\Applications?  (\secref{sec:app}, \secref{sec:prog})}  \\\cmidrule(l){2-2} 
+\multirow{5}{*}{\makecell[c]{Detailed \\Questions of\\ Graph Prompt}}
+        & \makecell[l]{Q1: How to Understand Existing Work with a \\Unified Framework? (\secref{subsec:pdesign})} \\\cmidrule(l){2-2}
+        & \makecell[l]{Q2: What's the Nature of Graph Prompt? \\(\secref{subsec:why_prompt}, \secref{subsec:pdiscussion})}   \\\cmidrule(l){2-2}
+        & \makecell[l]{Q3: How to Design Graph Prompts? (\secref{sec:ptask}) } \\\cmidrule(l){2-2}
+        % & \makecell[l]{How to Evaluate the Quality \\of Graph Prompts?     }    \\\cmidrule(l){2-2}
+        & \makecell[l]{Q4: How to Deploy Graph Prompts in Real-world \\Applications?  (\secref{sec:app}, \secref{sec:prog})}  \\\cmidrule(l){2-2}
         & \makecell[l]{Q5: What Are the Current Challenges and Future \\Directions? (\secref{sec:challenges}) }   \\ \bottomrule
 \end{tabular}%
 % }
@@ -70,10 +70,10 @@ Aiming at the three foundation problems mentioned in the research objectives (P1
 
 
 
-\textit{\romannumeral3. Graph Domain Adaptation through Prompting Techniques.} In this section, we introduce related work from two branches. The first branch presents works solving semantic alignment across different graph  domains, and the second branch presents structural alignment. 
+\textit{\romannumeral3. Graph Domain Adaptation through Prompting Techniques.} In this section, we introduce related work from two branches. The first branch presents works solving semantic alignment across different graph  domains, and the second branch presents structural alignment.
 
 \subsection{Literature Overview}
-This survey considers over one hundred representative papers, with particular attention to conference, journal, and arXiv works released through early 2026. The surveyed literature spans venues including but not limited to NeurIPS, SIGKDD, The Web Conference, ICLR, CIKM, ICML, IJCAI, EMNLP, SIGIR, ACL, AAAI, WSDM, and TKDE. Most of these venues are ranked as CCF A\footnote{\url{https://www.ccf.org.cn/Academic_Evaluation/By_category}} or CORE A*\footnote{\url{https://www.core.edu.au/conference-portal}}. Recent arXiv papers are also included to reflect developments that have not yet fully stabilized into journal or conference versions. Figure \ref{fig:venue_dis} presents the venue distribution of this corpus, and Figure \ref{fig:top10keys} summarizes the top 15 keywords appearing in paper titles. These statistics provide a high-level snapshot of the surveyed literature. 
+This survey considers over one hundred representative papers, with particular attention to conference, journal, and arXiv works released through early 2026. The surveyed literature spans venues including but not limited to NeurIPS, SIGKDD, The Web Conference, ICLR, CIKM, ICML, IJCAI, EMNLP, SIGIR, ACL, AAAI, WSDM, and TKDE. Most of these venues are ranked as CCF A\footnote{\url{https://www.ccf.org.cn/Academic_Evaluation/By_category}} or CORE A*\footnote{\url{https://www.core.edu.au/conference-portal}}. Recent arXiv papers are also included to reflect developments that have not yet fully stabilized into journal or conference versions. Figure \ref{fig:venue_dis} presents the venue distribution of this corpus, and Figure \ref{fig:top10keys} summarizes the top 15 keywords appearing in paper titles. These statistics provide a high-level snapshot of the surveyed literature.
 
 
 \begin{figure*}[!t]
@@ -81,7 +81,7 @@ This survey considers over one hundred representative papers, with particular at
 \subfloat[Venue distribution of collected papers.]{
 \label{fig:venue_dis}
 \includegraphics[width=0.4\textwidth]{pic/reference_venue.pdf}%
-} 
+}
 \subfloat[Top 15 Keywords appeared in titles of collected papers]{
 \label{fig:top10keys}
 \includegraphics[width=0.5\textwidth]{pic/top_keywords_bar.pdf}%
