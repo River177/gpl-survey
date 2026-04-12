@@ -48,32 +48,33 @@
 
 ## 当前执行状态
 
-- **已完成检查点：** `CP0`、`CP1`、`CP2`、`CP3`
-- **当前焦点：** `Task 5 / CP4`，即在保持现有 taxonomy 结构不变的前提下更新 `tex/5.tex`，纳入近期代表性方法。
-- **关键已完成产出：**
-  - `docs/research/2026-03-22-manuscript-baseline.md`
-  - `docs/papers/2026-03-22-recent-graph-prompt-paper-pool.md`
-  - `docs/research/2026-03-22-taxonomy-mapping.md`
-- **已完成的定位更新：**
-  - 已清理前言中的陈旧投稿说明和新颖性表述
-  - 已使用 2023 年之后的图提示综述更新 `Connection to Existing Work`
-  - 已统一摘要、引言和方法学部分的学术语气
-- **已纳入的新规划要求：**
-  - 修订所有与 ProG 相关的措辞，使其体现为已发表 benchmark 论文的状态
-  - 在合适位置用近期更具代表性的方法替换部分过旧方法
-  - 将 `Awesome-Graph-Prompt` 更新、`ProG-V2` 等生态刷新任务保留为可选后续工作
-- **最近一次验证：** `pdflatex -interaction=nonstopmode -halt-on-error 0.main.tex` 已于 `2026-03-22` 成功完成
+- **已正式完成的检查点：** `CP0`
+- **当前实际进度：** 仅发现 `tex/0.main.tex`、`tex/1.intro.tex`、`tex/2.methodology.tex` 有本轮文稿改写痕迹。
+- **已完成的文稿改写范围：**
+  - `tex/0.main.tex`：摘要与前言入口已更新，旧的投稿/拒稿说明已去除。
+  - `tex/1.intro.tex`：引言整体口径已按 2026 年综述语境重写。
+  - `tex/2.methodology.tex`：方法学与 `Connection to Existing Work` 已更新。
+- **尚未完成的正文范围：**
+  - `tex/5.tex`：仍为旧版 taxonomy 主体内容，未见本轮代表性方法刷新。
+  - `tex/6.Applications.tex`：仍为旧版应用章节，未见 overflow 承接更新。
+  - `tex/7.ProG.tex`：仍将 ProG 主要表述为统一库，尚未刷新为已发表 benchmark/toolkit 论文定位。
+  - `tex/8.Discussion.tex`：仍为旧版挑战与展望内容，未见近年趋势补充。
+- **本次进度回填原则：**
+  - 仅按 `tex/` 目录中的直接文稿证据标记完成状态。
+  - 即使 `docs/` 中已有辅助笔记或计划材料，若未在正文中体现，不视为对应 task 已完成。
+- **最近一次基线验证：** `pdflatex -interaction=nonstopmode -halt-on-error 0.main.tex` 已在 `2026-04-12` 成功执行。
+- **Task 1 产出：** `docs/research/2026-03-22-manuscript-baseline.md`
 
 ## 检查点总览
 
-- **CP0 基线已冻结：** 已记录当前稿件状态、警告信息和修订范围。
-- **CP1 近期论文池已就绪：** 2024-2026 年筛选后的论文列表已足够支撑修订。
-- **CP2 Taxonomy 映射已锁定：** 每篇保留的近期论文都已分配到目标章节。
-- **CP3 前言部分已更新：** 标题页文本、摘要、引言和方法学在时间口径上保持一致。
-- **CP4 核心 Taxonomy 已更新：** `tex/5.tex` 及其摘要性材料已反映近期代表性方法。
-- **CP5 溢出内容已补入：** 不属于 taxonomy 的工作已在 Applications 和趋势讨论中得到覆盖。
-- **CP6 参考文献与资源已同步：** 参考文献、表格、统计数字和图像内部一致。
-- **CP7 发布候选版已构建：** 论文可编译，并通过最终编辑检查。
+- **CP0 基线冻结：** 已完成
+- **CP1 近期论文池就绪：** 未完成
+- **CP2 Taxonomy 映射锁定：** 未完成
+- **CP3 前言部分更新：** 部分完成，目前仅 `tex/0.main.tex`、`tex/1.intro.tex`、`tex/2.methodology.tex` 有直接改写证据，且 ProG 定位尚未统一。
+- **CP4 核心 Taxonomy 更新：** 未完成
+- **CP5 溢出内容补入：** 未完成
+- **CP6 参考文献与资源同步：** 未完成
+- **CP7 发布候选版构建：** 未完成
 
 ### Task 1：冻结基线并记录修订范围
 
@@ -101,11 +102,11 @@
 - Create: `docs/papers/2026-03-22-recent-graph-prompt-paper-pool.md`
 - Update: `tex/zotero.bib`
 
-- [x] 收集 2024-2026 年的候选论文，重点覆盖图提示学习、图提示调优、图提示迁移、graph-LLM prompt interface，以及应用驱动的图提示工作。
-- [x] 为每篇论文记录 venue、年份、任务类型、prompt 类型，以及一句话贡献总结。
-- [x] 排除那些仅讨论图基础模型、泛化 graph-LLM survey，或根本没有实质性 prompt 组成部分的应用系统论文。
-- [x] 将每篇论文标记为 `core taxonomy`、`applications overflow`、`discussion/trend` 或 `discard`。
-- [x] 将所有保留论文缺失的 BibTeX 条目加入 `tex/zotero.bib`，但正文中的 citation 插入推迟到映射完成之后。
+- [ ] 收集 2024-2026 年的候选论文，重点覆盖图提示学习、图提示调优、图提示迁移、graph-LLM prompt interface，以及应用驱动的图提示工作。
+- [ ] 为每篇论文记录 venue、年份、任务类型、prompt 类型，以及一句话贡献总结。
+- [ ] 排除那些仅讨论图基础模型、泛化 graph-LLM survey，或根本没有实质性 prompt 组成部分的应用系统论文。
+- [ ] 将每篇论文标记为 `core taxonomy`、`applications overflow`、`discussion/trend` 或 `discard`。
+- [ ] 将所有保留论文缺失的 BibTeX 条目加入 `tex/zotero.bib`，但正文中的 citation 插入推迟到映射完成之后。
 
 **检查点 CP1**
 
@@ -121,11 +122,11 @@
 - Read: `tex/6.Applications.tex`
 - Read: `tex/8.Discussion.tex`
 
-- [x] 创建一张映射表，列包括：论文、venue/year、主要贡献、当前 taxonomy bucket、目标稿件章节，以及分配理由。
-- [x] 强制每篇保留论文进入以下三类去向之一：现有 taxonomy 小节、Applications 溢出区、或 Discussion 趋势分析。
-- [x] 识别当前 taxonomy 中那些确实获得了较多近年后续工作的叶子节点，并将其标记为应扩写。
-- [x] 识别当前 taxonomy 中那些后续工作很少、应主要保留历史角色的叶子节点。
-- [x] 标记那些边界适配的论文，并记录为什么它们不足以触发一次 taxonomy 重设计。
+- [ ] 创建一张映射表，列包括：论文、venue/year、主要贡献、当前 taxonomy bucket、目标稿件章节，以及分配理由。
+- [ ] 强制每篇保留论文进入以下三类去向之一：现有 taxonomy 小节、Applications 溢出区、或 Discussion 趋势分析。
+- [ ] 识别当前 taxonomy 中那些确实获得了较多近年后续工作的叶子节点，并将其标记为应扩写。
+- [ ] 识别当前 taxonomy 中那些后续工作很少、应主要保留历史角色的叶子节点。
+- [ ] 标记那些边界适配的论文，并记录为什么它们不足以触发一次 taxonomy 重设计。
 
 **检查点 CP2**
 
@@ -226,8 +227,8 @@
 ## 建议编辑顺序
 
 - [x] 先做 Task 1
-- [x] 然后做 Task 2
-- [x] 在任何正文大改之前完成 Task 3
+- [ ] 然后做 Task 2
+- [ ] 在任何正文大改之前完成 Task 3
 - [x] 在 Task 5 之前完成 Task 4
 - [ ] 在 Task 6 之前完成 Task 5
 - [ ] 在正文更新完成后执行 Task 7
