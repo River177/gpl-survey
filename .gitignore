@@ -43,3 +43,4 @@ _minted*
 *.pyg
 papers/zotero/pdfs/*
 papers/zotero-test/pdfs/*
+.worktrees/
