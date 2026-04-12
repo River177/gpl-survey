@@ -1,83 +1,83 @@
-# Graph Prompt Survey Revision Plan
+# 图提示综述修订计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **面向代理式执行者：** 必须使用子技能 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans`，按任务逐项执行本计划。步骤使用复选框语法（`- [ ]`）进行跟踪。
 
-**Goal:** Refresh the 2023 graph prompt survey draft to a 2026-ready version with minimal structural changes, preserving the main taxonomy and routing non-taxonomy recent methods into the Applications section.
+**目标：** 在尽量少改动整体结构的前提下，将 2023 年版图提示综述草稿刷新为适用于 2026 年投稿的版本；保留主 taxonomy，并将不适合纳入 taxonomy 的近年方法转移到 Applications 章节。
 
-**Architecture:** Keep the section order and taxonomy backbone unchanged, update claims and literature coverage, then absorb 2024-2026 work through existing subsections in the main taxonomy chapter. Any recent work that does not fit the current taxonomy should be documented in Applications or Discussion instead of forcing a taxonomy redesign.
+**整体方案：** 保持章节顺序和 taxonomy 主干不变，先更新论述口径与文献覆盖，再通过主 taxonomy 章节中的既有小节吸收 2024-2026 年工作。任何不适配当前 taxonomy 的近年工作，都应记录在 Applications 或 Discussion 中，而不是强行重构 taxonomy。
 
-**Tech Stack:** LaTeX, BibTeX, Markdown planning notes, local paper screening notes under `docs/`
+**技术栈：** LaTeX、BibTeX、Markdown 计划文档、`docs/` 下的本地论文筛选记录
 
 ---
 
-## Constraints and Scope
+## 约束与范围
 
-- Keep the top-level section structure in `tex/0.main.tex` unchanged.
-- Keep the taxonomy tree in `tex/pic/taxonomy.tex` unchanged unless a factual error forces a minimal patch.
-- Prefer textual updates over structural rewrites.
-- Treat the target refresh window as `2024-01-01` to `2026-03-22`.
-- Route methods that do not fit the existing taxonomy into `tex/6.Applications.tex` and, if needed, trend-level discussion into `tex/8.Discussion.tex`.
+- 保持 `tex/0.main.tex` 中的顶层章节结构不变。
+- 保持 `tex/pic/taxonomy.tex` 中的 taxonomy 树不变，除非事实错误迫使我们做最小修补。
+- 优先进行文字层面的更新，而不是结构性重写。
+- 将本轮刷新目标时间窗设为 `2024-01-01` 到 `2026-03-22`。
+- 不适合既有 taxonomy 的方法放入 `tex/6.Applications.tex`；如果需要趋势层面的总结，则写入 `tex/8.Discussion.tex`。
 
-## Global Success Criteria
+## 全局成功标准
 
-- The manuscript no longer contains outdated submission notes, stale novelty claims, or inconsistent year ranges.
-- Recent papers are added systematically rather than ad hoc.
-- The taxonomy chapter still reads as the center of the survey.
-- Overflow methods are handled explicitly in Applications instead of silently omitted.
-- ProG is described accurately as a published benchmark/toolkit paper rather than an unpublished companion artifact.
-- Overly old methods are selectively compressed or replaced when they no longer serve the updated survey narrative.
-- The full manuscript compiles cleanly with resolved references and bibliography.
+- 稿件中不再包含过时的投稿说明、陈旧的新颖性表述或不一致的年份范围。
+- 新近论文的加入是系统化完成的，而非零散补丁式添加。
+- taxonomy 章节仍然是整篇综述的核心。
+- 溢出方法会被明确放入 Applications，而不是被默默遗漏。
+- ProG 会被准确表述为已发表的 benchmark/toolkit 论文，而非未发表的附属产物。
+- 对于过旧的方法，会在其不再服务于更新后叙事时进行有选择的压缩或替换。
+- 全文可以在参考文献和交叉引用都正确解析的情况下顺利编译。
 
-## Main Workstreams
+## 主要工作流
 
-### Workstream 1: ProG Positioning Refresh
+### 工作流 1：刷新 ProG 的定位表述
 
-- Update all ProG-related wording so that ProG is described consistently as a published benchmark/toolkit paper rather than merely an internal library or companion artifact.
-- Check the abstract, introduction, methodology, Applications, and `tex/7.ProG.tex` for terminology, claims, and citation consistency.
+- 更新所有与 ProG 相关的措辞，使其被一致表述为已发表的 benchmark/toolkit 论文，而不只是内部库或附属产物。
+- 检查摘要、引言、方法学、Applications，以及 `tex/7.ProG.tex` 中的术语、论断与引用是否一致。
 
-### Workstream 2: Core Survey Refresh with Better Representative Methods
+### 工作流 2：用更具代表性的工作刷新核心综述
 
-- Update the taxonomy-centered review with representative work from 2024-2026 while keeping the existing taxonomy structure unchanged.
-- Compress, demote, or replace overly old methods when they no longer provide strong coverage of the current field, while preserving a necessary historical backbone.
+- 在保持现有 taxonomy 结构不变的前提下，用 2024-2026 年的代表性工作更新以 taxonomy 为中心的综述内容。
+- 对过旧的方法进行压缩、降级或替换，但保留必要的历史脉络。
 
-### Workstream 3: Optional Ecosystem Extension
+### 工作流 3：可选的生态扩展
 
-- Optionally sync recent papers into `Awesome-Graph-Prompt`.
-- Optionally update ProG with newly collected codebases, benchmarks, or wrappers for recent representative methods.
-- Optionally evaluate whether `ProG-V2` should be planned as a separate scoped follow-up project.
+- 可选地将近期论文同步到 `Awesome-Graph-Prompt`。
+- 可选地将新收集到的代码库、benchmark 或 wrapper 更新到 ProG 中，以覆盖近期代表性方法。
+- 可选地评估是否应将 `ProG-V2` 作为一个单独界定范围的后续项目来规划。
 
-## Current Execution State
+## 当前执行状态
 
-- **Completed checkpoints:** `CP0`, `CP1`, `CP2`, `CP3`
-- **Current focus:** `Task 5 / CP4`, namely updating `tex/5.tex` with recent representative methods while preserving the existing taxonomy structure.
-- **Key completed outputs:**
+- **已完成检查点：** `CP0`、`CP1`、`CP2`、`CP3`
+- **当前焦点：** `Task 5 / CP4`，即在保持现有 taxonomy 结构不变的前提下更新 `tex/5.tex`，纳入近期代表性方法。
+- **关键已完成产出：**
   - `docs/research/2026-03-22-manuscript-baseline.md`
   - `docs/papers/2026-03-22-recent-graph-prompt-paper-pool.md`
   - `docs/research/2026-03-22-taxonomy-mapping.md`
-- **Positioning updates already completed:**
-  - stale submission-note and novelty-claim cleanup in front matter
-  - `Connection to Existing Work` refreshed with post-2023 graph-prompt surveys
-  - academic tone unified across abstract, introduction, and methodology
-- **New planning requirements incorporated:**
-  - revise ProG-related wording to reflect its published benchmark-paper status
-  - replace some overly old methods with more representative recent methods where appropriate
-  - keep ecosystem refresh tasks such as `Awesome-Graph-Prompt` updates and `ProG-V2` as optional follow-up work
-- **Latest verification:** `pdflatex -interaction=nonstopmode -halt-on-error 0.main.tex` completed successfully on `2026-03-22`
+- **已完成的定位更新：**
+  - 已清理前言中的陈旧投稿说明和新颖性表述
+  - 已使用 2023 年之后的图提示综述更新 `Connection to Existing Work`
+  - 已统一摘要、引言和方法学部分的学术语气
+- **已纳入的新规划要求：**
+  - 修订所有与 ProG 相关的措辞，使其体现为已发表 benchmark 论文的状态
+  - 在合适位置用近期更具代表性的方法替换部分过旧方法
+  - 将 `Awesome-Graph-Prompt` 更新、`ProG-V2` 等生态刷新任务保留为可选后续工作
+- **最近一次验证：** `pdflatex -interaction=nonstopmode -halt-on-error 0.main.tex` 已于 `2026-03-22` 成功完成
 
-## Checkpoints Overview
+## 检查点总览
 
-- **CP0 Baseline Frozen:** current manuscript status, warnings, and revision scope are recorded.
-- **CP1 Recent Paper Pool Ready:** screened 2024-2026 paper list is complete enough for revision.
-- **CP2 Taxonomy Mapping Locked:** each retained recent paper has a destination section.
-- **CP3 Front Matter Updated:** title-page text, abstract, intro, and methodology are time-consistent.
-- **CP4 Core Taxonomy Updated:** `tex/5.tex` and its summary material reflect recent representative methods.
-- **CP5 Overflow Coverage Added:** non-taxonomy work is captured in Applications and trend discussion.
-- **CP6 References and Assets Synced:** bibliography, tables, counts, and figures are internally consistent.
-- **CP7 Release Candidate Built:** the paper compiles and passes final editorial checks.
+- **CP0 基线已冻结：** 已记录当前稿件状态、警告信息和修订范围。
+- **CP1 近期论文池已就绪：** 2024-2026 年筛选后的论文列表已足够支撑修订。
+- **CP2 Taxonomy 映射已锁定：** 每篇保留的近期论文都已分配到目标章节。
+- **CP3 前言部分已更新：** 标题页文本、摘要、引言和方法学在时间口径上保持一致。
+- **CP4 核心 Taxonomy 已更新：** `tex/5.tex` 及其摘要性材料已反映近期代表性方法。
+- **CP5 溢出内容已补入：** 不属于 taxonomy 的工作已在 Applications 和趋势讨论中得到覆盖。
+- **CP6 参考文献与资源已同步：** 参考文献、表格、统计数字和图像内部一致。
+- **CP7 发布候选版已构建：** 论文可编译，并通过最终编辑检查。
 
-### Task 1: Freeze Baseline and Record Revision Scope
+### Task 1：冻结基线并记录修订范围
 
-**Files:**
+**文件：**
 - Read: `tex/0.main.tex`
 - Read: `tex/1.intro.tex`
 - Read: `tex/2.methodology.tex`
@@ -86,34 +86,34 @@
 - Read: `tex/8.Discussion.tex`
 - Update or create: `docs/research/2026-03-22-manuscript-baseline.md`
 
-- [x] Build the current manuscript once and record whether it compiles without manual fixes.
-- [x] Record the current section layout, major tables/figures, and any compile warnings.
-- [x] Record all obviously stale content that must be removed early, especially the red submission note in `tex/0.main.tex`.
-- [x] Confirm the editing policy in writing: taxonomy backbone unchanged, recent papers added under existing nodes, overflow moved to Applications.
+- [x] 先完整编译当前稿件一次，并记录它是否能够在不手动修复的情况下成功编译。
+- [x] 记录当前章节布局、主要表格/图片以及所有编译警告。
+- [x] 记录所有显然已经过时、需要尽早删除的内容，尤其是 `tex/0.main.tex` 中红色的投稿说明。
+- [x] 以书面形式确认编辑策略：taxonomy 主干不变，近期论文加入现有节点，不适配 taxonomy 的内容转移到 Applications。
 
-**Checkpoint CP0**
+**检查点 CP0**
 
-- Exit criteria: one baseline note exists, current risks are listed, and the revision boundary is explicitly documented.
+- 退出标准：存在一份基线说明文档，已列出当前风险，并且明确写明本轮修订边界。
 
-### Task 2: Build the 2024-2026 Paper Pool
+### Task 2：构建 2024-2026 年论文池
 
-**Files:**
+**文件：**
 - Create: `docs/papers/2026-03-22-recent-graph-prompt-paper-pool.md`
 - Update: `tex/zotero.bib`
 
-- [x] Collect candidate papers from 2024-2026 focused on graph prompt learning, graph prompt tuning, graph prompt transfer, graph-LLM prompt interfaces, and application-driven graph prompting.
-- [x] For each paper, record venue, year, task type, prompt type, and a one-sentence contribution summary.
-- [x] Exclude papers that are only about graph foundation models, general graph-LLM surveys, or application systems with no meaningful prompt component.
-- [x] Mark each paper as `core taxonomy`, `applications overflow`, `discussion/trend`, or `discard`.
-- [x] Add missing BibTeX entries for retained papers into `tex/zotero.bib`, but defer in-text citation insertion until mapping is complete.
+- [x] 收集 2024-2026 年的候选论文，重点覆盖图提示学习、图提示调优、图提示迁移、graph-LLM prompt interface，以及应用驱动的图提示工作。
+- [x] 为每篇论文记录 venue、年份、任务类型、prompt 类型，以及一句话贡献总结。
+- [x] 排除那些仅讨论图基础模型、泛化 graph-LLM survey，或根本没有实质性 prompt 组成部分的应用系统论文。
+- [x] 将每篇论文标记为 `core taxonomy`、`applications overflow`、`discussion/trend` 或 `discard`。
+- [x] 将所有保留论文缺失的 BibTeX 条目加入 `tex/zotero.bib`，但正文中的 citation 插入推迟到映射完成之后。
 
-**Checkpoint CP1**
+**检查点 CP1**
 
-- Exit criteria: the paper pool file exists and every retained paper has a preliminary disposition label.
+- 退出标准：论文池文件已经存在，且每篇保留论文都有初步去向标签。
 
-### Task 3: Lock the Taxonomy Mapping
+### Task 3：锁定 Taxonomy 映射
 
-**Files:**
+**文件：**
 - Create: `docs/research/2026-03-22-taxonomy-mapping.md`
 - Read: `tex/pic/taxonomy.tex`
 - Read: `tex/2.methodology.tex`
@@ -121,145 +121,145 @@
 - Read: `tex/6.Applications.tex`
 - Read: `tex/8.Discussion.tex`
 
-- [x] Create a mapping table with columns: paper, venue/year, main contribution, current taxonomy bucket, target manuscript section, and rationale.
-- [x] Force every retained paper into one of three destinations: existing taxonomy subsection, Applications overflow, or Discussion trend analysis.
-- [x] Identify current taxonomy leaves that genuinely received meaningful recent work and should be expanded.
-- [x] Identify current taxonomy leaves that have seen little follow-up and should remain mostly historical.
-- [x] Mark any papers that are borderline fits and document why they should not trigger a taxonomy redesign.
+- [x] 创建一张映射表，列包括：论文、venue/year、主要贡献、当前 taxonomy bucket、目标稿件章节，以及分配理由。
+- [x] 强制每篇保留论文进入以下三类去向之一：现有 taxonomy 小节、Applications 溢出区、或 Discussion 趋势分析。
+- [x] 识别当前 taxonomy 中那些确实获得了较多近年后续工作的叶子节点，并将其标记为应扩写。
+- [x] 识别当前 taxonomy 中那些后续工作很少、应主要保留历史角色的叶子节点。
+- [x] 标记那些边界适配的论文，并记录为什么它们不足以触发一次 taxonomy 重设计。
 
-**Checkpoint CP2**
+**检查点 CP2**
 
-- Exit criteria: every retained paper has a final destination section and the team agrees no taxonomy redesign is required.
+- 退出标准：每篇保留论文都有最终目标章节，且团队已确认不需要重构 taxonomy。
 
-### Task 4: Refresh Front Matter and Survey Positioning
+### Task 4：刷新前言部分与综述定位
 
-**Files:**
+**文件：**
 - Modify: `tex/0.main.tex`
 - Modify: `tex/1.intro.tex`
 - Modify: `tex/2.methodology.tex`
 
-- [x] Remove the red rejection/submission note from `tex/0.main.tex`.
-- [x] Rewrite stale novelty claims in the abstract and introduction so they are accurate for a 2026 submission.
-- [x] Update wording such as `first`, `pioneering`, or `recent` where they are no longer defensible.
-- [x] Update paper counts and time windows in the methodology section to reflect the expanded corpus.
-- [x] Keep the original research questions and narrative arc, but rephrase any sentence that implies the field is still at its 2023 scale.
-- [x] Verify that abstract, introduction, and methodology use the same year range and paper-count framing.
-- [x] Update `Connection to Existing Work` with graph-prompt surveys published after 2023 and demote broader but less directly related surveys to background references.
-- [x] Unify the academic tone across abstract, introduction, and methodology by removing revision-trace wording and procedural phrasing.
-- [ ] Revisit all ProG-related wording in the front matter and survey positioning so that ProG is described consistently as a published benchmark/toolkit paper rather than only as an internally developed library.
+- [x] 删除 `tex/0.main.tex` 中红色的拒稿/投稿说明。
+- [x] 重写摘要和引言中已经过时的新颖性表述，使其适用于 2026 年投稿。
+- [x] 更新诸如 `first`、`pioneering`、`recent` 等已不再站得住脚的措辞。
+- [x] 更新方法学部分中的论文计数和时间窗口，使其反映扩展后的语料范围。
+- [x] 保留原有研究问题和叙事弧线，但改写所有暗示该领域仍停留在 2023 年规模的句子。
+- [x] 验证摘要、引言和方法学使用相同的年份范围和论文计数口径。
+- [x] 用 2023 年之后发表的图提示综述更新 `Connection to Existing Work`，并将更宽泛但相关性较弱的 survey 降为背景参考。
+- [x] 统一摘要、引言和方法学的学术语气，去掉修订痕迹式措辞和过程化表述。
+- [ ] 重新审查前言部分和综述定位中的所有 ProG 相关措辞，使 ProG 被一致表述为已发表的 benchmark/toolkit 论文，而不只是内部开发库。
 
-**Checkpoint CP3**
+**检查点 CP3**
 
-- Exit criteria: front matter is free of stale claims, internally consistent, aligned with the new revision scope, and written in a formal survey tone.
+- 退出标准：前言部分已去除陈旧论断，内部表述一致，与新的修订范围对齐，并采用正式的综述语气。
 
-### Task 5: Update the Core Taxonomy Chapter Without Restructuring It
+### Task 5：在不重构的前提下更新核心 Taxonomy 章节
 
-**Files:**
+**文件：**
 - Modify: `tex/5.tex`
 - Modify if needed: `tex/table/*`
 
-- [ ] Review each existing subsection in `tex/5.tex` and decide whether to add 0, 1, or several recent representative papers.
-- [ ] Insert recent papers under the existing categories only: prompt-as-tokens, prompt-as-graphs, answering functions, prompt tuning, multimodal prompting, and domain adaptation.
-- [ ] For each added paper, explain it through the current taxonomy language instead of introducing new category names.
-- [ ] Identify legacy methods that are now too old, too isolated, or too weakly representative, and compress or replace them with stronger recent exemplars while keeping necessary historical anchors.
-- [ ] Update summary tables so newly cited papers are visible in the structured comparison, not only in paragraph text.
-- [ ] Keep paragraph ordering stable where possible; append recent work near the end of each existing block unless a local rewrite is necessary.
-- [ ] Add short transition sentences where needed to clarify that the taxonomy remains valid despite newer variants.
+- [ ] 逐一审查 `tex/5.tex` 中现有的小节，并决定每个小节需要加入 0 篇、1 篇或多篇近期代表论文。
+- [ ] 仅在现有类别下插入近期论文：prompt-as-tokens、prompt-as-graphs、answering functions、prompt tuning、multimodal prompting、domain adaptation。
+- [ ] 对每篇新增论文，都使用当前 taxonomy 的语言来解释，而不是引入新的类别名称。
+- [ ] 识别那些如今已经过旧、过于孤立或代表性不足的历史方法，并在保留必要历史锚点的前提下，对其进行压缩或用更强的近年代表作替换。
+- [ ] 更新摘要表格，使新增引用不仅出现在段落文字中，也能出现在结构化对比里。
+- [ ] 在可能的情况下保持段落顺序稳定；除非局部重写不可避免，否则将近期工作追加在现有段落块的末尾。
+- [ ] 在需要时加入简短过渡句，说明即便出现了新变体，当前 taxonomy 仍然有效。
 
-**Checkpoint CP4**
+**检查点 CP4**
 
-- Exit criteria: `tex/5.tex` covers the recent representative methods through the existing taxonomy and no major subsection is left obviously outdated.
+- 退出标准：`tex/5.tex` 已通过既有 taxonomy 覆盖近期代表性方法，且没有哪个主要小节明显落后于当前领域进展。
 
-### Task 6: Capture Non-Taxonomy Methods in Applications and Discussion
+### Task 6：在 Applications 和 Discussion 中承接非 Taxonomy 方法
 
-**Files:**
+**文件：**
 - Modify: `tex/6.Applications.tex`
 - Modify: `tex/8.Discussion.tex`
 
-- [ ] Add a compact overflow subsection to `tex/6.Applications.tex` for recent methods that are application-driven, system-driven, or otherwise awkward to place in the taxonomy.
-- [ ] Keep the existing application domains, but update their representative citations where recent work materially changes the picture.
-- [ ] Add discussion text in `tex/8.Discussion.tex` for trends that are too broad for taxonomy placement, such as graph-LLM integration patterns, evaluation fragmentation, prompt interpretability, or cross-domain transfer issues.
-- [ ] Make the handoff explicit: if a paper is not in the taxonomy chapter, the Applications or Discussion section should say why it matters.
-- [ ] Update the ProG-related discussion so that the survey reflects its published benchmark status and clarifies how it relates to the broader graph prompting ecosystem.
+- [ ] 在 `tex/6.Applications.tex` 中新增一个紧凑的 overflow 小节，用于容纳近期那些由应用驱动、系统驱动，或难以放入 taxonomy 的方法。
+- [ ] 保留现有应用领域划分，但在近期工作实质改变图景的地方更新代表性引用。
+- [ ] 在 `tex/8.Discussion.tex` 中加入讨论文本，覆盖那些过于宽泛、不适合放入 taxonomy 的趋势，例如 graph-LLM 集成模式、评测碎片化、prompt 可解释性或跨领域迁移问题。
+- [ ] 明确写出承接关系：如果一篇论文不在 taxonomy 章节中，Applications 或 Discussion 章节应说明它为什么仍然重要。
+- [ ] 更新与 ProG 相关的讨论，使综述能够反映其已发表的 benchmark 状态，并澄清它与更广泛 graph prompting 生态之间的关系。
 
-**Checkpoint CP5**
+**检查点 CP5**
 
-- Exit criteria: recent non-taxonomy work is visible and the manuscript does not silently drop important trends.
+- 退出标准：近期非 taxonomy 工作是可见的，稿件不会悄悄遗漏重要趋势。
 
-### Task 7: Synchronize References, Statistics, and Supporting Assets
+### Task 7：同步参考文献、统计信息与支撑资源
 
-**Files:**
+**文件：**
 - Modify: `tex/zotero.bib`
 - Modify: `tex/2.methodology.tex`
 - Modify if needed: `tex/pic/taxonomy.tex`
 - Modify if needed: `tex/pic/reference_venue.pdf`
 - Modify if needed: `tex/pic/top_keywords_bar.pdf`
 
-- [ ] Deduplicate and normalize all new BibTeX entries.
-- [ ] Check whether the venue distribution and keyword statistics are still defensible after adding 2024-2026 papers.
-- [ ] Decide whether to fully regenerate the statistics figures or to keep them and explicitly soften any quantitative claim in text.
-- [ ] Ensure the paper count mentioned in the abstract, methodology, and discussion matches the actual bibliography-driven coverage.
-- [ ] Verify that every new citation key used in the manuscript resolves correctly.
+- [ ] 对所有新增 BibTeX 条目进行去重和规范化。
+- [ ] 检查在加入 2024-2026 年论文后，venue 分布和关键词统计是否仍然站得住脚。
+- [ ] 决定是完整重生成统计图，还是保留原图并在正文中明确弱化定量论断。
+- [ ] 确保摘要、方法学和讨论中提到的论文计数，与实际由参考文献驱动的覆盖范围一致。
+- [ ] 验证稿件中使用的每个新 citation key 都能被正确解析。
 
-**Checkpoint CP6**
+**检查点 CP6**
 
-- Exit criteria: bibliography is clean, counts are consistent, and supporting figures/tables no longer contradict the text.
+- 退出标准：参考文献干净，计数一致，支撑图表不再与正文矛盾。
 
-### Task 8: Final Editorial Pass and Build Verification
+### Task 8：最终编辑检查与构建验证
 
-**Files:**
+**文件：**
 - Modify as needed: `tex/*.tex`
 - Read: build logs
 
-- [ ] Compile the full manuscript until cross-references and bibliography stabilize.
-- [ ] Fix unresolved citations, broken figure/table references, and obvious formatting regressions.
-- [ ] Run a final pass for tense consistency, year phrasing, and overly strong novelty claims.
-- [ ] Check that Applications contains all overflow methods identified in the mapping file.
-- [ ] Check that no taxonomy change slipped in unintentionally.
-- [ ] Run a final consistency check on ProG references, terminology, and claims across the abstract, introduction, methodology, Applications, and `tex/7.ProG.tex`.
-- [ ] Record the final unresolved issues, if any, in a short release note under `docs/research/2026-03-22-revision-closeout.md`.
+- [ ] 反复编译全文，直到交叉引用和参考文献稳定下来。
+- [ ] 修复未解析的引用、损坏的图表引用，以及明显的格式回归问题。
+- [ ] 最后再检查一次时态一致性、年份表述以及过强的新颖性论断。
+- [ ] 检查 Applications 是否包含映射文件中识别出的所有 overflow 方法。
+- [ ] 检查是否有 taxonomy 变更被无意中混入。
+- [ ] 最后统一检查摘要、引言、方法学、Applications 与 `tex/7.ProG.tex` 中关于 ProG 的引用、术语和论断是否一致。
+- [ ] 如仍有未解决问题，在 `docs/research/2026-03-22-revision-closeout.md` 中记录一份简短的 release note。
 
-**Checkpoint CP7**
+**检查点 CP7**
 
-- Exit criteria: the manuscript builds, the revision is structurally conservative, and any remaining limitations are explicitly recorded.
+- 退出标准：稿件可编译，本轮修订在结构上是保守的，且所有剩余限制都已被明确记录。
 
-## Editing Order Recommendation
+## 建议编辑顺序
 
-- [x] Task 1 first
-- [x] Task 2 second
-- [x] Task 3 before any major manuscript edits
-- [x] Task 4 before Task 5
-- [ ] Task 5 before Task 6
-- [ ] Task 7 after the main text updates
-- [ ] Task 8 last
+- [x] 先做 Task 1
+- [x] 然后做 Task 2
+- [x] 在任何正文大改之前完成 Task 3
+- [x] 在 Task 5 之前完成 Task 4
+- [ ] 在 Task 6 之前完成 Task 5
+- [ ] 在正文更新完成后执行 Task 7
+- [ ] 最后执行 Task 8
 
-## Non-Goals
+## 非目标
 
-- Do not redesign the taxonomy from scratch.
-- Do not expand the survey into a general graph foundation model or graph-LLM survey.
-- Do not add new top-level sections unless a hard submission requirement appears.
-- Do not force every recent paper into the taxonomy if the fit is poor.
+- 不要从零开始重设计 taxonomy。
+- 不要把这篇综述扩展成泛化的图基础模型或 graph-LLM survey。
+- 除非出现硬性投稿要求，否则不要新增顶层章节。
+- 如果某篇近期论文与 taxonomy 的匹配度很差，不要强行把它塞进 taxonomy。
 
-## Optional Extension Track
+## 可选扩展轨道
 
-### Task 9: Ecosystem Refresh Beyond the Manuscript
+### Task 9：论文之外的生态刷新
 
-**Files / Repositories:**
+**文件 / 仓库：**
 - Optional update: `Awesome-Graph-Prompt`
 - Optional update: `ProG`
 - Optional planning note if needed: `docs/research/2026-03-22-ecosystem-extension.md`
 
-- [ ] Sync the most recent accepted and high-value preprint papers into `Awesome-Graph-Prompt`.
-- [ ] Update ProG to include newly collected codebases, benchmarks, or wrappers for recent representative methods where implementation quality is sufficient.
-- [ ] Evaluate whether a `ProG-V2` release is warranted, including scope, migration cost, benchmark coverage, and maintenance burden.
-- [ ] If `ProG-V2` is pursued, write a separate scoped plan rather than folding it into the survey-editing tasks.
+- [ ] 将最新已接收论文和高价值预印本同步到 `Awesome-Graph-Prompt`。
+- [ ] 在实现质量足够的前提下，将新收集到的代码库、benchmark 或 wrapper 加入 ProG，以覆盖近期代表性方法。
+- [ ] 评估是否有必要推进 `ProG-V2` 发布，包括范围、迁移成本、benchmark 覆盖与维护负担。
+- [ ] 如果决定推进 `ProG-V2`，应另外写一份边界清晰的独立计划，而不是把它混入综述修订任务中。
 
-**Optional Checkpoint OP1**
+**可选检查点 OP1**
 
-- Exit criteria: ecosystem-side updates are either completed or explicitly deferred with rationale, and any `ProG-V2` work has a separate scope definition.
+- 退出标准：生态侧更新要么已经完成，要么已附理由明确延期；任何 `ProG-V2` 相关工作都已有单独的范围定义。
 
-## Practical Completion Definition
+## 实际完成定义
 
-- The updated survey reads as a refreshed version of the same paper, not a rewritten manuscript.
-- A reader can still recover the original taxonomy logic immediately.
-- A reviewer can see that the literature update is systematic and current through early 2026.
+- 更新后的综述读起来应像同一篇论文的刷新版，而不是重写后的新稿。
+- 读者仍然可以立刻恢复并理解原有 taxonomy 逻辑。
+- 审稿人能够看出这次文献更新是系统性的，并且覆盖到了 2026 年初。
