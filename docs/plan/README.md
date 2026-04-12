@@ -12,4 +12,4 @@ This directory stores execution plans, progress notes, and review checkpoints.
 
 ## Current Index
 
-- `2026-03-22-graph-prompt-survey-revision-plan.md`: execution checklist and checkpoints for the graph prompt survey refresh.
+- `图提示综述修订计划.md`: execution checklist and checkpoints for the graph prompt survey refresh.
