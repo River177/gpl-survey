@@ -44,3 +44,6 @@ _minted*
 papers/zotero/pdfs/*
 papers/zotero-test/pdfs/*
 .worktrees/
+
+.agents/*
+*.pdf

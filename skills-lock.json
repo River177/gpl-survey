@@ -5,6 +5,31 @@
       "source": "yorkeccak/scientific-skills",
       "sourceType": "github",
       "computedHash": "dbf9afcf79e59c54dc66f9cd17455f70fdde038c20ba4f3af3b359f40761a350"
+    },
+    "bgpt-paper-search": {
+      "source": "K-Dense-AI/scientific-agent-skills",
+      "sourceType": "github",
+      "computedHash": "fbfac1bb60db78a05f130747c078e85c6ea3208723b96093de5ead50185efc3f"
+    },
+    "pdf": {
+      "source": "K-Dense-AI/scientific-agent-skills",
+      "sourceType": "github",
+      "computedHash": "d88055de294f6b363bc92aa775eed3d6e763b2fea5dc51f4d954da6bba8e1599"
+    },
+    "peer-review": {
+      "source": "K-Dense-AI/scientific-agent-skills",
+      "sourceType": "github",
+      "computedHash": "5e2ad9baf55279cc9e79580bfc99bcfa368c4ffe300c9ac635b694ff7e4df530"
+    },
+    "pyzotero": {
+      "source": "K-Dense-AI/scientific-agent-skills",
+      "sourceType": "github",
+      "computedHash": "85ec3db2e7951b98d3d8bc7106f3a76fc66e245eab1391312f8d36edbd57f7a9"
+    },
+    "scientific-writing": {
+      "source": "K-Dense-AI/scientific-agent-skills",
+      "sourceType": "github",
+      "computedHash": "c402452909f1fc3060cd8ac167523c2d4c43cd56573530ee3c22eb063692f4e5"
     }
   }
 }
