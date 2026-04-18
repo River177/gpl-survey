@@ -1,0 +1,1015 @@
+                                               RELIEF: Reinforcement Learning Empowered Graph Feature
+                                                                   Prompt Tuning
+                                                               Jiapeng Zhu                                                     Zichen Ding                                   Jianxiang Yu
+                                                   East China Normal University                                    East China Normal University                     East China Normal University
+                                                         Shanghai, China                                                  Shanghai, China                                  Shanghai, China
+                                                   jiapengzhu@stu.ecnu.edu.cn                                       zichending@stu.ecnu.edu.cn                      jianxiangyu@stu.ecnu.edu.cn
+
+                                                                  Jiaqi Tan                                                      Xiang Li∗                                  Weining Qian
+                                                   East China Normal University                                  East China Normal University                       East China Normal University
+arXiv:2408.03195v3 [cs.LG] 17 Jan 2025
+
+
+
+
+                                                          Shanghai, China                                       Engineering Research Center of                            Shanghai, China
+                                                     jiaqitan@stu.ecnu.edu.cn                                 Blockchain Data Management (East                       wnqian@dase.ecnu.edu.cn
+                                                                                                              China Normal University), Ministry
+                                                                                                                          of Education
+                                                                                                                Shanghai Engineering Research
+                                                                                                               Center of Big Data Management
+                                                                                                                       Shanghai, China
+                                                                                                                   xiangli@dase.ecnu.edu.cn
+
+                                         Abstract                                                                                        gain. Extensive experiments on graph and node-level tasks with
+                                         The advent of the “pre-train, prompt” paradigm has recently ex-                                 various pre-training strategies in few-shot scenarios demonstrate
+                                         tended its generalization ability and data efficiency to graph repre-                           that our RELIEF outperforms fine-tuning and other prompt-based
+                                         sentation learning, following its achievements in Natural Language                              approaches in classification performance and data efficiency. The
+                                         Processing (NLP). Initial graph prompt tuning approaches tailored                               code is available at https://github.com/JasonZhujp/RELIEF.
+                                         specialized prompting functions for Graph Neural Network (GNN)
+                                         models pre-trained with specific strategies, such as edge prediction,                           CCS Concepts
+                                         thus limiting their applicability. In contrast, another pioneering line                         • Information systems → Data mining; • Computing method-
+                                         of research has explored universal prompting via adding prompts                                 ologies → Reinforcement learning; Knowledge representation
+                                         to the input graph’s feature space, thereby removing the reliance                               and reasoning.
+                                         on specific pre-training strategies. However, the necessity to add
+                                         feature prompts to all nodes remains an open question. Motivated                                Keywords
+                                         by findings from prompt tuning research in the NLP domain, which                                Graph Neural Networks; Prompt Tuning; Reinforcement Learning;
+                                         suggest that highly capable pre-trained models need less condi-                                 Hybrid Action Space; Few-shot Learning
+                                         tioning signal to achieve desired behaviors, we advocate for strate-
+                                         gically incorporating necessary and lightweight feature prompts                                 ACM Reference Format:
+                                                                                                                                         Jiapeng Zhu, Zichen Ding, Jianxiang Yu, Jiaqi Tan, Xiang Li, and Weining
+                                         to certain graph nodes to enhance downstream task performance.
+                                                                                                                                         Qian. 2025. RELIEF: Reinforcement Learning Empowered Graph Feature
+                                         This introduces a combinatorial optimization problem, requiring
+                                                                                                                                         Prompt Tuning. In Proceedings of the 31st ACM SIGKDD Conference on
+                                         a policy to decide 1) which nodes to prompt and 2) what specific                                Knowledge Discovery and Data Mining V.1 (KDD ’25), August 3–7, 2025,
+                                         feature prompts to attach. We then address the problem by framing                               Toronto, ON, Canada. ACM, New York, NY, USA, 12 pages. https://doi.org/
+                                         the prompt incorporation process as a sequential decision-making                                10.1145/3690624.3709252
+                                         problem and propose our method, RELIEF, which employs Rein-
+                                         forcement Learning (RL) to optimize it. At each step, the RL agent                              1    Introduction
+                                         selects a node (discrete action) and determines the prompt content
+                                         (continuous action), aiming to maximize cumulative performance                                  In recent years, Graph Neural Networks (GNNs) have been ap-
+                                                                                                                                         plied in diverse domains, including knowledge graphs [21], social
+                                         ∗ Corresponding author
+                                                                                                                                         networks [1], and recommender systems [14], due to their power-
+                                                                                                                                         ful expressivity in capturing complex relationships in real-world
+                                         Permission to make digital or hard copies of all or part of this work for personal or
+                                         classroom use is granted without fee provided that copies are not made or distributed           data. To facilitate robust graph learning under few-shot and out-
+                                         for profit or commercial advantage and that copies bear this notice and the full citation       of-distribution settings, significant efforts have focused on pre-
+                                         on the first page. Copyrights for components of this work owned by others than the              training GNN models [42]. Despite advancements, the “pre-train,
+                                         author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+                                         republish, to post on servers or to redistribute to lists, requires prior specific permission   fine-tune” paradigm still exhibits drawbacks. The misalignment
+                                         and/or a fee. Request permissions from permissions@acm.org.                                     between pre-training and downstream objectives can lead to sub-
+                                         KDD ’25, Toronto, ON, Canada.                                                                   optimal performance [9]. Moreover, pre-trained models are prone
+                                         © 2025 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+                                         ACM ISBN 979-8-4007-1245-6/25/08                                                                to overfitting given rather limited samples, leading to catastrophic
+                                         https://doi.org/10.1145/3690624.3709252                                                         forgetting [22], which compromises their generalization ability.
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada.                                                                                          Jiapeng Zhu et al.
+
+
+
+                                             Fine-Tuning                              Pre-training-Dependent
+                                                                                          Prompt Tuning
+                                                                                                                                 Node-level pre-training
+         Any pre-training                                                                                 S       Super node
+           strategies
+
+                                                                   Downstream                                    ReadOut
+                                                                                                                                 Edge-level pre-training
+                                                                                                  ?
+                                       Feature Prompt Tuning         tasks                        ?
+                                                                                                  ?
+
+           Pre-training GNN                                                                  Class prototypes
+                                                                                                                                 Graph-level pre-training
+           Tuning pre-trained GNN
+
+           Frozen pre-trained GNN                 Prompt feature                                                Prompt graph
+
+
+Figure 1: A Comparison of Tuning Methods. Fine-tuning (upper left) updates the parameters of the pre-trained GNN model.
+Pre-training-dependent prompt tuning (right) freezes the GNN model and requires designing specialized prompt templates
+aligned with pre-training strategies, whereas feature prompt tuning (lower left) is applicable to any pre-training strategy.
+
+   To tackle the issues, prompt learning, which has shown remark-               Conversely, since prompts are directly added to node features, in-
+able success in Natural Language Processing (NLP) [19, 23] and                  corporating large-magnitude prompts to an excessive number of
+Computer Vision (CV) [12, 44], emerges as a promising approach.                 nodes might overwhelm the original input’s feature space, caus-
+By designing informative prompts to manipulate input data, prompt               ing pre-trained GNNs to perceive prompted graphs as unfamil-
+tuning aligns objectives between pretext and downstream tasks,                  iar, leading to a decline in transfer performance. Hence, the key
+thereby augmenting the potential of pre-trained models.                         lies in strategically incorporating necessary and lightweight
+   Naturally, researchers have extended the “pre-train, prompt”                 prompts into the original graph, allowing a GNN model to fully
+framework to graph domain [5, 15, 35, 40, 48]. Existing methods are             leverage its learned knowledge during pre-training without being
+broadly divided into two categories based on dependence on pre-                 overly disrupted, and to better generalize to downstream tasks
+training strategies. For methods reliant on pre-training strategies,            through flexible feature prompts.
+GPPT [32] and GraphPrompt [24] unify pretext and downstream                        The choice of prompting on certain nodes and attaching specific
+tasks as edge prediction. All in One [34] introduces a prompt graph             prompt contents leads to a combinatorial optimization problem. To
+to match the graph-level contrastive learning used in pre-training.             tackle this, we turn to Reinforcement Learning (RL), which effec-
+However, these methods may fail if the pre-training and prompt                  tively searches for heuristic strategies by training an agent [26],
+tuning objectives of the GNN model are misaligned. In contrast,                 and propose a REinforcement LearnIng Empowered graph Feature
+prompting methods agnostic to pre-training strategies offer greater             prompting method, named RELIEF. We formulate the process of
+compatibility. GPF [4] introduces graph feature-based prompt tun-               inserting prompts as a sequential decision-making problem. At each
+ing, demonstrating that adding a learnable uniform feature prompt               step, the RL agent: 1) selects which node to prompt (discrete action),
+vector to each node is theoretically equivalent to any graph manipu-            and 2) determines the prompt content, i.e., specific values of the
+lation, without restricting pre-training strategies. GPF-plus [4] and           prompt vector (continuous action). Therefore, an RL algorithm capa-
+SUPT [18] further provide more flexible adaptation by inserting                 ble of handling the discrete-continuous hybrid action space [3, 25] is
+node or subgraph-specific prompted features, respectively, cap-                 employed. The prompted graph is then evaluated by the pre-trained
+turing intricate topological nuances of graph, leading to a decent              GNN model. At the subsequent step, a new prompt generated by the
+performance improvement. Thus, feature-based prompting forms                    RL agent is added to the previous prompted graph. Prompt addition
+the basis of our paper due to its generality and effectiveness.                 and performance evaluation are iteratively performed to maximize
+   Nonetheless, it is critical to delve deeper into existing feature-           the expected cumulative performance gain on the downstream task.
+based prompting methods. In NLP, soft prompt tuning adapts frozen               Techniques like policy generalization [7, 28, 38] are integrated to
+language models for specific tasks using continuous prompt to-                  ensure training stability and effectiveness. Our contributions are
+kens [23]. Research shows that while increasing prompt token                    summarized as follows:
+length involves more tunable parameters and thus enhances expres-
+                                                                                • We suggest enhancing the performance of pre-trained GNN mod-
+sivity, excessively long prefixes can degrade test performance [20,
+                                                                                  els on downstream tasks by adding necessary and lightweight
+47]. In fact, T5-XXL can achieve strong results even with a single-
+                                                                                  feature prompts and design metrics to quantify their impact on
+token prompt, indicating that more capable models need less con-
+                                                                                  inputs, offering a new perspective on graph prompt tuning.
+ditioning signal to exhibit desired behavior [19]. This finding is
+                                                                                • As far as we know, we are the first to formulate feature prompt
+even more enlightening in the context of graphs. Since most GNNs
+                                                                                  incorporation as a sequential decision-making problem, and pro-
+follow the message-passing mechanism, information from a feature
+                                                                                  pose RELIEF, an RL empowered graph feature prompting method
+prompt attached to a target node will propagate to its neighbors,
+                                                                                  optimized through trial and error in a hybrid action space.
+diffusing the influence of prompting signals to a broader range.
+                                                                                • Extensive experiments across both graph and node-level tasks
+   We propose that given a pre-trained GNN model, judiciously
+                                                                                  with various pre-training strategies in few-shot scenarios demon-
+inserting minimal prompts as conditioning signals may suffice for
+                                                                                  strate that RELIEF achieves superior classification performance
+downstream tasks. In the realm of feature prompting, “minimal” can
+                                                                                  and data efficiency compared to fine-tuning and other competi-
+be translated as an appropriate amount and magnitude of prompts.
+                                                                                  tive prompt-based methods.
+RELIEF: Reinforcement Learning Empowered Graph Feature Prompt Tuning                                                   KDD ’25, August 3–7, 2025, Toronto, ON, Canada.
+
+
+2    Preliminaries                                                                   actions, respectively, alongside a single critic network for value esti-
+Let an undirected graph instance be G = (V, E, X) ∈ G, where                         mation. H-PPO extends Proximal Policy Optimization (PPO) [30] by
+V = {𝑣 1, 𝑣 2, . . . , 𝑣𝑛 } denotes the node set containing 𝑛 nodes; E =             separately optimizing the two actors with an entropy-regularized
+{(𝑣𝑖 , 𝑣 𝑗 ) | 𝑣𝑖 , 𝑣 𝑗 ∈ V} denotes the edge set; X = {𝑥 1, 𝑥 2, . . . , 𝑥𝑛 } ∈     PPO surrogate objective L PPO to maximize expected cumulative
+R𝑛×𝐷 denotes the node feature matrix, where 𝑥𝑖 ∈ R1×𝐷 is the                         discounted reward, while the critic minimizes Mean Squared Error
+feature vector of node 𝑣𝑖 with feature dimension 𝐷. The adjacency                    (MSE) loss L Critic to improve value estimation accuracy.
+matrix A ∈ {0, 1}𝑛×𝑛 is defined such that A𝑖 𝑗 = 1 if (𝑣𝑖 , 𝑣 𝑗 ) ∈ E.
+                                                                                     3     Method
+   Fine-tuning and Graph Prompt Tuning. Given a pre-trained                          In this section, we first introduce the formulation of a Markov De-
+GNN model 𝑓𝜃 and a task-specific projection head 𝑔𝜙 for making                       cision Process (MDP) designed for our feature prompting scenario
+predictions, parameters 𝜃 and 𝜙 are fine-tuned on a downstream                       (Section 3.1). We then detail the architecture of the policy network
+training dataset D = {(G1, 𝑦1 ), . . . , (G𝑚 , 𝑦𝑚 )} to maximize the                 to instantiate the MDP (Section 3.2). Next, we present the overall
+likelihood of correctly predicting label 𝑦 of graph G, described as:                 framework of RELIEF, featuring alternating training (Section 3.3).
+                𝑚
+                Ö                                  𝑚
+                                                   Ö                                 To mitigate policy overfitting, we integrate policy generalization
+          max         𝑃 𝑓𝜃 , 𝑔𝜙 (𝑦𝑖 | G𝑖 ) = max         𝑔𝜙 (𝑓𝜃 (X, A)) [𝑦𝑖 ]        techniques (Section 3.4). Additionally, we describe two metrics de-
+          𝜃,𝜙                                𝜃,𝜙
+                𝑖=0                                𝑖=0                               signed to quantify the impact of the inserted feature prompts on
+where [𝑦𝑖 ] fetches the prediction probability of label 𝑦𝑖 from 𝑔𝜙 (·).              original graphs (Section 3.5). Note that we use graph-level classifi-
+In contrast, the pre-trained GNN model 𝑓𝜃 remains frozen during                      cation as an example throughout this section and will later extend
+prompt tuning. The primary focus shifts to learning a prompting                      to node tasks in the experiments section.
+function 𝑢𝜓 : G → G, which transforms the original graphs G to
+prompted graphs 𝑢𝜓 (G), used as inputs to the GNN model. The                         3.1     Incorporating Feature Prompts as MDP
+projection head 𝑔𝜙 is also tuned to coordinate with the prompting                    In RL domain, the environment is typically modeled by an MDP [36].
+function. The optimal 𝑢𝜓 and 𝑔𝜙 are obtained by:                                     With the aim of framing the process of incorporating prompts as
+          𝑚
+          Ö                                        𝑚
+                                                   Ö                                 an MDP, we present the design of the basic elements as follows.
+    max         𝑃 𝑓𝜃 , 𝑔𝜙 (𝑦𝑖 | 𝑢𝜓 (G𝑖 )) = max           𝑔𝜙 (𝑓𝜃 (X𝜓 , A𝜓 )) [𝑦𝑖 ]
+    𝜓,𝜙
+          𝑖=0
+                                             𝜓,𝜙
+                                                    𝑖=0
+                                                                                        Action Space. Given a graph G with 𝑛 nodes, a discrete action
+                                                                                     𝑎 is to select a node 𝑣𝑎 from the node set {𝑣 1, . . . , 𝑣𝑛 }, and a con-
+where X𝜓 and A𝜓 are prompted feature and adjacency matrix,                           tinuous action 𝑧 ∈ R1×𝐷 is to determine a real-valued vector for
+respectively, acquired by prompting function 𝑢𝜓 . For evaluation, the                node 𝑣𝑎 , where 𝐷 is the dimension of the initial node feature. Thus,
+downstream testing graphs are first transformed by the prompting                     a hybrid action, i.e., feature prompt, incorporated at time step 𝑡 can
+function and then passed through the pre-trained GNN model,                          be denoted as (𝑎𝑡 , 𝑧𝑡 ) = 𝑝𝑡𝑎,𝑧 . We further define the prompt matrix
+followed by the projection head to produce predictions.
+                                                                                     at step 𝑡 as P𝑡 = {𝑝 1,𝑡 , . . . , 𝑝𝑛,𝑡 } ∈ R𝑛×𝐷 . P0 is initialized as a zero
+   Graph Feature Prompt Tuning. This line of prompting method                        matrix, indicating no prompt is applied. Thus, the prompted feature
+introduces learnable components to the feature space of the input                    X∗ of a prompted graph G ∗ is obtained by X∗ = X + P.
+graph. Given the node feature matrix X = {𝑥 1, 𝑥 2, . . . , 𝑥𝑛 } of a
+                                                                                        State Transition. We define the state space as node represen-
+graph G, learnable prompt feature vectors 𝑝 1, 𝑝 2, . . . , 𝑝𝑛 ∈ R1×𝐷
+                                                                                     tations of the prompted graph G ∗ obtained from the pre-trained
+are added to node features. This can be viewed as the prompting
+                                                                                     GNN model 𝑓𝜃 . This allows the agent to be aware of node represen-
+function 𝑢𝜓 , achieving a prompted feature matrix X∗ expressed as:
+                                                                                     tations that closely tied to the GNN model, enabling precise control.
+       X∗ = {𝑥 1 + 𝑝 1, 𝑥 2 + 𝑝 2, . . . , 𝑥𝑛 + 𝑝𝑛 } = {𝑥 1∗, 𝑥 2∗, . . . , 𝑥𝑛∗ }    Formally, the state at time step 𝑡 is denoted as:
+and X∗ is then processed by the GNN model. Note that feature                                   𝑠𝑡 B 𝑓𝜃 (G𝑡∗−1 ) = 𝑓𝜃 (X𝑡∗−1, A) = 𝑓𝜃 (X + P𝑡 −1, A)
+prompt tuning does not explicitly prompt on the adjacency matrix,                                                         ∗
+                                                                                                  = {ℎ ∗1,𝑡 −1 , . . . , ℎ𝑛,𝑡 −1 } ∈ R
+                                                                                                                                      𝑛×𝑑
+thus the representation of a prompted graph is given by 𝑓𝜃 (G ∗ ) =
+                                                                                               ∗
+𝑓𝜃 (X∗, A). Different feature prompting methods vary in their prompt                 where ℎ𝑖,𝑡  −1 is the representation of node 𝑣𝑖 in the prompted graph
+vector designs or learning approaches. A comparison of aforemen-                       ∗
+                                                                                     G𝑡 −1 , and 𝑑 is the dimension of the latent space. Notably, the current
+tioned tuning methods is depicted in Figure 1.                                       state builds upon the representation of the previous step. However,
+                                                                                     as different graphs contain varying numbers of nodes, this results in
+    RL with Hybrid Action Space. Most RL algorithms operate                          state spaces of different sizes, posing challenges for batch training.
+within either discrete or continuous action spaces [36]. In our                      To fix the size, we set a maximum number of nodes 𝑁 and use zero
+scenario, however, we deal with a hybrid action space [25], in-                      padding, i.e., append (𝑁 − 𝑛) zero vectors 0 ∈ R1×𝑑 to the end of
+volving selecting nodes (discrete) and specifying feature prompts                     ∗ , ensuring a fixed-size state representation:
+                                                                                     ℎ𝑛,𝑡
+(continuous). Formally, discrete actions are chosen from a finite set
+A𝑑 = {𝑎 1, 𝑎 2, . . . , 𝑎𝑛 }, each corresponding to a real-valued contin-                       𝑠𝑡 B 𝑓𝜃 (X𝑡∗−1, A) || 0 (𝑁 −𝑛) ×𝑑
+uous action 𝑧 ∈ R𝐷 , where 𝐷 is the dimension of the continuous                                                                                                    (1)
+                                                                                                                          ∗
+                                                                                                   = {ℎ ∗1,𝑡 −1, . . . , ℎ𝑛,𝑡 −1 , 0𝑛+1 , . . . , 0𝑁 } ∈ R
+                                                                                                                                                           𝑁 ×𝑑
+action space A𝑐 = {𝑧 1, 𝑧 2, . . . , 𝑧𝑛 }. H-PPO [3] is an RL algorithm
+tailored for hybrid action spaces based on actor-critic architecture.                where || denotes concatenation. When the agent executes action
+It employs two parallel actor networks for discrete and continuous                   𝑝𝑡𝑎,𝑧 at step 𝑡, which inherently operates on node 𝑣𝑎 ’s feature prompt
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada.                                                                                             Jiapeng Zhu et al.
+
+
+𝑝𝑎 , the prompted feature matrix then transits to X𝑡∗ = X + P𝑡 , with                    Continuous Actor. Represents the continuous policy 𝜋𝑐 (𝑧|𝑠, 𝑎).
+P𝑡 computed as:                                                                      Given state 𝑠 ∈ R𝑁 ×𝑑 , the MLP𝑧 outputs 𝑁 parameters 𝝁 ∈ R1×𝐷
+                                                                                     for all the 𝑁 possible discrete actions. Then 𝝁 with index [𝑎] is
+      P𝑡 = P𝑡 −1 + 𝑝𝑡𝑎,𝑧 = {𝑝 1,𝑡 −1 , . . . , 𝑝𝑎,𝑡 −1 + 𝑝𝑡𝑎,𝑧 , . . . , 𝑝𝑛,𝑡 −1 }   chosen paired with the selected discrete action 𝑎. Subsequently,
+Finally, the next state 𝑠𝑡 +1 is obtained by replacing X𝑡∗−1 in Eq. (1)              the agent constructs a Gaussian distribution based on (𝝁, 𝝈) and
+with X𝑡∗ . Practically, this involves feeding the prompted graph G𝑡∗                 samples a vector 𝑧 ∈ R1×𝐷 as a prompt feature 𝑝 𝑎,𝑧 stochastically,
+into the pre-trained GNN model to derive new node representations,                   or directly use 𝝁 as the action deterministically, where the standard
+along with zero padding, to construct the subsequent state.                          deviation 𝝈 ∈ R1×𝐷 can either be learned or pre-defined. To ensure
+                                                                                     𝑝 𝑎,𝑧 remains within a desired range, each dimension of 𝑧 is clamped
+   Reward Function. An ideal reward function is goal-oriented,                       to range [−𝑧 max, 𝑧 max ], where 𝑧 max > 0 is a hyper-parameter con-
+providing guiding signals about action values during exploration.                    trolling the scale of the prompt added at every step.
+While downstream task metrics such as AUC or F1-score might
+seem straightforward for graph classification tasks, we require a                        Critic. Used for estimating the state-value function. At its core,
+reward to measure the quality of prompt inserted at each step                        it maps a state 𝑠 to a real value 𝑉 (𝑠) ∈ R. However, there exists
+for each graph. However, these metrics are infeasible to apply to a                  a dimension discrepancy: our state space possesses a node-level
+single graph. Instead, we use the loss decrease as our instant reward,               granularity, whereas value estimation is based on a global view.
+since it captures the concept of performance gain somewhat and                       Therefore, we use Flatten operation to transform the size of state
+can be derived from each graph. Formally, given two adjacent steps,                  𝑠 from 𝑁 × 𝑑 to 1 × 𝑁𝑑. The flattened vector is then passed through
+the reward 𝑟 (𝑠𝑡 , 𝑎𝑡 , 𝑧𝑡 , 𝑠𝑡 +1 ), or 𝑟𝑡 for short, is defined as:                MLP𝑐 to produce a real value, treated as the estimation of 𝑉 (𝑠).
+                                                                                         It is worth noting that the state encoder in the policy network
+                                                                                     Π𝜔 is a direct copy of the pre-trained GNN model and keeps frozen
+                                                                   
+ 𝑟𝑡 = L𝑡 −1 − L𝑡 = L 𝑔𝜙 𝑓𝜃 (G𝑡∗−1 ) , 𝑦 − L 𝑔𝜙 𝑓𝜃 (G𝑡∗ ) , 𝑦 (2)
+                                                                                     during policy learning. This implies it is by updating the parameters
+where L (·) denotes a loss function associated with the downstream                   of the MLPs, that the actors are enabled to map states to actions, and
+task, such as cross-entropy loss for classification. Hence, the reward               the critic is enabled to map states to state values. Such structure has
+is positive if the prompt assigned at this step leads to a loss decrease,            been widely used in RL from Human Feedback (RLHF) practice [2,
+and negative if it increases loss. Consequently, the cumulative re-                  27], where reward models and policy networks are constructed on
+ward reflects the total loss decrease from time step 1 to 𝑇 , serving                fixed LLMs with learnable linear layers appended.
+as a surrogate measurement of overall performance improvement.
+                                                                                     3.3    Overall Framework of RELIEF
+3.2      Policy Network Architecture                                                 RELIEF contains two trainable modules: the policy network and the
+RELIEF employs H-PPO, comprising two parallel actor networks                         projection head, as illustrated in Figure 2. Effective coordination of
+and a single critic network collectively referred to as the policy                   these two modules greatly enhances the prompting performance.
+network Π𝜔 , where 𝜔 denotes the parameters of these networks.                       We train them alternatively in practice, as described below.
+   In practice, all the three networks share the first few layers to en-             3.3.1 Policy network training. Given the frozen pre-trained GNN
+code state information. Since the state space is designed as the node                model 𝑓𝜃 , the policy network Π𝜔 , the projection head 𝑔𝜙 and a
+representations of a prompted graph, we utilize the pre-trained                      graph G with label 𝑦 containing 𝑛 nodes, the initial loss L0 is
+GNN model 𝑓𝜃 as the state encoder. Thereafter, Multi-Layer Per-                      computed via L (𝑔𝜙 (𝑓𝜃 (G)), 𝑦), with no prompt attached.
+ceptrons (MLPs) with different output dimensions are connected
+                                                                                        At each step, the agent samples a feature prompt 𝑝𝑡𝑎,𝑧 with re-
+to each of the three networks, facilitating the corresponding func-
+                                                                                     spect to the policies 𝜋𝑑 and 𝜋𝑐 , and adds it to node 𝑣𝑎 . The prompted
+tions. Given a prompted graph G ∗ , the forward propagation of the
+                                                                                     graph is then passed to the GNN model followed by the projection
+networks is presented as follows:
+                                                                                     head to obtain the current loss according to label 𝑦. By comparing
+               𝑝 (𝑎 | 𝑠) ← Softmax MLP𝑎 𝑓𝜃 (G ∗ )
+                                                       
+                                                                                     the current loss with the previous one, an instant reward is com-
+                                                                                     puted by Eq. (2). As a result, the agent collects a transition, denoted
+                 𝝁 (𝑠, 𝑎) ← MLP𝑧 𝑓𝜃 (G ∗ ) [𝑎]
+                                          
+                                                                                     as a tuple (𝑠, 𝑎, 𝑧, 𝑟, 𝑠 ′ ). The prompt addition process is repeated
+                   𝑉 (𝑠) ← MLP𝑐 Flatten 𝑓𝜃 (G ∗ )
+                                                      
+                                                                                     𝑛 times, equivalent to the number of nodes, theoretically giving
+                                                                                     every node a chance of being prompted. Notably, both actors use
+   Let’s elaborate on each expression in turn.
+                                                                                     stochastic policies for better exploration during training.
+   Discrete Actor. Represents the discrete policy 𝜋𝑑 (𝑎|𝑠). Given
+                                                                                        Next, the collected 𝑛 transitions are used to update the policy
+node representations of a prompted graph as state 𝑠, i.e., 𝑓𝜃 (G ∗ )
+                                                                                     network. The two actors are independently trained using the PPO
+with size 𝑁 × 𝑑, the MLP𝑎 followed by a Softmax operation trans-
+                                                                                     surrogate objective L PPO , whereas the critic is trained by MSE loss
+forms 𝑠 into a discrete action probability 𝑝 (𝑎|𝑠) ∈ R𝑛 . The agent
+                                                                                     L Critic . The above process is batchified by consuming a batch of
+then either samples a node 𝑣𝑎 based on this probability or greedily
+                                                                                     graphs simultaneously to increase sampling and training efficiency.
+selects the node with the highest probability as a discrete action,
+indicating a stochastic or deterministic policy, respectively. Note                  3.3.2 Projection head training. This aligns predictions with their
+that we set the entries in 𝑝 (𝑎|𝑠) associated with zero padding to                   correct labels by coordinating the projection head with representa-
+zero, eliminating their chance of being selected, which reduces the                  tions of the ultimate prompted graphs. Thus, we use the learned pol-
+number of valid discrete actions from 𝑁 to 𝑛.                                        icy to insert feature prompts for 𝑛 steps to obtain the final prompted
+RELIEF: Reinforcement Learning Empowered Graph Feature Prompt Tuning                                                                                                         KDD ’25, August 3–7, 2025, Toronto, ON, Canada.
+
+
+                             Discrete actor        Continuous actor                     Agent Sampling [ Loop for each sub-policy ]                                                 Policy Update
+                             Critic                Frozen GNN
+                                                                           t=0                          t=1                     t=2           ……        t=N                [ Loop for each sub-policy ]
+                             Projection Head      Tuned       Frozen
+                                                                        No prompt             a=1 z=                   a=5 z=                      a=2 z=
+                                                                        2               5       2                5      2                5          2                5
+                                                                                1                        1                       1            ……            1
+                                                                            3       4               3        4              3        4                  3        4            Update actors by
+                                                                                                                                                                                  [Eq.(4)] and          [Eq.(6)]
+
+                                                                pairs
+                                        Sample transitions with
+                                        sub-policies    and                             difference
+                                                                                                                                                                                  Update critic by
+                                                                                                                     ……                                     Buffer                          [Eq.(11)]
+              Alternating
+
+
+
+
+                                                                                                                                                                                                                   Alternating
+                            training
+
+
+
+
+                                                                                                                                                                                                                    training
+                                                                                                                                      Attach prompt N times
+
+                                                                                                                        2                 5           Add prompts with
+                                              Update by     [Eq.(3)]                                Buffer                       1
+                                                                                                                            3         4            joint policies and
+                                                     [ Loop for q times ]                                            Prompted graph
+                                                    Projection Head Update                               Prompt Addition
+
+Figure 2: RELIEF pipeline. The policy network (upper) and the projection head (lower) are trained alternately. Feature prompts
+are incorporated during the agent sampling and prompt addition processes via discrete and continuous actors.
+
+graph G ∗ . Here, we modify the continuous policy to be determinis-                                                                  policy 𝜋𝑑, 𝐽 , i.e., maximizing the following objective:
+tic, ensuring identical prompt vector values for the same state and                                                                                                         h                             i
+                                                                                                                                                    PPO
+discrete action. This guarantees stable prompted graphs and thus                                                                        L𝑑,𝑖 = L𝑑,𝑖       − 𝛼𝑑 E𝑠∼𝜋𝑑,𝑖 , D𝑖 𝐷 KL 𝜋𝑑,𝑖 (𝑎|𝑠) || 𝜋𝑑, 𝐽 (𝑎|𝑠)                       (4)
+consistent representations, which together with the labels, are used
+                                                                                                                                     where 𝛼𝑑 > 0 is a uniform penalty hyper-parameter for all discrete
+to supervise the projection head update. Given 𝑚 graph samples,
+                                                                                                                                     sub-polices and 𝐷 KL denotes the KL-divergence. The discrete joint
+the projection head 𝑔𝜙 is updated by minimizing the objective:
+                                                                                                                                     policy 𝜋𝑑, 𝐽 combines all sub-policies 𝜋𝑑,𝑖 , and is computed as:
+                                            𝑚
+                                         1 ∑︁                                                                                                                                max𝑖=1,...,𝑙 𝜋𝑑,𝑖 (𝑎|𝑠)
+                                   min         L 𝑔𝜙 𝑓𝜃 (G𝑖∗ ) , 𝑦                                                (3)                                            𝜋𝑑, 𝐽 (𝑎|𝑠) = Í                                                  (5)
+                                       𝜙 𝑚                                                                                                                                                             ′
+                                           𝑖=1                                                                                                                                 𝑎 ′ max𝑖=1,...,𝑙 𝜋𝑑,𝑖 (𝑎 |𝑠)
+where L (·) is the same loss function as in Eq. (2). To facilitate a                                                                 indicating that to obtain the discrete action probability 𝑝 (𝑎|𝑠) given
+more rapid coordination of the projection head with the policy, the                                                                  by 𝜋𝑑, 𝐽 , we take the maximum probability across all 𝑙 sub-policies
+projection head is updated 𝑞 times.                                                                                                  for each action 𝑎, and normalize these maxima by their sum across
+   To summarize, the above alternating process – training policy                                                                     all actions.
+network once and projection head 𝑞 times – defines a training                                                                            Since RELIEF requires hybrid action spaces, we extend LEEP
+epoch. At the evaluation stage, we directly apply the two learned                                                                    to continuous action spaces. Similarly, we learn 𝑙 continuous sub-
+actors to incorporate feature prompts step by step into the down-                                                                    policies {𝜋𝑐,1, . . . , 𝜋𝑐,𝑙 }, each exploring in its respective training
+stream validation and testing graphs. These prompted graphs are                                                                      contexts D𝑖 . In other words, we employ 𝑙 parallel H-PPO algorithms,
+transformed by the pre-trained GNN model and the learned pro-                                                                        but still with a single critic. Each continuous sub-policy 𝜋𝑐,𝑖 is
+jection head to produce predictions, which are then measured by                                                                      trained by maximizing the following objective:
+downstream metrics.                                                                                                                                                         h                            i
+                                                                                                                                                   PPO
+                                                                                                                                          L𝑐,𝑖 = L𝑐,𝑖    − 𝛼𝑐 E𝑠∼𝜋𝑐,𝑖 , D𝑖 𝐷 KL 𝜋𝑐,𝑖 (𝑎|𝑠) || 𝜋𝑐, 𝐽 (𝑎|𝑠)    (6)
+3.4    Policy Generalization
+                                                                                                                                     where 𝛼𝑐 > 0 is a uniform penalty hyper-parameter for continuous
+When trained in a limited set of environments, general RL algo-
+                                                                                                                                     sub-policies. The continuous joint policy 𝜋𝑐, 𝐽 is defined as:
+rithms often exhibit overfitting, resulting in poor generalization
+to unseen testing scenarios [28, 38], which is exactly the case in                                                                                                           𝑙                     𝑙
+                                                                                                                                                                          1 ∑︁                  1 ∑︁
+few-shot prompt tuning. To tackle this, we introduce a policy gen-                                                                                 𝜋𝑐, 𝐽 (𝑧|𝑠, 𝑎) =             𝜋𝑐,𝑖 (𝑧|𝑠, 𝑎) =      𝝁 (𝑠, 𝑎)                    (7)
+                                                                                                                                                                          𝑙 𝑖=1                 𝑙 𝑖=1 𝑖
+eralization technique, named LEEP [7], which can be seamlessly
+integrated with PPO, and thus compatible to our RELIEF.                                                                              indicating that the average mean 𝝁 𝑖 of all sub-policies is used as
+   Practically, LEEP is an ensemble-based method designed for                                                                        the continuous joint policy.
+discrete action spaces, adding a regularization term to PPO surro-                                                                      To sum up, the policy network, enhanced by policy general-
+gate objective L PPO for updating the actor network. LEEP learns                                                                     ization techniques, now comprises 𝑙 discrete actors, 𝑙 continuous
+a generalized joint policy by leveraging all sub-policies. To gener-                                                                 actors and a single critic. During training, discrete and continuous
+alize our discrete policy 𝜋𝑑 (𝑎|𝑠), we learn 𝑙 discrete sub-policies                                                                 actors within each pair are independently updated using Eq. (4)
+{𝜋𝑑,1, . . . , 𝜋𝑑,𝑙 }. Each 𝜋𝑑,𝑖 gathers transitions from a training graph                                                           and (6), respectively, followed by the critic update using L Critic .
+set D𝑖 , which is bootstrap-sampled from the entire training set D.                                                                  Each pair of actors is sequentially updated. The joint policies 𝜋𝑑, 𝐽
+Each 𝜋𝑑,𝑖 is updated by maximizing the expected reward, while min-                                                                   and 𝜋𝑐, 𝐽 are applied to incorporate prompt features when training
+imizing the disagreement between 𝜋𝑑,𝑖 itself and the joint discrete                                                                  the projection head or testing at the evaluation stage.
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada.                                                                                    Jiapeng Zhu et al.
+
+
+3.5     Metrics for Quantifying Prompts Impact                              4.2    RL for Graph Representation Learning
+Our RELIEF stands out from existing feature prompting methods [4,           The integration of RL into graph representation learning has ad-
+18] by incorporating necessary and lightweight feature prompts.             vanced significantly. MAG-GNN [17] uses DQN to select optimal
+To measure the disturbance to the original input space caused by            subgraph subsets to achieve high expressivity. WSD [39] employs
+these prompts, we introduce two metrics: Prompt Coverage Ratio              weighted sampling for subgraph counting, with edge weights deter-
+(PCR) and Average Prompt Magnitude (APM).                                   mined by DDPG. SUGAR [33] preserves hierarchical graph proper-
+                                                                            ties by selecting subgraphs using an RL pooling mechanism based
+   Prompt Coverage Ratio. Given a graph G with 𝑛 nodes, and the             on Q-learning. GPA [10] utilizes DQN to learn optimal annotation
+final prompt matrix P = {𝑝 1, . . . , 𝑝𝑛 } ∈ R𝑛×𝐷 obtained by adding        strategies for valuable nodes in active search, while GraphCBAL [46]
+feature prompts 𝑝 𝑎,𝑧 over 𝑛 steps, starting from a zero matrix, PCR        further employs A2C for a class-balanced active search strategy.
+is calculated as:                                                              While these works typically apply basic RL algorithms to either
+                             𝑛
+                         1 ∑︁                                               select actions from finite sets or determine single real values, RELIEF
+              PCR(G) =          1 [𝑝𝑖 ≠ 01×𝐷 ] ∈ [0, 1]           (8)       employs RL in a hybrid action space, skillfully integrating policy
+                         𝑛 𝑖=1
+                                                                            generalization techniques to achieve intricate control, representing
+where 1 [·] is the indicator function, which equals 1 if the feature        a more cohesive fusion of RL and graph learning.
+prompt 𝑝𝑖 is not a zero vector 01×𝐷 (i.e., a valid prompt), otherwise
+0. PCR signifies the proportion of nodes prompted at least once             5 Experiments
+during the entire prompt addition process.
+                                                                            5.1 Few-shot Graph Classification
+   Average Prompt Magnitude. We use L1-norm of the valid fea-                  GNN Architecture and Datasets. We use a 5-layer GIN [43] as
+ture prompts averaged over dimensions, to describe the magnitude            the base architecture for the GNN model, which is pre-trained on
+of inserted prompts, which is computed as:                                  chemistry datasets [11] and prompt tuned on molecule properties
+                          𝑛                                                 prediction benchmark from MoleculeNet [41] as downstream tasks.
+                      1 ∑︁ 1
+        APM(G) =              1 [𝑝𝑖 ≠ 01×𝐷 ] · ∥𝑝𝑖 ∥ 1 ∈ [0, +∞)     (9)    Descriptions of these datasets are provided in Appendix A.1.
+                      𝑛 𝑖=1 𝐷
+                                                                               Pre-training Strategies. To demonstrate the generality of our
+where ∥𝑝𝑖 ∥ 1 denotes the Manhattan norm of 𝑝𝑖 , i.e., the sum of the       RELIEF, we pre-train the GIN model with four common strategies
+absolute values of all entries of 𝑝𝑖 . Thus, APM characterises the          at both node and graph levels: Deep Graph Infomax (Infomax) [37],
+scale of valid feature prompts, offering a tangible measurement in          Attribute Masking (AttrMasking) [11], Context Prediction (Con-
+terms of “lightweight”.                                                     textPred) [11], and Graph Contrastive Learning (GCL) [45]. Descrip-
+   PCR and APM collectively assess how extensively and signif-              tions of these methods are available in Appendix A.2.
+icantly feature prompts are integrated, which are applicable for
+evaluating any feature prompting methods.                                       Baselines. We compare RELIEF with the following tuning ap-
+                                                                            proaches, all of which involve adjusting the projection head. Be-
+4 Related Work                                                              sides, Fine-Tuning (FT) tunes the parameters of the pre-trained
+                                                                            GNN model; feature prompt tuning methods, including GPF,
+4.1 Graph Prompt Tuning                                                     GPF-plus [4], SUPTsoft and SUPThard [18], tune the parameters
+Graph prompt tuning research can be categorized based on whether            of learnable feature prompts with the GNN model fixed; other
+the prompting methods are independent of pre-training strate-               prompt-based method, All in One [34], uses a frozen GNN model
+gies. For methods paired with specific pre-trained GNN models,              specifically pre-trained by GCL, adapting learnable graph prompts,
+GPPT [32] and GraphPrompt [24] align pretext and downstream                 is included as it strictly aligns with our experimental setting.
+tasks using link prediction. All in One [34] unifies tasks at graph
+                                                                               Training Scheme. Since molecular predictions are multi-label
+level and incorporates learnable prompt graphs tuned by meta-
+                                                                            binary classifications, we use binary cross-entropy loss as the re-
+learning. PSP [6] and Self-Pro [8] further adapt prompting ap-
+                                                                            ward function and evaluate by averaging the ROC-AUC of each
+proaches to heterophilous graphs by introducing graph-level dual-
+                                                                            label. We construct few-shot scenarios with 50 samples for prompt
+view and asymmetric contrastive learning, respectively, as pretext
+                                                                            tuning over five random seeds. The number of sub-policies 𝑙 is set
+tasks, preserving more graph structural information.
+                                                                            to 3, with penalty factors 𝛼𝑑 selected from {1e0, 1e1, 1e3, 1e5} and
+   Although these methods have shown success, their reliance on
+                                                                            𝛼𝑐 set to 0.1. The maximum prompt scale per step 𝑧 max is selected
+specific pre-training strategies limits their applicability. In contrast,
+                                                                            from {0.1, 0.5, 1.0}. The projection head is chosen from {1, 2, 3}-
+feature prompt tuning, has demonstrated comparable results across
+                                                                            layer MLPs and trained 𝑞 times per epoch, ranging from {1, 2, 3}.
+various pre-training strategies. Pioneering works like GPF, GPF-
+                                                                            Detailed data splitting and hyper-parameter settings are provided in
+plus [4], and SUPT [18] introduce learnable feature prompts to
+                                                                            Appendix A.3. All the experiments were conducted on an NVIDIA
+every node. However, they potentially overemphasize prompts and
+                                                                            A800 PCIe 80GB GPU.
+disrupt the input space, which may degrade performance.
+   To the best of our knowledge, our work is the first to apply RL             Performance Results. Based on the results in Table 1, RELIEF
+to graph feature prompt tuning, aiming to optimize a policy for             achieves superior graph classification performance in few-shot
+inserting necessary and lightweight feature prompts to enhance              settings, surpassing baselines in 28/32 tasks, with an average im-
+the downstream tasks performance of pre-trained GNN models.                 provement of 1.64% over fine-tuning and 1.04% over the runner-up.
+RELIEF: Reinforcement Learning Empowered Graph Feature Prompt Tuning                                                           KDD ’25, August 3–7, 2025, Toronto, ON, Canada.
+
+
+Table 1: ROC-AUC (%) and standard deviation for graph classification on molecule property prediction benchmark under
+50-shot scenario with various pre-training and tuning strategies. The best results for each dataset and pre-training strategy are
+highlighted in bold, and the runner-up is underlined.
+                       Tuning
+                       Strategy        BBBP             Tox21             ToxCast       SIDER             ClinTox       MUV            HIV             BACE          Avg.
+
+                         FT          65.26 ±1.05      71.54 ±0.73      57.98 ±0.42    53.45 ±0.49      59.01 ±2.18   64.08 ±0.84    65.13 ±2.50     64.57 ±0.71      62.63
+                                     66.30 ±0.94      71.26 ±0.30      58.33 ±0.27    53.65 ±0.34      63.11 ±2.35   67.19 ±0.10    64.09 ±0.66     64.32 ±0.88
+     Infomax
+
+
+
+
+                        GPF                                                                                                                                          63.53
+                      GPF-plus       66.12 ±1.27      71.54 ±0.63      58.43 ±0.27    53.76 ±1.15      65.06 ±1.56   67.20 ±0.17    64.81 ±1.62     65.88 ±1.72      64.10
+                      SUPTsoft       66.45 ±0.85      71.82 ±0.16      58.71 ±0.44    53.72 ±0.45      65.96 ±3.37   66.52 ±0.55    65.51 ±2.31     66.26 ±2.45      64.37
+                      SUPThard       66.14 ±0.85      71.55 ±0.37      58.65 ±0.33    53.82 ±0.49      65.90 ±3.41   66.53 ±0.35    65.59 ±2.26     66.40 ±0.70      64.32
+                       RELIEF        67.93 ±0.73      71.58 ±0.13      58.78 ±0.17    53.95 ±0.40      66.28 ±2.07   67.23 ±0.08    67.00 ±0.55     67.95 ±0.52      65.09
+                                     66.48 ±0.44      72.32 ±0.19      57.35 ±0.42    54.62 ±0.58      59.71 ±4.43   61.49 ±1.04    58.37 ±1.51     65.41 ±2.09
+   AttrMasking
+
+
+
+
+                         FT                                                                                                                                          61.97
+                        GPF          66.67 ±0.60      72.31 ±0.30      58.01 ±0.27    55.65 ±1.92      67.25 ±2.41   62.58 ±0.31    58.71 ±2.56     68.54 ±1.24      63.72
+                      GPF-plus       66.29 ±0.36      72.75 ±0.38      57.91 ±0.38    55.05 ±1.20      68.89 ±2.86   62.70 ±0.48    58.71 ±1.07     68.07 ±1.20      63.80
+                      SUPTsoft       66.28 ±0.81      72.76 ±0.41      58.28 ±0.34    54.70 ±1.03      68.58 ±4.54   62.81 ±0.25    58.95 ±1.71     66.41 ±0.49      63.60
+                      SUPThard       66.93 ±0.91      72.75 ±0.41      58.18 ±0.44    55.20 ±1.26      68.36 ±3.57   62.81 ±0.22    59.02 ±1.61     68.92 ±0.96      64.02
+                       RELIEF        67.18 ±0.55      72.40 ±0.32      58.41 ±0.14    56.54 ±0.75      74.39 ±1.18   63.18 ±0.17    59.42 ±0.55     69.37 ±0.70      65.11
+                         FT          62.82 ±0.83      70.11 ±0.38      57.68 ±0.69    56.68 ±0.78      60.99 ±2.28   61.28 ±1.93    59.14 ±1.93     64.47 ±2.47      61.65
+     ContextPred
+
+
+
+
+                        GPF          61.65 ±0.76      70.42 ±0.29      58.51 ±0.38    56.55 ±0.46      58.80 ±2.57   64.83 ±0.32    59.68 ±2.20     68.57 ±1.19      62.38
+                      GPF-plus       61.25 ±0.73      70.12 ±0.42      57.64 ±0.70    56.86 ±0.52      61.43 ±3.06   64.59 ±0.28    59.15 ±2.23     68.58 ±1.42      62.45
+                      SUPTsoft       61.85 ±1.56      70.37 ±0.14      57.82 ±0.37    56.57 ±0.50      59.13 ±1.99   64.59 ±1.00    56.58 ±1.94     68.92 ±0.92      61.98
+                      SUPThard       62.29 ±1.41      70.40 ±0.15      58.06 ±0.39    56.34 ±0.72      59.18 ±2.07   64.57 ±0.69    59.08 ±1.47     69.40 ±1.62      62.42
+                       RELIEF        62.99 ±0.67      70.51 ±0.14      58.58 ±0.04    56.89 ±0.25      63.06 ±1.74   64.87 ±0.31    59.72 ±1.67     70.19 ±0.96      63.35
+                          FT         62.13 ±1.66      61.35 ±0.88      53.96 ±0.80    52.63 ±0.71      68.73 ±4.74   51.96 ±1.93    58.67 ±1.41     49.94 ±3.80      57.42
+                         GPF         61.58 ±1.81      59.92 ±1.29      54.44 ±0.31    51.21 ±0.56      75.52 ±3.08   52.26 ±1.28    58.37 ±1.16     56.09 ±2.44      58.67
+     GCL
+
+
+
+
+                      GPF-plus       62.19 ±1.45      60.13 ±0.52      54.43 ±0.43    50.90 ±0.78      75.50 ±1.11   52.40 ±1.55    58.30 ±1.68     59.55 ±3.17      59.18
+                       SUPTsoft      63.96 ±0.85      60.13 ±0.52      54.57 ±0.76    51.44 ±1.24      78.03 ±2.32   51.86 ±1.48    59.30 ±2.59     57.39 ±2.64      59.59
+                      SUPThard       64.15 ±0.96      60.56 ±0.20      54.72 ±0.71    51.60 ±0.85      77.88 ±2.06   51.78 ±1.72    59.24 ±2.42     59.68 ±1.46      59.95
+                      All in One     62.90 ±3.77      61.49 ±0.96      54.72 ±1.03    52.73 ±0.84      66.59 ±3.84   53.34 ±4.20    60.60 ±3.80     59.57 ±5.62      58.99
+                       RELIEF        64.80 ±0.69      61.45 ±0.35      55.03 ±0.39    52.82 ±0.59      79.75 ±1.28   53.52 ±2.17    60.44 ±2.39     62.97 ±1.19      61.35
+
+Table 2: PCR, APM and overall impact (OV.) of feature                                               5.2    Data Efficiency
+prompting methods averaged on all graph classification task.
+                                                                                                To evaluate the data efficiency of feature prompting methods, we
+                   Tuning Strategy   PCR    APM (10−2 )     OV. (10−2 )    ROC-AUC              incrementally add 5% of the training samples until the average ROC-
+                        GPF          1.00      7.15             7.15          62.08             AUC over five random seeds surpasses full-shot fine-tuning. We
+                      GPF-plus       1.00      6.69             6.69          62.38             report the minimum proportion of data required for each method on
+                      SUPTsoft       1.00      6.46             6.46          62.39
+                      SUPThard       0.65      6.10             3.97          62.68             five datasets pre-trained with Infomax and ContextPred strategies.
+                       RELIEF        0.61      6.03             3.68          63.72                Table 3 shows that RELIEF requires the least data for all tasks,
+                                                                                                while other baselines, more or less, fail to surpass full-shot fine-
+Notably, RELIEF is the only method consistently surpassing fine-                                tuning even with the entire dataset. Figure 4 illustrates the perfor-
+tuning across all tasks. Moreover, we observe that All in One yields                            mance trends on BBBP pre-trained with Infomax, which demon-
+better results by inserting prompt graphs with fewer nodes, suggest-                            strates that RELIEF achieves the most noticeable improvement as
+ing that compact prompt structures may enhance prompt tuning.                                   data scales up, whereas other methods fail to exceed fine-tuning.
+   We illustrate the tuning process of RELIEF on the BACE dataset                                  We attribute RELIEF’s superior data efficiency to its RL-based
+pre-trained with Infomax in Figure 3. The ROC-AUC curve demon-                                  learning paradigm. Firstly, it reduces learning difficulty by opti-
+strates a monotonically increasing trend, indicating the stability                              mizing one feature prompt at a time, allowing the agent to focus
+of the training process. The reward curve and distributions show                                on a single state-to-action mapping instead of optimizing entire
+reward improvement as the epochs progress, confirming the effec-                                feature prompts at once. Secondly, the step-by-step insertion and
+tiveness of RELIEF in enhancing downstream task performance.                                    evaluation of prompts expose the agent to various state patterns
+   Furthermore, we measure the impact of prompts on input graphs                                and loss values, acting as data augmentation in few-shot settings.
+in terms of PCR and APM, and further multiply them to express
+the overall impact (OV.). Results are averaged across all tasks, as                                 5.3    Few-shot Node Classification
+outlined in Table 2. RELIEF exhibits the smallest PCR, APM and                                         Extend to Node-Level Tasks. Given that feature prompting
+overall impact compared to baselines. Interestingly, SUPThard also                                  methods are originally designed for graph-level tasks [4], adapting
+prompts on specific nodes with a PCR of 0.65, as each basis prompt                                  them to node-level tasks requires careful consideration. Fortunately,
+vector affects only the top-ranked nodes, where the top-rank ratio                                  prior research has successfully unified various levels of tasks as
+is a hyper-parameter. In contrast, RELIEF does not rely on priori                                   subgraph-level tasks [24, 34]. This unification is achieved by gen-
+information, such as the usage of basis vectors or a top-rank ratio,                                erating induced graphs for nodes or edges, which enables feature
+offering a highly flexible prompting policy based on the actors. No-                                prompting methods to operate on 𝑘-hop subgraphs. These sub-
+tably, the flexibility of graph manipulations is crucial for prompting                              graphs act as proxies for the target nodes or edges during prompt
+performance [34, 35], contributing to RELIEF’s superior results.                                    tuning and downstream tasks evaluation.
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada.                                                                                                                                                                                                          Jiapeng Zhu et al.
+
+
+
+                        100                                                           2e-3
+                                                                                                       Training
+                               90                                                                      Validation
+                                                                 Training                              Testing                                     20                                                                       20
+                 ROC-AUC (%)
+
+
+
+
+                               80                                Validation                                                                        25                                                                       25
+
+
+
+
+                                                                                 Reward
+                                                                 Testing              1e-3                                                         30                                                                       30
+                               70
+
+
+
+
+                                                                                                                                                                                                                    Epoch
+                                                                                                                                           Epoch
+                                                                                                                                                   35                                                                       35
+                               60                                                                                                                  40                                                                       40
+                                                                                                                                                   45                                                                       45
+                               50                                                           0                                                      50                                                                       50
+                                       0      10     20     30     40       50                  0       10      20     30        40   50            -4e-3                         -2e-3     0      2e-3      4e-3            -4e-3   -2e-3     0      2e-3      4e-3
+                                                       Epoch                                                      Epoch                                                                   Reward                                             Reward
+                                             (a) ROC-AUC Curve                                      (b) Average Reward Curve                  (c) Training Reward Distribution                                              (d) Testing Reward Distribution
+Figure 3: Tuning process of RELIEF on BACE. (a) and (b) present the ROC-AUC and average reward curves, respectively, for the
+training, validation, and testing sets across 5 random seeds. (c) and (d) illustrate the reward distributions for the training and
+testing sets as the tuning epochs progress, with white vertical lines indicating the average rewards for each distribution.
+
+Table 3: The minimum proportion (%) of data required for                                                                                                                                   full            random_c                  random_d            linear probing
+
+
+
+
+                                                                                                                                                       ROC-AUC or Accuracy (%)
+surpassing the performance of full-shot FT. The minimum
+proportion are highlighted in bold. × denotes cannot surpass.                                                                                                                    65
+                                           Methods     BBBP       Tox21          SIDER               Cinltox     Bace
+                                          GPF            ×          60               60                ×            55                                                           60
+                                                         ×
+                           Infomax
+
+
+
+
+                                        GPF-plus                    60               60                65           50
+                                        SUPTsoft         ×          65               60                70           45
+                                                         ×                                                                                                                       55
+                                        SUPThard
+                                         RELIEF          75
+                                                                    60
+                                                                    50
+                                                                                     55
+                                                                                     40
+                                                                                                       65
+                                                                                                       60
+                                                                                                                    50
+                                                                                                                    40                                                                    BACE            ClinTox              HIV           Cora            CiteSeer
+                                          GPF            ×          55               55                70           95                              Figure 5: Effectiveness of discrete and continuous policies.
+                           ContPred
+
+
+
+
+                                        GPF-plus         ×          50               45                60           90
+                                        SUPTsoft         ×          65               50                65           85
+                                        SUPThard         ×          65               50                75           85                                 Performance Results. As illustrated in Table 4, RELIEF con-
+                                         RELIEF          90         50               40                55           65
+                                                                                                                                                   sistently achieves top-tier performance across majority of tasks,
+                                        GPF        GPF-plus      SUPTsoft                 SUPThard           RELIEF         FT                     frequently ranking either first or as the runner-up, underscoring
+                                                                                                                                                   its applicability and effectiveness. On average, RELIEF outperforms
+   ROC-AUC (%)
+
+
+
+
+                 69
+                                                                                                                                                   fine-tuning by 2.05% and 1.43% on accuracy and macro f1-score, re-
+                 67                                                                                                                                spectively. Additionally, RELIEF surpasses the second-best method,
+                 65                                                                                                                                GPF-plus, by 0.89% in accuracy. In contrast, GPPT and GraphPrompt
+                 63                                                                                                                                exhibit inferior performance in most tasks. A plausible explanation
+                                      5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100
+                     Proportion of Training Data (%)                                                                                               is that their prediction results rely on class prototypes, which are
+Figure 4: Performance of feature prompting methods with                                                                                            challenging to accurately construct with limited labeled data.
+training data scaling up, compared to full-shot FT.
+                                                                                                                                                   5.4                            Ablation Study
+   Datasets, Baselines and Pre-training Strategies. We adopt
+                                                                                                                                                   Considering the core of RELIEF lies in its two actors for incorpo-
+Cora, Citeseer, Pubmed [16] and Amazon-Co-Buy (Computer and
+                                                                                                                                                   rating prompts, we deactivated either one to create two variants.
+Photo) [31] for node classification. To complement the node and
+                                                                                                                                                   Specifically, “random_d” randomly samples a valid node to prompt
+graph-level pre-training strategies used in graph classification, here
+                                                                                                                                                   at each step, while “random_c” generates a real-valued vector sam-
+we focus on edge-level pre-training. Therefore, we include all pre-
+                                                                                                                                                   pled from a random Gaussian distribution. Additionally, we include
+viously mentioned feature prompting methods and additionally
+                                                                                                                                                   “linear probing”, which discards the prompting components and
+involve GPPT [32] and GraphPrompt [24] as baselines, which are
+                                                                                                                                                   adjusts only the projection head.
+tailored to GNNs pre-trained at edge-level and capable of transfer-
+                                                                                                                                                       Figure 5 shows the comparisons of RELIEF with its variants on
+ring to node classification. For pre-training strategies, GPPT uses
+                                                                                                                                                   three graph-level and two node-level tasks. We find that deactivat-
+masked edge prediction (MaskedEdge), while GraphPrompt em-
+                                                                                                                                                   ing either actor results in performance drops due to the disruption
+ploys contrastive learning based on edge connectivity (ContraEdge).
+                                                                                                                                                   of their coordination. Particularly, the discrete actor plays a crucial
+Descriptions of the two strategies are presented in Appendix B.
+                                                                                                                                                   role in RELIEF. Intuitively, a random prompt context assigned to
+   Training Scheme. We construct 10-shot node classification by                                                                                    a target node can be rectified by prompting on the node again in
+randomly sampling 10 nodes per class, with additional 500 nodes                                                                                    later steps, given the premise of a powerful discrete actor for lo-
+each for validation and testing. Considering the average degree of                                                                                 cating this node. However, with a random node selection policy, a
+different datasets, we set varying 𝑘 for generating k-hop subgraphs                                                                                suboptimal feature prompt is difficult to mitigate by prompting on
+for each dataset. We employ a 2-layer GIN [43] as the fundamental                                                                                  arbitrary nodes, and is further exacerbated by the message-passing
+GNN model. Cross-entropy loss is used as the reward function. Five                                                                                 mechanism, which spreads chaotic prompts throughout the graph.
+rounds of experiments with different random seeds are conducted,                                                                                   In addition, "linear probing", which only trains the projection head,
+and the performance is assessed via accuracy and macro F1-score.                                                                                   exhibits significantly inferior performance, clearly demonstrating
+More experimental settings are available in Appendix B.3.                                                                                          the contribution of the inserted feature prompts.
+RELIEF: Reinforcement Learning Empowered Graph Feature Prompt Tuning                                                                                               KDD ’25, August 3–7, 2025, Toronto, ON, Canada.
+
+
+Table 4: Accuracy (%) and Macro F1-score (%) with respective standard deviation for node classification under 10-shot scenario
+with various two edge-level pre-training and various tuning strategies. The best results for each dataset and pre-training
+strategy are highlighted in bold, and the runner-up is underlined.
+
+                                   Tuning                           Cora                                   CiteSeer                     PubMed                   Computers                    Photos
+                                   Strategy                  Accuracy Macro F1                       Accuracy Macro F1            Accuracy Macro F1         Accuracy Macro F1          Accuracy Macro F1
+                                      FT                 54.40 ±1.44 53.27 ±1.45                   61.28 ±0.93 56.60 ±0.92       71.40 ±1.61 67.11 ±1.51   80.52 ±1.18 76.35 ±1.57    83.40 ±3.00 81.31 ±2.88
+                                                         55.04 ±1.82 54.20 ±2.03                   60.48 ±1.11 55.57 ±0.97       64.96 ±6.77 60.63 ±5.17   73.32 ±2.56 68.53 ±2.21    83.08 ±0.68 80.60 ±1.04
+   MaskedEdge
+
+
+
+
+                                     GPF
+                                   GPF-plus              56.36 ±1.46 55.84 ±1.33                   61.36 ±0.70 56.50 ±0.44       72.32 ±4.17 67.52 ±3.51   80.56 ±1.97 76.69 ±1.87    85.08 ±1.22 82.26 ±0.94
+                                   SUPTsoft              55.24 ±1.01 54.69 ±1.18                   59.60 ±1.97 54.88 ±1.45       62.40 ±7.67 58.76 ±6.17   77.28 ±4.18 72.63 ±4.86    84.52 ±1.55 82.22 ±1.36
+                                   SUPThard              56.96 ±1.28 55.86 ±1.28                   61.28 ±1.84 56.81 ±1.45       71.64 ±5.98 65.20 ±5.70   77.96 ±1.61 73.60 ±1.72    85.24 ±0.81 82.92 ±0.56
+                                     GPPT                45.76 ±0.34 46.05 ±0.30                   57.00 ±0.55 51.03 ±0.68       71.36 ±0.70 64.53 ±0.84   75.80 ±0.42 69.97 ±0.57    82.48 ±0.74 80.65 ±0.71
+                                    RELIEF               56.76 ±0.23 55.94 ±0.25                   65.16 ±1.21 58.55 ±1.12       72.36 ±1.05 66.71 ±1.10   77.68 ±0.93 72.53 ±1.26    85.16 ±0.89 84.07 ±0.69
+                                      FT                 60.60 ±1.89 59.82 ±2.01                   60.88 ±2.79 56.90 ±2.20       72.20 ±1.02 67.44 ±0.81   80.64 ±1.23 76.02 ±1.75    82.24 ±1.92 79.71 ±1.79
+                                     GPF                 59.12 ±1.95 58.70 ±1.92                   63.24 ±3.09 55.00 ±2.54       71.24 ±1.98 66.35 ±2.84   80.68 ±1.48 76.29 ±1.60    83.64 ±1.30 81.33 ±1.27
+   ContraEdge
+
+
+
+
+                                   GPF-plus              60.60 ±1.08 60.63 ±0.87                   62.44 ±1.86 56.81 ±0.55       73.64 ±3.73 69.95 ±3.67   80.68 ±0.65 76.93 ±0.92    86.20 ±1.15 83.57 ±1.19
+                                   SUPTsoft              60.28 ±1.32 60.05 ±1.08                   63.16 ±2.35 55.95 ±1.69       73.52 ±3.81 69.70 ±3.31   80.84 ±0.85 75.30 ±0.81    85.36 ±1.75 82.47 ±1.94
+                                   SUPThard              58.92 ±0.86 58.75 ±0.82                   64.32 ±2.38 55.96 ±2.20       73.56 ±1.97 69.48 ±2.18   80.52 ±0.95 76.69 ±0.87    86.28 ±0.55 83.92 ±0.34
+                                   GPrompt               57.20 ±2.13 53.98 ±2.82                   59.52 ±0.65 55.46 ±0.70       70.00 ±0.62 66.17 ±0.51   67.44 ±0.80 64.81 ±1.42    74.08 ±2.55 71.26 ±2.66
+                                    RELIEF               61.20 ±1.20 60.89 ±0.91                   66.28 ±0.27 58.01 ±0.32       74.96 ±1.72 70.22 ±1.70   82.04 ±0.83 78.03 ±0.77    86.48 ±0.90 83.88 ±0.62
+
+
+                              85                                                  85                                                 5.6     Why RELIEF works?
+    ROC-AUC or Accuracy (%)
+
+
+
+
+                              80                                                  80                                                 Despite of RELIEF’s superior performance in graph and node-level
+                              75                                Node-level        75                            Node-level           tasks, it is essential to explain why RELIEF, utilizing an RL frame-
+                              70                                Graph-level       70                            Graph-level
+                                                                                                                                     work, fulfills our motivation – achieving powerful downstream
+                              65                                                  65                                                 performance by adding necessary and lightweight prompts.
+                              60                                                  60                                                    Powerful. RL demonstrates significant efficacy in solving com-
+                                   0.01 0.05 0.1 0.25 0.5 0.75 1.0 1.25 1.5 2.0         1 2 3 4 5 6 7 8 9 10
+                                                       zmax                                               l                          binatorial optimization problems [17, 26]. With a goal-oriented
+                                            (a) Analysis of zmax                                (b) Analysis of l                    reward function and adequate exploration within stable state and
+                              85                                                  85
+    ROC-AUC or Accuracy (%)
+
+
+
+
+                                                                                                                                     reward dynamics, the RELIEF agent identifies an optimal prompting
+                              80                                                  80                                                 policy to maximize performance gains.
+                              75                                Node-level        75                            Node-level              Necessary. The agent makes decisions based on state patterns
+                              70                                Graph-level       70                            Graph-level          and learned policies, displaying specific node selection preferences
+                              65                                                  65                                                 when faced with similar prompted features. Suboptimal node se-
+                              60                                                  60                                                 lection at any step leads to a cumulative reward decrease, which is
+                                   10 310 210 1 100 101 102 103 104 105 106 107        10 4 10 3 10 2 10 1 100 101 102 103 104       captured by the critic and rectified through policy updates, thereby
+                                                         d                                                 c
+                                             (c) Analysis of d                                 (d) Analysis of c                     avoiding unnecessary prompts.
+                                                                                                                                        Lightweight. RELIEF tends to preserve pre-trained graph knowl-
+                                        Figure 6: Parameter sensitivity analysis.
+                                                                                                                                     edge rather than overwhelm it. Larger-scale prompts cause the GNN
+                                                                                                                                     model to generate unfamiliar representations, disrupting coordina-
+5.5                            Parameter Analysis                                                                                    tion between representations and the projection head, potentially
+We analyze the critical hyper-parameters in RELIEF, including the                                                                    leading to negative rewards. These punishments are applied to the
+maximum feature prompt scale per step 𝑧 max , the number of sub-                                                                     actor, urging it to provide prompts that avoid excessive disturbance
+policies 𝑙, and the two penalty factors 𝛼𝑑 and 𝛼𝑐 related to policy                                                                  to the initial input through policy updates.
+generalization. Figure 6 illustrates the ROC-AUC on ClinTox and
+accuracy on Computers, with each hyper-parameter varied over its                                                                     6     Conclusion
+legal range of values. The observations are as follows:                                                                              In this paper, inspired by the marginal effect of increasing prompt
+    RELIEF performs consistently well across a broad range of hyper-                                                                 token length on performance improvement in LLMs, we propose
+parameter values, demonstrating its robustness. Specifically, when                                                                   RELIEF, an RL empowered graph feature prompt tuning method.
+𝑧 max is too large, the excessive magnitude of prompts introduces                                                                    RELIEF enhances the downstream performance of pre-trained GNN
+unnecessary disturbance, leading to performance degradation. Con-                                                                    models by incorporating only necessary and lightweight feature
+versely, setting 𝑧 max too small weakens the impact of feature prompt-                                                               prompts to original graphs. To tackle this, we employ an RL al-
+ing, making it more similar to linear probing. By setting 𝑙 to 1, which                                                              gorithm designed for hybrid action spaces and integrated policy
+discards the policy generalization technique, results in significant                                                                 generalization techniques. Extensive experiments on graph and
+performance decline. While increasing 𝑙 may improve performance,                                                                     node-level tasks demonstrate RELIEF’s effectiveness and data effi-
+it also requires maintaining more pairs of actors, leading to com-                                                                   ciency compared to fine-tuning and other prompt-based methods.
+putational overhead. For 𝛼𝑑 and 𝛼𝑐 , excessively large values may
+result in overly punishment, making the policies too conservative                                                                    Acknowledgments
+and hindering performance improvements.
+                                                                                                                                     This work is supported by National Natural Science Foundation of
+    Due to space constraints, we relocate the scalability analysis of
+                                                                                                                                     China No. 62202172.
+our RELIEF to Appendix C.
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada.                                                                                                                 Jiapeng Zhu et al.
+
+
+References                                                                                 [25] Warwick Masson, Pravesh Ranchod, and George Konidaris. 2016. Reinforcement
+ [1] Yuwei Cao, Hao Peng, Jia Wu, Yingtong Dou, Jianxin Li, and Philip S Yu. 2021.              learning with parameterized actions. In Proceedings of the AAAI conference on
+     Knowledge-preserving incremental social event detection via heterogeneous                  artificial intelligence, Vol. 30.
+     gnns. In Proceedings of the Web Conference 2021. 3383–3395.                           [26] Nina Mazyavkina, Sergey Sviridov, Sergei Ivanov, and Evgeny Burnaev. 2021.
+ [2] Josef Dai, Xuehai Pan, Ruiyang Sun, Jiaming Ji, Xinbo Xu, Mickel Liu, Yizhou               Reinforcement learning for combinatorial optimization: A survey. Computers &
+     Wang, and Yaodong Yang. 2023. Safe RLHF: Safe Reinforcement Learning from                  Operations Research 134 (2021), 105400.
+     Human Feedback. In The Twelfth International Conference on Learning Represen-         [27] Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela
+     tations.                                                                                   Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022.
+ [3] Zhou Fan, Rui Su, Weinan Zhang, and Yong Yu. 2019. Hybrid Actor-Critic                     Training language models to follow instructions with human feedback. Advances
+     Reinforcement Learning in Parameterized Action Space. In Proceedings of the                in neural information processing systems 35 (2022), 27730–27744.
+     Twenty-Eighth International Joint Conference on Artificial Intelligence, IJCAI-19.    [28] Roberta Raileanu and Rob Fergus. 2021. Decoupling value and policy for gen-
+ [4] Taoran Fang, Yunchao Zhang, Yang Yang, Chunping Wang, and Lei Chen. 2024.                  eralization in reinforcement learning. In International Conference on Machine
+     Universal prompt tuning for graph neural networks. Advances in Neural Infor-               Learning. 8787–8798.
+     mation Processing Systems 36 (2024).                                                  [29] Bharath Ramsundar, Peter Eastman, Pat Walters, and Vijay Pande. 2019. Deep
+ [5] Ziqi Gao, Xiangguo Sun, Zijing Liu, Yu Li, Hong Cheng, and Jia Li. 2024. Protein           learning for the life sciences: applying deep learning to genomics, microscopy, drug
+     Multimer Structure Prediction via Prompt Learning. In The Twelfth International            discovery, and more. " O’Reilly Media, Inc.".
+     Conference on Learning Representations.                                               [30] John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov.
+ [6] Qingqing Ge, Zeyuan Zhao, Yiding Liu, Anfeng Cheng, Xiang Li, Shuaiqiang                   2017. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347
+     Wang, and Dawei Yin. 2024. PSP: Pre-training and Structure Prompt Tuning for               (2017).
+     Graph Neural Networks. In Joint European Conference on Machine Learning and           [31] Oleksandr Shchur, Maximilian Mumme, Aleksandar Bojchevski, and Stephan
+     Knowledge Discovery in Databases. 423–439.                                                 Günnemann. 2018. Pitfalls of graph neural network evaluation. arXiv preprint
+ [7] Dibya Ghosh, Jad Rahme, Aviral Kumar, Amy Zhang, Ryan P Adams, and Sergey                  arXiv:1811.05868 (2018).
+     Levine. 2021. Why generalization in rl is difficult: Epistemic pomdps and implicit    [32] Mingchen Sun, Kaixiong Zhou, Xin He, Ying Wang, and Xin Wang. 2022. Gppt:
+     partial observability. Advances in neural information processing systems 34 (2021).        Graph pre-training and prompt tuning to generalize graph neural networks. In
+ [8] Chenghua Gong, Xiang Li, Jianxiang Yu, Yao Cheng, Jiaqi Tan, and Chengcheng                Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and
+     Yu. 2024. Self-pro: A Self-prompt and Tuning Framework for Graph Neural                    Data Mining. 1717–1727.
+     Networks. In Joint European Conference on Machine Learning and Knowledge              [33] Qingyun Sun, Jianxin Li, Hao Peng, Jia Wu, Yuanxing Ning, Philip S Yu, and
+     Discovery in Databases. 197–215.                                                           Lifang He. 2021. Sugar: Subgraph neural network with reinforcement pooling
+ [9] Xueting Han, Zhenhuan Huang, Bang An, and Jing Bai. 2021. Adaptive transfer                and self-supervised mutual information mechanism. In Proceedings of the Web
+     learning on graph neural networks. In Proceedings of the 27th ACM SIGKDD                   Conference 2021. 2081–2091.
+     Conference on Knowledge Discovery & Data Mining. 565–574.                             [34] Xiangguo Sun, Hong Cheng, Jia Li, Bo Liu, and Jihong Guan. 2023. All in one:
+[10] Shengding Hu, Zheng Xiong, Meng Qu, Xingdi Yuan, Marc-Alexandre Côté,                      Multi-task prompting for graph neural networks. In Proceedings of the 29th ACM
+     Zhiyuan Liu, and Jian Tang. 2020. Graph policy network for transferable active             SIGKDD Conference on Knowledge Discovery and Data Mining. 2120–2131.
+     learning on graphs. Advances in Neural Information Processing Systems 33 (2020).      [35] Xiangguo Sun, Jiawen Zhang, Xixi Wu, Hong Cheng, Yun Xiong, and Jia Li. 2023.
+[11] Weihua Hu, Bowen Liu, Joseph Gomes, Marinka Zitnik, Percy Liang, Vijay Pande,              Graph prompt learning: A comprehensive survey and beyond. arXiv preprint
+     and Jure Leskovec. 2019. Strategies for pre-training graph neural networks. arXiv          arXiv:2311.16534 (2023).
+     preprint arXiv:1905.12265 (2019).                                                     [36] Richard S Sutton and Andrew G Barto. 2018. Reinforcement learning: An intro-
+[12] Menglin Jia, Luming Tang, Bor-Chun Chen, Claire Cardie, Serge Belongie,                    duction. MIT press.
+     Bharath Hariharan, and Ser-Nam Lim. 2022. Visual prompt tuning. In Euro-              [37] Petar Veličković, William Fedus, William L Hamilton, Pietro Liò, Yoshua Bengio,
+     pean Conference on Computer Vision. 709–727.                                               and R Devon Hjelm. 2018. Deep graph infomax. arXiv preprint arXiv:1809.10341
+[13] Minqi Jiang, Edward Grefenstette, and Tim Rocktäschel. 2021. Prioritized Level             (2018).
+     Replay. In Proceedings of the 38th International Conference on Machine Learning,      [38] Kaixin Wang, Bingyi Kang, Jie Shao, and Jiashi Feng. 2020. Improving generaliza-
+     ICML 2021, 18-24 July 2021, Virtual Event, Vol. 139. 4940–4950.                            tion in reinforcement learning with mixture regularization. Advances in Neural
+[14] Yangqin Jiang, Chao Huang, and Lianghao Huang. 2023. Adaptive graph con-                   Information Processing Systems 33 (2020), 7968–7978.
+     trastive learning for recommendation. In Proceedings of the 29th ACM SIGKDD           [39] Kaixin Wang, Cheng Long, Da Yan, Jie Zhang, and HV Jagadish. 2023. Reinforce-
+     conference on knowledge discovery and data mining. 4252–4261.                              ment learning enhanced weighted sampling for accurate subgraph counting on
+[15] Jiahui Jin, Yifan Song, Dong Kan, Haojia Zhu, Xiangguo Sun, Zhicheng Li, Xigang            fully dynamic graph streams. In 2023 IEEE 39th International Conference on Data
+     Sun, and Jinghui Zhang. 2024. Urban Region Pre-training and Prompting: A                   Engineering (ICDE). 1084–1097.
+     Graph-based Approach. arXiv preprint arXiv:2408.05920 (2024).                         [40] Yingying Wang, Yun Xiong, Xixi Wu, Xiangguo Sun, Jiawei Zhang, and GuangY-
+[16] Thomas N. Kipf and Max Welling. 2017. Semi-Supervised Classification with                  ong Zheng. 2024. Ddiprompt: Drug-drug interaction event prediction based on
+     Graph Convolutional Networks. In 5th International Conference on Learning                  graph prompt learning. In Proceedings of the 33rd ACM International Conference
+     Representations.                                                                           on Information and Knowledge Management. 2431–2441.
+[17] Lecheng Kong, Jiarui Feng, Hao Liu, Dacheng Tao, Yixin Chen, and Muhan Zhang.         [41] Zhenqin Wu, Bharath Ramsundar, Evan N Feinberg, Joseph Gomes, Caleb Ge-
+     2024. MAG-GNN: Reinforcement Learning Boosted Graph Neural Network.                        niesse, Aneesh S Pappu, Karl Leswing, and Vijay Pande. 2018. MoleculeNet: a
+     Advances in Neural Information Processing Systems 36 (2024).                               benchmark for molecular machine learning. Chemical science 9, 2 (2018), 513–530.
+[18] Junhyun Lee, Wooseong Yang, and Jaewoo Kang. 2024. Subgraph-level Universal           [42] Yaochen Xie, Zhao Xu, Jingtun Zhang, Zhengyang Wang, and Shuiwang Ji. 2022.
+     Prompt Tuning. arXiv preprint arXiv:2402.10380 (2024).                                     Self-supervised learning of graph neural networks: A unified review. IEEE trans-
+[19] Brian Lester, Rami Al-Rfou, and Noah Constant. 2021. The Power of Scale for                actions on pattern analysis and machine intelligence 45, 2 (2022), 2412–2429.
+     Parameter-Efficient Prompt Tuning. In Proceedings of the 2021 Conference on           [43] Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka. 2018. How powerful
+     Empirical Methods in Natural Language Processing, EMNLP 2021. 3045–3059.                   are graph neural networks? arXiv preprint arXiv:1810.00826 (2018).
+[20] Xiang Lisa Li and Percy Liang. 2021. Prefix-Tuning: Optimizing Continuous             [44] Hantao Yao, Rui Zhang, and Changsheng Xu. 2023. Visual-language prompt tun-
+     Prompts for Generation. In Proceedings of the 59th Annual Meeting of the Associa-          ing with knowledge-guided context optimization. In Proceedings of the IEEE/CVF
+     tion for Computational Linguistics and the 11th International Joint Conference on          Conference on Computer Vision and Pattern Recognition. 6757–6767.
+     Natural Language Processing, ACL/IJCNLP 2021. 4582–4597.                              [45] Yuning You, Tianlong Chen, Yongduo Sui, Ting Chen, Zhangyang Wang, and
+[21] Ke Liang, Yue Liu, Sihang Zhou, Wenxuan Tu, Yi Wen, Xihong Yang, Xiangjun                  Yang Shen. 2020. Graph Contrastive Learning with Augmentations. Advances in
+     Dong, and Xinwang Liu. 2023. Knowledge graph contrastive learning based                    Neural Information Processing Systems 33 (2020), 5812–5823.
+     on relation-symmetrical structure. IEEE Transactions on Knowledge and Data            [46] Chengcheng Yu, Jiapeng Zhu, and Xiang Li. 2024. GraphCBAL: Class-Balanced
+     Engineering (2023).                                                                        Active Learning for Graph Neural Networks via Reinforcement Learning. In Pro-
+[22] Huihui Liu, Yiding Yang, and Xinchao Wang. 2021. Overcoming catastrophic                   ceedings of the 33rd ACM International Conference on Information and Knowledge
+     forgetting in graph neural networks. In Proceedings of the AAAI conference on              Management. 3022–3031.
+     artificial intelligence, Vol. 35. 8653–8661.                                          [47] Qi Zhu, Bing Li, Fei Mi, Xiaoyan Zhu, and Minlie Huang. 2022. Continual Prompt
+[23] Pengfei Liu, Weizhe Yuan, Jinlan Fu, Zhengbao Jiang, Hiroaki Hayashi, and                  Tuning for Dialog State Tracking. In Proceedings of the 60th Annual Meeting of
+     Graham Neubig. 2023. Pre-train, Prompt, and Predict: A Systematic Survey of                the Association for Computational Linguistics, ACL 2022. 1124–1137.
+     Prompting Methods in Natural Language Processing. ACM Comput. Surv. 55, 9,            [48] Chenyi Zi, Haihong Zhao, Xiangguo Sun, Yiqing Lin, Hong Cheng, and Jia Li. 2024.
+     Article 195 (jan 2023), 35 pages.                                                          ProG: A Graph Prompt Learning Benchmark. arXiv preprint arXiv:2406.05346
+[24] Zemin Liu, Xingtong Yu, Yuan Fang, and Xinming Zhang. 2023. Graphprompt:                   (2024).
+     Unifying pre-training and downstream tasks for graph neural networks. In Pro-
+     ceedings of the ACM Web Conference 2023. 417–428.
+RELIEF: Reinforcement Learning Empowered Graph Feature Prompt Tuning                                           KDD ’25, August 3–7, 2025, Toronto, ON, Canada.
+
+
+A     Details of Graph-level Tasks                                              and the clusters are recombined by prioritizing the most frequently
+For datasets and pre-training strategies used in graph classification,          occurring scaffolds in the training set. This produces validation and
+we adhere to the training procedures in [11], with pre-trained GIN              testing sets containing structurally different molecules [11], allow-
+models available on their GitHub repository 1 .                                 ing us to evaluate the model’s out-of-distribution generalization.
+                                                                                   To create 50-shot scenarios, we randomly sampled 50 graphs
+A.1      Datasets                                                               from the training set. This procedure introduced randomness, dif-
+                                                                                fering from previous works [4, 18] that selected training data in
+Chemical datasets [11] are used to pre-train GNN models, consisting
+                                                                                descending order of scaffold occurrence. Given the limited budget
+of both unlabeled and labeled molecules to facilitate comprehensive
+                                                                                of only 50 samples, prior methods resulted in training data with
+model training. Specifically, 2 million unlabeled molecules from
+                                                                                very few scaffold types, exacerbating overfitting. Consequently, the
+the ZINC15 database are utilized for node-level self-supervised
+                                                                                average ROC-AUC of fine-tuning across tasks under the 50-shot
+pre-training. For graph-level multi-task supervised pre-training, a
+                                                                                setting reported in previous works [4, 18] was 55.40±2.13%, slightly
+preprocessed subset of the ChEMBL database including 456k labeled
+                                                                                above a random guess for binary classification tasks. In contrast, our
+molecules is used, offering a diverse chemical space that enhances
+                                                                                randomness brings about a dataset with more molecular diversity
+the model’s ability to generalize across various biochemical tasks.
+                                                                                and also prevents scaffold overlap between training, validation and
+   For downstream graph classification tasks, 8 binary classification
+                                                                                test sets. As a result, the average ROC-AUC under our data splitting
+datasets for molecular property prediction about biophysics and
+                                                                                method is 60.92% with a smaller standard deviation of 1.46%.
+physiology [41] are employed. The statistics of these downstream
+                                                                                   We employ a 5-layer GIN with hidden dimensions of 300. The
+datasets are summarized in Table 5.
+                                                                                policy network and the projection head are independently updated
+Table 5: Statistics of the downstream datasets used in our                      using two Adam optimizers. We assess downstream task perfor-
+graph classification experiments.                                               mance using the validation early stopping protocol, reporting the
+                                                                                test ROC-AUC at the best validation epoch. Additionally, consid-
+  Dataset    # Molecules     # Tasks       Dataset     # Molecules    # Tasks   ering that 50-shot may be insufficient for some datasets to ensure
+   BBBP          2039           1          ClinTox        1478           2      stable performance at the onset of training, we determine the best
+   Tox21         7831          12           MUV           93087          17     validation epoch after 20 epochs. The complete hyper-parameters
+  ToxCast        8575          617           HIV          41127           1
+   SIDER         1427          27           BACE          1513            1     for graph classification are detailed listed in Table 7.
+
+                                                                                B Details of Node-level Tasks
+A.2      Pre-training Strategies                                                B.1 Datasets
+Four pre-training strategies are used to assess the universal appli-            We adopt Cora, Citeseer, Pubmed [16] and Amazon-Co-Buy (Com-
+cability of prompting approaches.                                               puter and Photo) [31] for node classification. Cora, Citeseer, and
+   Deep Graph Infomax (Infomax) [37] aims to derive expressive                  Pubmed are citation networks, where each node represents a publi-
+representations for graphs or nodes by maximizing the mutual                    cation with a sparse bag-of-words feature vector, and edges signify
+information between the overall graph-level representations and                 citation links. Computer and Photo are segments of the Amazon co-
+the substructure-level representations at various granularities.                purchase graph, with nodes representing products, edges indicating
+   Attribute Masking (AttrMasking) [11] involves obscuring certain              frequent co-purchases, node features encoded as bag-of-words from
+node or edge attributes. GNN models are then tasked with predict-               product reviews, and class labels derived from product categories.
+ing these masked attributes based on the surrounding structural                 The statistics of these dataset are summarized in Table 6.
+information.
+   Context Prediction (ContextPred) [11] uses subgraphs to predict              Table 6: Statistics of the datasets used in our node classifica-
+their surrounding graph structures, which is designed to map nodes              tion experiments.
+that appear in similar structural contexts to nearby embeddings,
+thereby capturing the context in which nodes are found.                                   Dataset    # Nodes      # Edges    # Features   # Classes
+   Graph Contrastive Learning (GCL) [45] focuses on embedding                             Cora         2708        5429        1433           7
+augmented versions of the same anchor closely together (positive                         CiteSeer      3327        9104        3703            6
+                                                                                         PubMed       19717       88648         500           3
+samples) while pushing the embeddings of different samples (nega-                       Computers     13752       491722       767            10
+tives) apart.                                                                             Photo        7650       238162        745           8
+   The GNN models are first pre-trained using one of the above
+self-supervised methods and follow by the graph-level multi-task
+supervised pre-training.
+                                                                                B.2    Pre-training Strategies
+                                                                                To complement the node and graph-level pre-training strategies
+A.3      Experimental Settings                                                  used in graph classification experiments, we focus on edge-level
+We divide each dataset into training, validation, and testing sets              pre-training strategies to demonstrate the generality of RELIEF.
+with ratios of 80%, 10%, and 10%, respectively. Molecules are divided           Therefore, we include all previously mentioned feature prompting
+based on their scaffolds, i.e., molecular graph substructures [29],             methods and additionally involve GPPT [32] and GraphPrompt [24]
+                                                                                as baselines, which are tailored to GNN models pre-trained at edge-
+1 https://github.com/snap-stanford/pretrain-gnns/tree/master/chem/model_gin
+                                                                                level and capable of transferring to node classification.
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada.                                                                                          Jiapeng Zhu et al.
+
+
+Table 7: Hyper-parameter settings for graph and node level                          We employ a 2-layer GIN [43], which is widely utilized in pre-
+tasks.                                                                           vious works [16, 31, 32], with a hidden dimension of 128. While
+                                                                                 more advanced subgraph GNN techniques might yield better per-
+   Hyper-parameter                            graph-level       node-level       formance, as noted in [4], we opt to use the basic GIN for processing
+                       General Hyper-parameters                                  prompted subgraphs to ensure a fair comparison with GPPT and
+   # Training epochs                    {50, 100}          {50, 100, 300}        GraphPrompt, as these two methods do not incorporate subgraph-
+   Graph loader batch size                      {8, 16, 32, 64}                  related designs. To achieve more compact node representations,
+   # GIN layers                              5                   2               we use Singular Value Decomposition (SVD) to reduce the initial
+   GIN hidden dimension                     300                 128              features of each dataset to 100 dimensions. The policy network and
+   Dropout ratio                                       0.5
+   Actors learning rate (lr)                          5e-4                       the projection head are independently updated using two Adam
+   # Sub-policies 𝑙                                     3                        optimizers. Other hyper-parameters are listed in Table 7. The RL
+   Discrete actors penalty 𝛼𝑑                {1e0, 1e1, 1e3, 1e5}                hyper-parameter settings are partly referenced from [13], aligning
+   Continuous actors penalty 𝛼𝑐                        0.1                       with its established terminology.
+   Critic lr                                          5e-4
+   Maximum prompt scale 𝑧 max         {0.1, 0.5, 1.0}     {0.05, 0.1, 0.5}
+   Policy network weight decay                        1e-5
+                                                                                 C    Scalability Analysis
+   Policy network lr linear decay                {True, False}                   We analyze the feasibility of scaling RELIEF to larger graphs from
+   Projection head lr                        {5e-4, 1e-3, 1.5e-3}                three perspectives.
+   # Projection head layers                         {1, 2, 3}
+   # Projection head updates 𝑞                      {1, 2, 3}                       Performance. While larger graphs introduce additional chal-
+   Projection head weight decay              0                  5e-4             lenges, they also provide more interactive transitions for updating
+   Projection head lr linear decay               {True, False}                   the RL policy. We evaluate the average ROC-AUC improvement
+                           RL Hyper-parameters                                   of RELIEF over fine-tuning across various datasets based on 1. It
+   Discount factor 𝛾                                0.99                         can be observed datasets with more transitions yield larger perfor-
+   GAE 𝜆                                            0.95                         mance gains. For example, BACE and MUV, with 1698 and 1243
+   # PPO epochs                                      10                          transitions, respectively, achieve AUC improvements of 6.5 and 2.5,
+   PPO mini-batch size                    {32, 64, 128, 256, 512}                whereas Tox21 and ToxCast, with 806 and 805 transitions, show
+   PPO clip range                                   0.2
+   Return normalization                            True                          more modest gains of 0.2 and 1.0. This suggests that RELIEF can
+   Entropy bonus coefficient 𝛽                      0.01                         scale effectively with larger graphs.
+   Critic loss coefficient                          0.5
+                                                                                    Memory. The only learnable modules in RELIEF are MLPs in
+   Formally, GPPT uses masked edge prediction (MaskedEdge) as                    actors and the critic. Given a node representation with a hidden size
+pretext task, which is optimized by a binary cross-entropy loss L (·)            of 𝑑, the discrete actor’s MLP maps tensors from 𝑑 to 1 representing
+formulated as:                                                                   the action probability, while the continuous actor’s MLP maps from
+                        ∑︁                                                       𝑑 to 𝑑 for the prompt content. Thus, the number of parameters in
+                            L 𝑓𝜃 (𝑣𝑖 ) ⊤ 𝑓𝜃 (𝑣 𝑗 ), A𝑖 𝑗
+                                                         
+                  min
+                       𝜃     𝑣𝑖 ,𝑣 𝑗
+                                                                                 the actors remains constant, independent of graph size. For the
+                                                                                 critic, we can further apply pooling operations to reduce the state
+where A𝑖 𝑗 represents if node 𝑣𝑖 and 𝑣 𝑗 are connected given graph               representation size, which significantly decreases the input size for
+G with the adjacency matrix A. Moreover, GraphPrompt employs                     the critic’s MLP.
+contrastive learning using positive and negative node pairs deter-
+mined based on edge connectivity (ContraEdge). The pre-training                     Runtime. Table 8 presents a comparison of average training
+loss is defined as follows:                                                      time (in seconds) for 50 epochs between RELIEF and other prompt-
+          1 ∑︁ 1                                                                 based methods. While RL inevitably introduces additional com-
+  min −                   ·
+   𝜃     |V |      |V + |                                                        plexity, the runtime remains manageable. Moreover, RELIEF’s data
+              𝑣∈V                                                                efficiency reduces the need for extensive training data, potentially
+                 ∑︁                             exp(ℎ ⊤ ℎ 𝑣 + /𝜏)                further shortening the overall training time.
+                            log                     Í𝑣
+                                  exp(ℎ ⊤ ℎ
+                                        𝑣 𝑣 + /𝜏) +   −
+                                                                   ⊤
+                                                     𝑣 ∈ V − exp(ℎ 𝑣 ℎ 𝑣 − /𝜏)
+              𝑣 + ∈ N (𝑣)
+                                                                                               Table 8: Training time comparisons.
+where ℎ 𝑣 , ℎ 𝑣 + and ℎ 𝑣 − are representations of node 𝑣, 𝑣 + and 𝑣 −
+produced by 𝑓𝜃 (G). V + is the positive node set containing the
+neighbors of node 𝑣, while V − is the negative node set constructed                   Method      BBBP     Tox21    ToxCast     ClinTox       BACE
+by random sampling. 𝜏 is the temperature hyper-parameter.                               GPF        110.1    112.0     108.7      109.3        108.8
+                                                                                      GPF-plus     113.2    116.9     112.6      110.4        111.5
+B.3     Experimental Settings                                                        SUPT-soft     100.2     96.8     94.5       101.7        101.5
+We construct 10-shot node classification experiments. Consider-                      SUPT-hard     100.3     99.5     94.8       100.1        99.3
+ing the average degree of different datasets, we set varying 𝑘 for                   All in one    276.3    283.9     285.0      271.2        274.8
+generating k-hop subgraphs, specifically 4, 3, 2, 2, 2 for Cora, Cite-                RELIEF       225.6    220.8     188.5      297.2        284.3
+seer, Pubmed, Computers and Photo, respectively, to ensure an
+appropriate number of nodes for induced subgraphs.
+

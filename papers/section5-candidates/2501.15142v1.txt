@@ -1,0 +1,1040 @@
+                                               DAGPrompT: Pushing the Limits of Graph Prompting with a
+                                                  Distribution-aware Graph Prompt Tuning Approach
+                                                                                  Qin Chen                                                                       Liang Wang
+                                                State Key Laboratory of General Artificial Intelligence,                                                        Alibaba Group
+                                                School of Intelligence Science and Technology, Peking                                                           Beijing, China
+                                                                       University                                                                        liangbo.wl@alibaba-inc.com
+                                                                     Beijing, China
+                                                                 chenqink@pku.edu.cn
+
+                                                                                 Bo Zheng                                                                        Guojie Song∗
+arXiv:2501.15142v1 [cs.LG] 25 Jan 2025
+
+
+
+
+                                                                           Alibaba Group                                                 State Key Laboratory of General Artificial Intelligence,
+                                                                           Beijing, China                                                School of Intelligence Science and Technology, Peking
+                                                                      bozheng@alibaba-inc.com                                                                   University
+                                                                                                                                                              Beijing, China
+                                                                                                                                                           gjsong@pku.edu.cn
+
+                                         Abstract                                                                                        Keywords
+                                         The "pre-train then fine-tune" approach has advanced GNNs by                                    graph neural networks, graph prompting, few-shot learning
+                                         enabling general knowledge capture without task-specific labels.
+                                                                                                                                         ACM Reference Format:
+                                         However, an objective gap between pre-training and downstream
+                                                                                                                                         Qin Chen, Liang Wang, Bo Zheng, and Guojie Song. 2025. DAGPrompT:
+                                         tasks limits its effectiveness. Recent graph prompting methods aim                              Pushing the Limits of Graph Prompting with a Distribution-aware Graph
+                                         to close this gap through task reformulations and learnable prompts.                            Prompt Tuning Approach. In Proceedings of the ACM Web Conference 2025
+                                         Despite this, they struggle with complex graphs like heterophily                                (WWW ’25), April 28-May 2, 2025, Sydney, NSW, Australia. ACM, New York,
+                                         graphs. Freezing the GNN encoder can reduce the impact of prompt-                               NY, USA, 13 pages. https://doi.org/10.1145/3696410.3714917
+                                         ing, while simple prompts fail to handle diverse hop-level distribu-
+                                         tions. This paper identifies two key challenges in adapting graph
+                                         prompting methods for complex graphs: (i) adapting the model
+                                                                                                                                         1    Introduction
+                                         to new distributions in downstream tasks to mitigate pre-training                               In recent years, the schema of "pre-training then fine-tuning" on
+                                         and fine-tuning discrepancies from heterophily and (ii) customiz-                               Graph Neural Networks (GNNs) has experienced significant growth,
+                                         ing prompts for hop-specific node requirements. To overcome these                               especially in few-shot learning scenarios [10, 17, 27, 44]. Specifically,
+                                         challenges, we propose Distribution-aware Graph Prompt Tuning                                   GNNs are pre-trained in a self-supervised manner on tasks such
+                                         (DAGPrompT), which integrates a GLoRA module for optimizing                                     as graph property reconstruction [8, 12] or contrastive learning
+                                         the GNN encoder’s projection matrix and message-passing schema                                  [24, 39]. Then, GNNs are adapted to downstream tasks during the
+                                         through low-rank adaptation. DAGPrompT also incorporates hop-                                   fine-tuning. However, a common limitation is that the gap between
+                                         specific prompts accounting for varying graph structures and dis-                               pre-training and downstream objectives is often overlooked, which
+                                         tributions among hops. Evaluations on 10 datasets and 14 baselines                              hinders the model performance. For example, the pre-training ob-
+                                         demonstrate that DAGPrompT improves accuracy by up to 4.79% in                                  jective may be link prediction, while the downstream objective may
+                                         node and graph classification tasks, setting a new state-of-the-art                             be node classification, and these two objectives vary a lot [26]. To
+                                         while preserving efficiency. Codes are available at GitHub.                                     address this, recent research has begun incorporating graph prompt-
+                                                                                                                                         ing techniques [7, 16, 25, 26] to bridge the gap between pre-training
+                                         CCS Concepts                                                                                    and downstream tasks. They propose using prompts to reformulate
+                                                                                                                                         downstream tasks as pre-training tasks with additional learnable
+                                         • Mathematics of computing → Graph algorithms; • Comput-
+                                                                                                                                         parameters. The pre-trained GNN encoder remains frozen during
+                                         ing methodologies → Neural networks; Supervised learning.
+                                                                                                                                         this process. For example, GPPT [25] reformulates the downstream
+                                         ∗ Corresponding author.                                                                         task, node-classification, to the pre-training task, link-prediction.
+                                                                                                                                         This reformulation reduces the objective gap between the pre-train
+                                         Permission to make digital or hard copies of all or part of this work for personal or
+                                         classroom use is granted without fee provided that copies are not made or distributed           and downstream by the alignment of objective forms.
+                                         for profit or commercial advantage and that copies bear this notice and the full citation          However, existing prompting methods are sub-optimal for graphs
+                                         on the first page. Copyrights for components of this work owned by others than the              with complex distributions, such as heterophily graphs, where con-
+                                         author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+                                         republish, to post on servers or to redistribute to lists, requires prior specific permission   nected nodes frequently have different labels [4, 42]. This label
+                                         and/or a fee. Request permissions from permissions@acm.org.                                     disparity creates a profound disconnect between pre-training objec-
+                                         WWW ’25, Sydney, NSW, Australia                                                                 tives and downstream tasks. As most pre-training techniques are
+                                         © 2025 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+                                         ACM ISBN 979-8-4007-1274-6/25/04                                                                label-agnostic and rely on graph structure to varying extents, they
+                                         https://doi.org/10.1145/3696410.3714917                                                         inherently suffer from this discrepancy. For instance, tasks like link
+WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia                                                                                                              Trovato et al.
+
+
+prediction push the model to generate similar embeddings for con-                                                   GCN     GCN Finetune-LP     GCN Finetune-DGI       GPPT
+nected nodes, ignoring label differences. Consequently, connected
+
+
+
+
+                                                                                                    Accuracy
+nodes with distinct labels are mapped to similar embeddings in het-                                            60
+erophily graphs, as shown in Figure 1. During prompting, current                                               50
+approaches [7, 16, 25, 26, 34, 40] typically freeze the GNN encoder
+and employ basic prompting techniques (e.g., projection or additive                                                  Cora (0.81)        Texas (0.11)       Cornell (0.31)
+layers). However, freezing the GNN encoder restricts its adaptability                                                                     Dataset
+to distribution shifts in downstream tasks. As illustrated in Figure 1,
+this limitation prevents the model from adjusting GNN parameters                                    Figure 2: Conventional graph prompting techniques are less
+to produce distinct node embeddings for different labels. The basic                                 effective or even detrimental on heterophily datasets. The
+prompting mechanisms struggle to disentangle node embeddings                                        homophily ratio [42] is indicated in the brackets, with a lower
+effectively, ultimately leading to reduced performance.                                             ratio representing stronger heterophily.
+
+                               Similar Embeddings
+
+
+                 Pre-train                      Prompting                                           in response to the two challenges outlined above: (i) Graph Low-
+                 GNN                             Frozen                                             Rank Adaptation (GLoRA) module: This module leverages low-rank
+  Input Graph
+                                                 GNN
+                                                            As is frozen, during prompting,         matrix approximations to tune both the projection parameters and
+                                                            connected nodes with different          the message-passing mechanism in the GNN encoder. By doing so,
+                                                            labels are consistently mapped to
+                                                                                                    it adapts the GNN encoder to the new distributions encountered
+       Class Label A
+                                                            nearby positions in the latent space,
+                             Dissimilar Embeddings
+       Class Label B                                        making them difficult to distinguish.
+                                                                                                    in downstream tasks, while preserving the valuable knowledge
+                                                                                                    embedded in pre-trained weights in an efficient manner. For ex-
+Figure 1: Heterophily diminishes the effectiveness of prompt-                                       ample, in the scenario depicted in Figure 1, GLoRA addresses the
+ing techniques that freeze the GNN encoder, resulting in in-                                        limitations by enabling the GNN encoder to produce separable
+distinguishable node embeddings.                                                                    embeddings for nodes with different labels. (ii) Hop-specific Graph
+                                                                                                    Prompting module: This module decomposes downstream tasks
+   Moreover, distributional differences across graph hops in com-                                   into hop-specific components, allowing the model to weigh the
+plex graphs further challenge existing prompting methods: some                                      importance of different hops adaptively. We validate DAGPrompT
+nodes prioritize information from closer hops, while others rely                                    through experiments on 10 datasets, focusing on both node and
+more on distant ones [30, 42]. Additionally, the heterophily distri-                                graph classification tasks, and comparing it against 14 baseline
+bution varies across hops (see Figure 6 in Appendix D) and affects                                  methods. Our model achieves state-of-the-art performance, with
+performance to varying extents. Many existing methods rely on                                       an average accuracy improvement of 3.63%, and up to 7.55%. In
+the final layer representation of the GNN encoder, overlooking                                      summary, our contributions are as follows:
+these hop-specific variations [16, 25, 40]. While some approaches
+                                                                                                               • We identify the key challenges of applying graph prompting
+[7, 26, 37] attempt to merge intermediate embeddings, they fail to
+                                                                                                                 techniques to heterophily graphs and introduce DAGPrompT
+account for hop-specific preferences or offer tailored prompts for
+                                                                                                                 as a solution. DAGPrompT distinguishes itself as a pioneer-
+different hops, limiting their adaptability to these variations.
+                                                                                                                 ing model in extending the capabilities of graph prompting
+   In summary, two primary challenges arise when extending graph
+                                                                                                                 techniques to heterophily graphs.
+prompting methods to diverse graph data with varying internal dis-
+                                                                                                               • We propose two key modules for DAGPrompT: GLoRA and
+tributions: (i) adapting the model to new distributions in downstream
+                                                                                                                 the Hop-specific Graph Prompting module. These modules
+tasks, reducing the discrepancy between pre-training and fine-tuning
+                                                                                                                 mitigate distributional misalignment between pre-training
+caused by heterophily, and (ii) customizing prompts to address the
+                                                                                                                 and downstream tasks, and adapt the model to the diverse
+hop-specific requirements of different nodes. These challenges stem
+                                                                                                                 distributions across hops.
+from the inherent limitations of the prompting paradigm and the
+                                                                                                               • We conduct extensive experiments on both node and graph
+complexities of heterophily graphs, making them critical obstacles
+                                                                                                                 classification tasks using 10 datasets and 14 baselines. DAG-
+in advancing graph prompting techniques. While existing methods
+                                                                                                                 PrompT demonstrates remarkable performance improve-
+perform well on homophily graphs, they degrade on heterophily
+                                                                                                                 ments, improving the accuracy up to 4.79%. We further eval-
+graphs due to neglecting these issues. We compare the 5-shot node
+                                                                                                                 uate DAGPrompT in terms of data heterophily level, number
+classification accuracy of a popular prompting method, GPPT [25],
+                                                                                                                 of shots, transferability, efficiency, and ablation studies.
+with a GCN trained from scratch [11] and pre-trained models us-
+ing link prediction [17] and DGI [27], as shown in Figure 2. GPPT
+and pre-training strategies perform well on the homophily graph                                     2          Preliminary
+Cora but are outperformed by a GCN trained from scratch on the                                          Notations. Consider an undirected graph G = {V, E}, where V
+heterophily graphs Texas and Cornell, which exhibit strong het-                                     represents the set of 𝑁 nodes and E represents the set of 𝐸 edges.
+erophily and variation across hops (see Figure 6 in Appendix D).                                    The graph is described by its adjacency matrix A ∈ R𝑁 ×𝑁 , where
+   In this paper, we propose Distribution-aware Graph Prompt                                        A𝑖 𝑗 = 1 if and only if there exists an edge 𝑒𝑖 𝑗 ∈ E connecting node
+Tuning (DAGPrompT), which comprises two core components                                             𝑣𝑖 and node 𝑣 𝑗 . Additionally, each node 𝑣𝑖 ∈ V is associated with
+DAGPrompT: Pushing the Limits of Graph Prompting with a Distribution-aware Graph Prompt Tuning Approach               WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia
+
+
+
+                                                                             Frozen
+                                                                                              Projection
+                                                               Transfer
+                                        GNN Encoder                       GNN Encoder                       GLoRA            Class Tokens
+                                                                                              Message
+                                                Pre-training                     Tuning
+                                                                                              Passing                             Prompting
+
+                                              Sim                                Sim Eval
+
+
+                                              Sim
+
+                                                                                 Sim Eval
+                                    Link Prediction Loss
+
+    Sampled Graphs                      (a) Pre-training                                    (b) Hop-specific Graph Prompting with GLoRA Tuning.
+
+
+                                          Figure 3: The framework of Distribution-aware Graph Prompt Tuning.
+
+
+the feature vector X𝑖 ∈ R𝑁 ×𝐹 and a label y𝑖 , with 𝐹 representing                            we optimize 𝜃 to maximize the likelihood of predicting the correct
+the dimension of the node features.                                                           labels y, guided by ℎ: max {𝜃 } 𝑃 𝑓 ,{𝜃 } (y | ℎ(D)).
+
+   Graph Homophily Measurements. Real-world graphs are inher-
+ently complex, often featuring diverse internal structures where                              3     Method
+nodes follow varying patterns [18, 22]. Heterophily provides a use-                           In this section, we elaborate on the Distribution-aware Graph
+ful lens for analyzing these structures, particularly through the                             Prompt Tuning (DAGPrompT). The framework of DAGPrompT
+concept of label consistency, measured by the homophily ratio [42]                            is illustrated in Figure 3, which consists of two stages: (i) Link-
+ℎ=
+     | { (𝑣 ,𝑣 ):(𝑣 ,𝑣 ) ∈ E∧y =y } |
+         𝑖 𝑗   𝑖 𝑗      𝑖  𝑗
+                             . ℎ represents the fraction of edges in                          prediction-based pre-training. (ii) Graph Low-rank Adaptation with
+                |E|
+E that connect nodes with the same label. High homophily indi-                                Hop-specific Graph Prompting. We also provide a detailed algo-
+cates strong similarity between connected nodes (ℎ near 1), while                             rithm in Appendix A and a complexity analysis in Appendix B.
+low homophily suggests greater dissimilarity (ℎ near 0).
+
+  Graph Neural Networks (GNNs). The remarkable success of GNNs
+                                                                                              3.1    Label-free Pre-Training
+can largely be attributed to the message-passing mechanism [29],                              The pre-training strategy is essential for few-shot learning, allow-
+and a general GNN layer can be defined as:                                                    ing the model to capture graph structures across diverse domains
+                                                                                              without labeled data, as shown by several approaches [16, 25, 26, 40].
+                                                                                              It also aids in capturing local structures and reduces over-fitting
+                                     n          o
+                  = 𝑓𝜃 AGGR H𝑖 , H 𝑗 : 𝑣 𝑗 ∈ N𝑖              (1)
+            (𝑙+1)                 (𝑙 )   (𝑙 )
+          H𝑖                                          ,
+                                                                                              [17]. We adopt link prediction for pre-training due to its advan-
+where H (𝑙 ) ∈ R𝑁 ×𝑑 represents the node embeddings at layer
+                          (𝑙 )                                                                tages: (i) the abundance of inherent edge data in graphs, and (ii)
+𝑙, with initial embeddings H (0) = X. The term 𝑑 (𝑙 ) denotes the                             alignment in objective forms between pre-training and downstream
+dimensionality at layer 𝑙, AGGR(·) aggregates the neighboring                                 tasks, as tasks like node and graph classification can be seamlessly
+node embeddings, and 𝑓𝜃 applies a projection, for example, using a                            reformulated as link prediction by introducing pseudo-nodes or
+linear transformation followed by non-linear activation (e.g., ReLU).                         pseudo-graphs [16, 25].
+                                                                                                 Consider a node 𝑣 in a graph G. For training, a positive node 𝑎 is
+   Fine-tuning Pre-trained GNNs. For a pre-trained GNN model 𝑓 ,                              selected from the neighbors of 𝑣, and a negative node 𝑏 from the non-
+a learnable projection head 𝜃 , and a downstream task (e.g., node                             neighbors, forming a triplet (𝑣, 𝑎, 𝑏). Let the GNN encoder 𝑓 produce
+classification) dataset D, we fine-tune the parameters of 𝑓 and 𝜃 to                          the corresponding embeddings s𝑣 , s𝑎 , and s𝑏 . By considering all
+maximize the likelihood of predicting the correct labels y in D:                              nodes in G, the pre-training dataset Tpt is constructed. The pre-
+                                                                                              training loss is then defined as:
+                                 max 𝑃 𝑓 ,𝜃 (y | D)                               (2)
+                                 𝑓 ,𝜃
+
+   Prompting Pre-trained GNNs. Given a GNN model 𝑓 pre-trained                                                                           exp (sim (s𝑣 , s𝑎 ) /𝜏)
+                                                                                                                                 ln Í                                         (3)
+                                                                                                                     ∑︁
+under task Tpt , a set of learnable prompting parameters {𝜃 }, and                                  Lpt (Θ) = −                                                           ,
+                                                                                                                                     𝑢 ∈ {𝑎,𝑏 } exp (sim (s𝑣 , s𝑢 ) /𝜏)
+a downstream task dataset D for task Tds , we introduce a task                                                    (𝑣,𝑎,𝑏 ) ∈ T
+reformulation function ℎ. This function maps the downstream task
+to a form consistent with the pre-trained task Tpt . For instance,                            where 𝜏 is a temperature hyper-parameter that controls the sharp-
+node classification (Tds ) can be reformulated as link prediction                             ness of the output distribution, and Θ represents the parameters
+(Tpt ) by introducing pseudo nodes, where labels are assigned by                              of the function 𝑓 . The goal of pre-training for link prediction is
+predicting the most probable links between nodes and pseudo nodes                             to push node embeddings connected by edges closer in the latent
+[25]. During the prompting, the parameters of 𝑓 are frozen, and                               space, while separating those without connections [16].
+WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia                                                                                       Trovato et al.
+
+
+3.2     Distribution-aware Graph Prompt Tuning                            Meanwhile, the frozen parameters preserve the knowledge acquired
+In this subsection, we discuss tuning and prompting the pre-trained       during pre-training.
+GNN 𝑓 for downstream tasks in a distribution-aware approach. We
+                                                                          3.2.2     Hop-specific Graph Prompting.
+introduce the Graph Low-Rank Adaptation (GLoRA) module, which
+aligns the projection and message passing scheme of 𝑓 with the dis-           Unification of Downstream Tasks. We begin the elaboration of
+tribution of downstream tasks through low-rank adaptation. This           our prompting technique by introducing how we unify various
+approach preserves the knowledge embedded in the pre-trained              downstream tasks. To achieve this, we reformulate all downstream
+weights while adapting to new tasks. We then detail the prompting         tasks as sub-graph level tasks, as they represent a general and
+module, which links diverse downstream tasks to the pre-training          expressive framework for many tasks [26]. This allows us to adapt
+objective, ensuring alignment with the unique downstream distri-          various downstream tasks to our link-prediction pre-training task.
+butions in a hop-decoupled manner.                                        Formally, given a node 𝑣 in a graph G, we define its 𝑘-hop neighbor-
+3.2.1 Tuning with Graph Low-Rank Adaptation. Previous works               hood as N𝑘 (𝑣) and its embedding (produced by the GNN encoder
+often pre-train GNNs and keep them frozen during prompting, re-           𝑓 ) as s𝑘,𝑣 . Consequently, we have:
+lying on learnable prompts for downstream tasks [7, 16, 25, 26].                  • Link-Prediction. Given a node triplet (𝑣, 𝑎, 𝑏) where an
+While effective in graphs with strong homophily, this approach un-                  edge exists between nodes (𝑣, 𝑎) but not between (𝑣, 𝑏) does
+derperforms in more complex settings, such as graphs with strong                    not, it’s expected that sim(s𝑘,𝑣 , s𝑘,𝑎 ) > sim(s𝑘,𝑣 , s𝑘,𝑏 ). Here,
+heterophily, as shown in Figure 2. Freezing the GNN can lead to per-                the similarity measure (sim) can be computed using methods
+formance degradation in such cases, as most pre-training methods                    such as cosine similarity.
+are label-agnostic, and downstream objectives often differ from pre-              • Node Classification. In a graph with 𝐶 labels, we construct
+training goals, especially in heterophily graphs. For instance, link                𝐶 pseudo-nodes, with their embeddings initialized as the
+prediction favors similar embeddings for connected nodes, which                     mean of the embeddings of nodes from the same class in
+aligns with homophily but fails in heterophily, where connected                     the training set. The label prediction task for a node 𝑣 is
+nodes may have dissimilar characteristics. As illustrated in Figure 1,              then reduced to identifying the pseudo-node most likely to
+on heterophily graphs, pre-training without tuning the GNN en-                      form an edge with 𝑣, transforming the problem into a link
+coder can result in nodes with different labels being mapped too                    prediction task.
+closely in latent space, making them difficult to distinguish dur-                • Graph Classification. For a set of graphs with 𝐶 labels, we
+ing prompting. However, tuning GNN parameters directly during                       generate 𝐶 pseudo-graphs, initializing their embeddings as
+prompting presents other challenges, including computational inef-                  the average of the graph embeddings from the training set.
+ficiency and the risk of over-fitting due to sparse downstream labels               Similar to node classification, predicting a graph’s label is
+[17]. A theoretical analysis is offered in section 4, with experimental             formulated as a link prediction problem between the graph
+results in subsection E.6. A theoretical analysis of these issues is                and the pseudo-graphs.
+provided in section 4, with corresponding experimental results in            Conventional approaches with GNN encoders of 𝐿 layers typi-
+subsection E.6.
+                                                                          cally rely on the final layer embedding H (𝐿) , or a combination of
+    To efficiently adapt to the distributions of downstream tasks
+                                                                          all intermediate embeddings for prompting [7, 16, 25]. However,
+while preserving the knowledge in the pre-trained weights, we in-
+                                                                          these methods often fail to account for hop-specific preferences
+troduce the Graph Low-Rank Adaptation (GLoRA) module, inspired
+                                                                          of different nodes, limiting their adaptability. For example, in het-
+by LoRA from the NLP field [9]. GLoRA targets two components
+                                                                          erophilic graphs like dating networks where gender is the label, the
+during fine-tuning: (i) the message-passing scheme and (ii) the pro-
+                                                                          first-hop neighborhood may exhibit heterophily, while the second-
+jection matrices. Formally, for the 𝑙-th GNN layer, the fine-tuning
+                                                                          hop neighborhood may show homophily [18, 42]. We illustrate
+process with GLoRA is expressed as follows:
+                                                                          this in Figure 6. Given the varying distributions across hops and
+                     (𝑙 ) (𝑙 ) ⊤                              ⊤           their potential differing impact on performance [42], we propose
+                                                             
+      H (𝑙 ) = A + PA QA
+                                             (𝑙 )
+                                   H (𝑙 −1) W0 + P (𝑙 ) Q (𝑙 ) ,    (4)
+                                                                          decoupling the graph prompting process in a hop-specific manner.
+where W0 represents the frozen parameters of the 𝑙-th GNN layer.
+          (𝑙 )                                                               First, we collect intermediate embeddings from GNN layers to
+                                                                          construct a more informative sequence than using only H (𝐿) :
+P (𝑙 ) , Q (𝑙 ) ∈ R𝑑 ×𝑟 and PA , QA ∈ R𝑁 ×1 denotes the trainable low-
+                            (𝑙 )   (𝑙 )
+
+rank adaptation matrices of layer 𝑙 with rank of 𝑟 and 1, respectively.                    h                          i
+                                                               (𝑙 ) ⊤
+                                                                                      H = H (0) ∥H (1) || · · · ∥H (𝐿) ∈ R (𝐿+1) ×𝑁 ×𝑑 ,    (5)
+Note that 𝑟 << 𝑑, and for extremely large graphs, PA QA can
+                                                        (𝑙 )
+
+be further reduced, see Appendix A for details.                           where H (𝑙 ) represents the embedding produced by the 𝑙-th layer
+   The adaptation in GLoRA operates on two levels: (i) PA and QA
+                                                                          of the GNN encoder, and H (0) = Linear(X). Then, we gather the
+adjust the message-passing process, allowing for more effective
+                                                                          Layer-specific Class Prompts from each layer:
+alignment with downstream tasks by modulating the connections
+between nodes; and (ii) P and Q adapt the projection matrices. This
+                                                                                            h                           i
+                                                                                        P = P (0) ∥P (1) || · · · ∥P (𝐿) ∈ R (𝐿+1) ×𝐶 ×𝑑
+dual adaptation allows DAGPrompT to handle diverse downstream
+task distributions, such as disentangling embeddings of connected                                                  train |
+                                                                                                               | D∑︁                                  (6)
+                                                                                                     1             𝑐
+nodes with different labels. It retains the benefits of pre-training,                     (𝑙 )
+                                                                                         P𝑐 =
+                                                                                                                              (𝑙 )   (𝑙 )
+                                                                                                                             H𝑣 + Θ𝑐 ,
+including efficient few-shot learning and adaptability to new tasks.                             |D𝑐train |
+                                                                                                              𝑣 ∈ D𝑐train
+DAGPrompT: Pushing the Limits of Graph Prompting with a Distribution-aware Graph Prompt Tuning Approach   WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia
+
+
+where 𝐶 denotes the number of classes in the dataset, D𝑐train rep-                 in zero complexity) leads to high empirical risk 𝐿ˆ D (ℎ) and under-
+resents the subset of the training dataset with label 𝑐, and Θ (𝑙 ) ∈              fitting, which is sub-optimal. GLoRA strikes a balance between
+R𝐶 ×𝑑 is a layer-specific learnable prompt that enhances the model’s               flexibility and complexity, enhancing generalization in limited data
+representational capacity. These Layer-specific Class Prompts cap-                 scenarios. The experiment in subsection E.6 supports this analysis.
+ture the hop-specific representations of the training nodes, allowing
+for more precise prompting and evaluation at each hop.                             5      Experiments
+   Based on the two sequences of node embeddings H, and class                      In this section, we evaluate the capability of DAGPrompT by ad-
+tokens P, we prompt the graph in a hop-specific manner, effectively                dressing the following key questions:
+addressing the diverse hop-wise distributions present in graphs:                        • Q1: How does DAGPrompT perform compared to state-of-
+                                                                                          the-art models on real-world datasets?
+                                          
+               S (𝑙 ) = Sim H (𝑙 ) , P (𝑙 ) , 𝑙 = 0, 1, · · · , 𝐿, (7)
+                                                                                        • Q2: How does the internal data distribution, such as het-
+where Sim(·, ·) is a similarity function, for which we adopt cosine                       erophily levels, affect DAGPrompT’s performance?
+similarity, and S (𝑙 ) represents the prompted scores at hop 𝑙. Finally,                • Q3: How does the number of labels impact DAGPrompT’s
+we introduce a set of learnable coefficients to adaptively integrate                      performance?
+these scores and obtain the final result:                                               • Q4: How well does DAGPrompT transfer to other graphs?
+                         𝐿                                                              • Q5: What is the running efficiency of DAGPrompT?
+                           𝛾 (𝑙 ) S (𝑙 ) , Ŷ = arg max S̃𝑐 ,       (8)                 • Q6: How do the main components of DAGPrompT influence
+                        ∑︁
+                 S̃ =
+                                                  𝑐
+                      𝑙=1                                                                 its performance?
+where S̃𝑐 denotes the score for label 𝑐, and 𝛾 (𝑙 ) ∈ R is a learnable                We also conduct additional experiments on other backbones,
+parameter, initially set as 𝛾 (𝑙 ) = 𝛼 (1 − 𝛼)𝑙 with 𝛾 (𝐿) = (1 − 𝛼) 𝐿 ,           along with a full-shot evaluation, parameter analysis, and visual-
+where 𝛼 ∈ [0, 1] is a hyper-parameter. This setup incorporates prior               izations of graph hop-wise distributions and GLoRA weights, as
+knowledge about the relative importance of different hops in the                   detailed in Appendix E.
+graph, controlled by 𝛼. For instance, by tuning 𝛼, one can prioritize
+closer hops over distant ones, or adjust the relative importance be-               5.1      Datasets and Settings
+tween them. During training, DAGPrompT adaptively refines 𝛾 (𝑙 ) ,
+which helps handle the diverse distributions across hops, improv-                  Table 1: Statistics for node-classification datasets. ℎ stands
+ing model performance. Additionally, it remains computationally                    for the homophily ratio.
+efficient, requiring only a small number of additional parameters.
+   Finally, we adopt the following loss to optimize the parameters
+                                                                                       Dataset        #Nodes      #Edges     #Attributes     #Class       ℎ
+with a temperature 𝜏 and a cosine similarity function Sim(·, ·):
+                                                                                   Texas          183         325        1703            5            0.11
+                                        exp Sim H𝑥𝑖 , P𝑦𝑖 /𝜏
+                                                   (𝑙 ) (𝑙 )
+                𝐿                                                                      Wisconsin      251         515        1703            5            0.20
+                                                                   (9)
+               ∑︁         ∑︁
+      Lds = −                                                                        Cornell        183         298        1703            5            0.30
+               𝑙=0 (𝑥𝑖 ,𝑦𝑖 ) ∈ D train 𝑐=1 exp Sim H𝑥𝑖 , P𝑐
+                                      Í𝐶               (𝑙 ) (𝑙 )
+                                                                  /𝜏                   Chameleon      2277        36101      1703            5            0.20
+                                                                                       Squirrel       5201        217073     2089            5            0.22
+4    Theoretical Analysis                                                              Arxiv-year     169343      1166243    128             5            0.22
+In this section, we present a theoretical analysis of the GLoRA                        Cora           2708        10556      1433            7            0.81
+module. Although low-rank adaptation may be less optimal than
+full-parameter fine-tuning in NLP tasks [28], we demonstrate that in
+few-shot settings, low-rank adaptation proves to be more effective.
+                                                                                          Table 2: Statistics for graph-classification datasets.
+    Theorem 1. Let H be a hypothesis class, and D = {(𝑥𝑖 , 𝑦𝑖 )} be
+a dataset of 𝑚 i.i.d. samples. Suppose the loss function ℓ (ℎ(𝑥), 𝑦) is                Dataset      #Graphs #Avg.Nodes #Avg.Edges #Attributes #Class
+bounded by 0 ≤ ℓ (ℎ(𝑥), 𝑦) ≤ 𝐵. Then, with probability at least 1 − 𝛿,
+                                                                                       Texas*     183          10.5         9.96        1703          5
+for all ℎ ∈ H , we have:
+                                                                                       Chameleon* 2277         16.3         31.3        1703          5
+                                                   log(2/𝛿)                            MUTAG      177          17.9         19.7        7             2
+                                                √︂
+            𝐿(ℎ) − 𝐿ˆ D (ℎ) ≤ 2R D (H ) + 3𝐵                  ,                        COX2       467          41.2         43.5        3             2
+                                                      2𝑚
+                                                                                       ENZYMES 600             32.6         62.2        3             6
+where 𝐿(ℎ) is the true risk, 𝐿ˆ D (ℎ) is the empirical risk, and R D (H )
+is the empirical Rademacher complexity [23].
+                                                                                      We evaluate DAGPrompT on both few-shot node classification
+   When data is limited, the second term grows large due to the                    and graph classification tasks. For the few-shot node classification,
+small 𝑚, making it crucial to minimize the first term, which is in-                we use seven datasets of varying scales, types, and heterophily
+fluenced by model complexity. Low-rank adaptations like GLoRA                      levels. Texas, Wisconsin, Cornell, Chameleon, Squirrel [21], and
+reduce model complexity by using much fewer parameters, tight-                     Arxiv-Year [15] represent well-known heterophily datasets, while
+ening the generalization bound, and improving performance in                       Cora [32] is a commonly used homophily graph. The dataset sta-
+few-shot settings. In contrast, freezing all parameters (resulting                 tistics are provided in Table 1. Additionally, we generate synthetic
+WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia                                                                                                              Trovato et al.
+
+
+graphs with varying levels of heterophily following [18]. Classifi-                        DAGPrompT                      Scratch         Finetune-LP            GraphPrompt
+cation accuracy is measured on five-shot and ten-shot settings for                         GPF-Plus-LP                    GCOPE            GPR-GNN
+all datasets. For few-shot graph classification, we adapt the Texas                         100
+
+
+
+
+                                                                            Accuracy (%)
+and Chameleon datasets (denoted with ∗) by sampling each node’s
+2-hop neighbors and labeling each graph with the center node’s                                  80
+label. We also include three molecular datasets—MUTAG, COX2,
+and ENZYMES [13]—for comparison, they are evaluated under a                                     60
+five-shot setting. Further details can be found in Appendix D.                                           0.9        0.8     0.7     0.6   0.5       0.4    0.3   0.2    0.1
+                                                                                                                                  Homophily Ratio ℎ
+5.2     Involved Baselines & Settings
+To thoroughly evaluate the effectiveness of DAGPrompT, we com-
+                                                                                   Figure 4: Impact of data heterophily on Syn-Chameleon.
+pare it with several state-of-the-art baselines, categorized as follows:
+      • Supervised. We train GCN [11] from scratch, which is
+        widely used for homophily graphs. Additionally, we include                         DAGPrompT                      Scratch         Finetune-LP            GraphPrompt
+        heterophily-aware GNNs such as H2GCN [42], GPR-GNN                                 GPF-Plus-LP                    GCOPE            GPR-GNN
+        [4], and ALT-GNN [30] for comparison.                                                                                             60
+      • Pre-training + Fine-tuning. We pre-train GCN using link                            80
+
+
+
+
+                                                                            Accuracy (%)
+                                                                                                                                          50
+        prediction (LP) [17], DGI [27], and GraphCL [33], and then                         60
+        fine-tune the models on downstream tasks.                                          40
+                                                                                                                                          40
+
+      • Pre-training + Prompting. We pre-train GNNs using the                                                                             30
+                                                                                           20
+        link-prediction task (or the task specified by each model) and                               1         3            5        10         1          3      5           10
+        prompt them with graph prompting techniques. The graph
+                                                                                                                   Shot 𝑘                                   Shot 𝑘
+        prompting methods considered include GPPT [25], Graph-
+        Prompt [16], GPF, GPF-Plus [7], All-In-One [26], HGPrompt                                                  Texas                                  Chameleon
+        [34], and GCOPE [40].
+                                                                                           Figure 5: Impact of shots on Texas and Chameleon.
+   We employ the Adam Stochastic Gradient Descent optimizer [6]
+with a learning rate 𝜂 ∈ {0.1, 0.5, 1, 5, 10} × 10 −4 , a weight decay in
+{0, 2.5, 5} × 10 −6 , and a maximum of 200 epochs to train all models.
+The dimensions of hidden representations are set to 128 or 256.             effectiveness of prompt-based methods in learning embeddings. (iii)
+We choose 𝑟 in {8, 16, 32}, and 𝛼 in {0.1, 0.3, 0.5, 0.7, 0.9}. Hyper-      Fewer labels for training significantly hinder models trained
+parameters are selected based on performance. We use an "end-to-            from scratch, especially in heterophily settings. On graphs
+end" approach by grid-searching various settings, applying them             with smaller label ratios, Chameleon, Squirrel, and Arxiv-year, even
+during pre-training, and evaluating performance on downstream               non-heterophily-aware models, such as GraphPrompt, outperform
+tasks with the same setting. We train all the models on five NVIDIA         heterophily-aware models by a large margin. This may be due to
+RTX4090 with 24G memory. For a fair comparison, we use GCN                  better utilization of graph structure during the pre-training and
+as the backbone for all models except for GCOPE, where FAGCN                fine-tuning phases.
+[2] is recommended. For GPF and GPF-Plus, we choose the link-                  We also conduct experiments on the graph classification task1 ,
+prediction task for pre-training, referring to them as GPF-LP and           as shown in Table 4, where DAGPrompT consistently delivers the
+GPF-Plus-LP. The pre-training strategies for other methods follow           best performance.
+the approaches outlined in their original papers.
+                                                                            5.4                 Evaluation on Data Heterophily (Q2) and
+5.3     Evaluation on Real-world Datasets (Q1)                                                  Number of Shots (Q3)
+We evaluate DAGPrompT with GCN as the backbone, as shown in                 We investigate the impact of varying heterophily levels by gener-
+Table 3, and draw the following key observations: (i) DAGPrompT             ating a series of synthetic graphs, Syn-Chameleon, based on the
+consistently outperforms other baselines by a large margin.                 Chameleon dataset. Following the method in [18], we control the
+The performance improvements on heterophily datasets are par-               homophily ratio of Syn-Chameleon by adjusting the edges, allow-
+ticularly notable, with up to a 4.79% increase on Texas and an              ing the homophily ratio to range from 0.9 (strong homophily) to 0.1
+average improvement of 2.43% across all datasets. (ii) Fine-tuning          (strong heterophily). Models are evaluated on these graphs under a
+or prompting methods sometimes underperform compared                        full-shot setting, using 50% of the nodes for training to minimize the
+to training from scratch on heterophily graphs. For example,                effect of label quantity. The results, shown in Figure 4, demonstrate
+H2GCN, trained from scratch, surpasses most graph prompt meth-              that DAGPrompT consistently outperforms the baselines, especially
+ods on Texas, Cornell, and Wisconsin. This supports the claim in            in strong heterophily scenarios. Notably, heterophily-aware models
+section 1 that larger gaps exist between pre-training and down-             like GPR-GNN outperform most non-heterophily-aware models,
+stream tasks in complex graphs, where task reformulation and                such as GraphPrompt and GPF-Plus-LP, in this setting.
+prompting alone are insufficient to bridge the gap caused by intri-
+cate graph distributions. The heterophily in these graphs limits the        1 Baselines unsuitable for graph classification are excluded.
+DAGPrompT: Pushing the Limits of Graph Prompting with a Distribution-aware Graph Prompt Tuning Approach              WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia
+
+
+Table 3: Summary of the mean and standard deviation of accuracy across all runs for the few-shot node classification tasks.
+The best results for each dataset are highlighted in gray. GCN is used as the backbone encoder, except for H2GCN, GPR-GNN,
+ALT-GNN, and GCOPE, which use their specific architectures.
+
+                     Texas (0.11)            Cornell (0.31)        Wisconsin (0.20) Chameleon (0.20)        Squirrel (0.22)     Arxiv-year (0.22)        Cora (0.81)
+                   5-shot     10-shot        5-shot    10-shot      5-shot     10-shot   5-shot   10-shot   5-shot    10-shot 5-shot 10-shot          5-shot     10-shot
+ Label Ratio       13.6%       27.3%         13.6%      27.3%        9.9%       19.9%    1.09%     2.19%    0.48%      0.96% 0.0147% 0.0295%          1.29%       2.58%
+ GCN             56.32±3.45 58.55±4.92 59.01±4.10 63.42±3.24 56.24±3.97 56.37±3.12 31.61±3.32 34.04±4.42 21.07±0.82 23.01±1.73 22.05±1.36 23.94±1.34 55.27±1.34 58.45±1.74
+ H2GCN           72.95±3.30 76.75±4.74 77.86±4.82 82.62±5.86 68.38±2.95 72.72±3.74 44.74±2.95 49.64±2.75 29.47±2.43 30.61±3.48 28.65±1.44 30.23±1.37 66.56±1.37 69.45±1.42
+ GPR-GNN         74.83±2.84 77.44±3.96 79.73±3.85 82.87±4.02 71.42±3.28 73.24±2.58 43.32±2.52 50.96±3.28 28.93±1.36 32.05±2.86 28.49±2.94 30.47±2.41 69.03±1.40 71.42±1.08
+ ALT-GNN         74.36±2.86 78.42±2.76 78.72±3.46 83.51±3.75 70.45±2.38 73.52±2.01 45.51±2.47 52.84±1.98 30.73±2.23 33.26±2.97 29.05±2.74 30.20±1.98 68.15±1.09 71.30±1.42
+ Finetune-LP 52.26±4.42 52.23±6.15 56.20±4.66 61.53±5.57 55.27±3.85 57.84±2.90 32.26±4.21 35.69±4.28 22.55±1.52 24.29±2.38 22.26±2.16 24.29±1.51 60.31±2.06 65.26±2.07
+ Finetune-DGI 50.32±5.84 51.52±9.17 54.36±6.31 62.61±6.08 51.45±5.66 54.95±6.02 32.55±1.92 36.58±3.07 22.27±1.87 24.41±1.19 23.22±1.96 24.80±1.72 61.78±2.32 64.75±3.97
+ Finetune-GCL 46.17±4.13 49.54±6.89 52.06±4.81 61.98±3.10 46.39±5.68 52.48±9.52 30.13±2.42 36.85±5.37 21.07±5.86 22.46±4.97 22.19±3.48 22.91±7.01 53.91±2.96 57.81±2.85
+ GPPT         54.56±5.24 59.93±4.37 56.79±6.02 62.47±5.37 53.57±2.48 53.94±3.21 38.75±1.55 43.86±2.92 25.78±2.23 28.32±2.86 24.45±1.19 25.08±1.47 63.34±1.84 65.96±1.32
+ GraphPrompt 68.90±1.95 69.73±2.02 72.38±6.89 79.62±6.99 66.88±2.25 68.09±2.76 47.89±4.17 52.84±2.77 30.23±3.87 32.93±2.45 28.46±1.02 28.76±2.18 70.21±1.35 71.74±0.97
+ GPF-LP       66.93±6.06 66.01±0.82 69.14±7.40 72.01±8.35 59.46±2.59 61.67±2.43 45.76±2.16 47.55±3.03 28.57±2.79 29.45±1.90 28.64±5.82 29.03±3.84 65.30±2.45 67.31±2.94
+ GPF-Plus-LP 71.99±4.41 75.51±2.38 78.17±8.48 82.24±3.97 68.26±4.32 72.82±2.45 49.40±3.21 53.37±2.89 31.08±2.06 33.29±2.45 29.45±3.32 30.06±1.72 69.43±1.09 70.85±1.86
+ All-In-One   71.85±3.08 74.70±2.37 79.42±5.27 81.37±4.72 69.63±3.09 70.18±2.67 48.09±2.97 53.63±2.84 30.22±2.01 32.58±2.74 29.85±3.62 30.89±2.84 67.04±2.01 70.42±1.64
+ HGPrompt     67.48±2.08 70.30±2.02 72.01±5.33 73.47±6.38 65.87±3.27 66.08±3.58 46.87±3.29 53.10±3.04 30.09±2.33 32.46±2.98 28.41±1.34 28.90±2.08 68.42±1.37 69.54±1.54
+ GCOPE        75.85±2.36 77.50±1.94 78.53±4.74 82.04±5.36 71.45±2.86 73.85±2.84 49.24±3.37 54.01±2.74 31.32±2.45 34.06±2.45 29.59±1.45 30.67±1.98 69.24±1.35 70.57±2.64
+ DAGPrompT 80.64±3.75 81.75±1.64 84.09±1.57 85.13±2.08 73.86±2.45 76.54±1.75 52.86±1.35 56.34±1.98 33.60±2.54 35.87±2.34 31.06±1.03 31.99±0.98 71.60±1.77 73.02±0.93
+ Improvement 4.79       3.33       4.36       1.62       2.41       2.69       3.47       2.33       2.28       1.81       1.21       1.10       1.39       1.28
+
+
+Table 4: Summary of the mean and standard deviation of                                      declines significantly, underscoring the need for a distribution-
+accuracy across all runs for the graph classification. The best                             aware graph prompting approach.
+results for each dataset are highlighted in gray.
+                                                                                            5.5     Evaluation on Transfer Ability (Q4)
+                 Texas*       Chameleon*        MUTAG         COX2        ENZYMES
+  Scratch        52.46±2.34     25.30±2.84      56.43±2.85   45.98±4.97   22.65±3.85
+                                                                                            Table 5: Transfer ability measured by classification accuracy
+  Finetune-LP    53.37±1.84     25.75±2.85      58.87±1.65   51.45±3.65   24.90±4.74
+  GraphPrompt    72.75±2.09     44.18±2.51      73.85±1.97   55.86±5.73   25.67±3.49        across different domains. Source domain: Texas. Target do-
+  GPF-LP         68.34±2.14     41.01±3.30      70.68±2.75   40.87±5.67   20.58±1.97        mains: Cornell, Wisconsin, and Chameleon.
+  GPF-Plus-LP    71.06±2.56     46.27±4.41      73.86±1.90   54.80±3.48   25.65±3.97
+  All-In-One     73.46±1.90     46.26±2.85      74.58±1.85   55.03±3.48   26.08±4.86
+  HGPrompt       70.56±2.86     45.93±2.38      73.46±1.37   50.07±4.87   22.75±4.87                                      Cornell      Wisconsin         Chameleon
+  GCOPE          73.64±2.11     46.78±2.85      73.98±2.64   52.18±3.38   25.45±5.38
+                                                                                              Finetune-LP-Scratch         59.01±4.10     56.24±3.97        31.61±3.32
+  DAGPrompT      79.53±2.89     51.26±3.44      76.01±1.79   56.46±4.76   26.71±4.22
+  Improvement      5.89           4.48            1.43         0.60         0.63              Finetune-LP-Cross           60.50±2.30     56.58±1.90        31.18±2.81
+                                                                                              All-In-One-Scratch          64.16±2.13     63.96±2.90        32.56±2.13
+                                                                                              All-In-One-Cross            75.57±2.47     66.85±2.48        45.86±2.41
+                                                                                              DAGPrompT-Scratch           65.58±1.65     63.34±2.95        33.45±2.09
+   We evaluate the effect of varying shot numbers on the Texas and                            DAGPrompT-Cross             82.45±2.74     70.75±2.84        52.08±1.38
+Chameleon datasets, as shown in Figure 5, by adjusting the shot
+count from 1 to 10. Overall, DAGPrompT consistently outperforms
+the baselines, with the most notable improvements occurring at                                 We evaluate the transferability of DAGPrompT in Table 5. For
+5-shot on Texas (5.51%) and 3-shot on Chameleon (3.99%). As the                             pre-training, we use the Texas dataset as the source domain and
+number of shots increases, the non-pre-trained model, GPR-GNN,                              test the transfer to downstream tasks on the Cornell, Wisconsin,
+demonstrates a considerable advantage over prompt-based meth-                               and Chameleon datasets. Models with the suffix -Scratch are those
+ods. However, in scenarios with extremely limited labeled data,                             trained directly on the downstream tasks without pre-training,
+GPR-GNN underperforms significantly, lagging behind prompting                               while models with the suffix -Cross are pre-trained on the source
+approaches.                                                                                 domain and then fine-tuned (or prompted) on the target domains.
+   These two experiments reinforce the findings from subsection 5.3:                           The results show that pre-training, even across different domains,
+heterophily and label scarcity are key factors that limit model per-                        generally enhances model performance. DAGPrompT exhibits the
+formance. Prompting methods address label scarcity but overlook                             most significant improvement when transitioning from training
+heterophily, while heterophily-oriented methods generally neglect                           from scratch to cross-domain pre-training, highlighting its strong
+label scarcity. If either issue is inadequately addressed, performance                      transferability. This makes DAGPrompT particularly useful in cases
+WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia                                                                                          Trovato et al.
+
+
+where initial training data is unavailable or unsuitable due to pri-                Contrastive Methods, which leverage mutual information to encode
+vacy concerns or computational constraints.                                         global patterns in local representations [24, 27].
+                                                                                       The aforementioned approaches often overlook the objective
+5.6     Efficiency Analysis (Q5)                                                    gap between pre-training and fine-tuning, which limits their gener-
+                                                                                    alization across tasks [26]. To address this, GPPT [25] was the first
+Table 6: Efficiency analysis on the Chameleon dataset report-                       to incorporate learnable graph label prompts, reformulating down-
+ing iterations/sec, peak GPU memory (MB), tunable parame-                           stream node classification tasks as link prediction tasks to narrow
+ters, and average ranks. "PT" denotes pre-training, "DS" for                        the gap between pre-training and fine-tuning. Subsequently, Graph-
+downstream, "-" for not applicable, and "K" for thousand.                           Prompt [16, 35] introduced a unified template to accommodate a
+                                                                                    broader range of downstream tasks. All-in-One [26] reformulated
+                                                                                    all downstream tasks into graph-level tasks and integrated meta-
+                 Iter/sec. ↑ Memory ↓ T.Parameters ↓
+                                                                    Avg.Rank ↓      learning techniques for multi-task prompting. GPF and GPF-Plus
+                   PT     DS PT        DS        PT            DS                   [7] proposed a universal prompting system operating solely within
+ Scratch        - 72.82   -           889     -          331K                #3.3   the node feature space. While prior work primarily focused on
+ Finetune-LP 2.82 69.68 586           896 331K           331K                #3.3   downstream tasks, GCOPE [40] shifted the emphasis to the pre-
+ GPPT        1.30 5.35 583           1527 331K            3.8K               #4.2   training phase, combining disparate graph datasets to distill and
+ GraphPrompt 2.57 37.81 591          2101 331K              2K               #3.2   transfer knowledge to target tasks. Additionally, HGraphPrompt
+ GPF-Plus-LP 2.09 34.97 591          2515 331K           93.5K               #5.2   [34] and HetGPT [19] extended prompting techniques to hetero-
+ All-In-One  1.86 20.45 853          3064 331K            7.4K               #6.3   geneous graph learning, broadening the scope of their applica-
+ HGPrompt    2.49 24.57 585          2908 331K              2K               #4.0   tion. Recent studies have also explored cross-domain prompting
+ GCOPE       0.49 1.37 525           2184 92.5K          47.6K               #5.2
+                                                                                    [31, 38, 43] and multi-task prompting [37]. These methods often
+ DAGPrompT 2.60 27.54 585            2121 331K            6.4K               #3.5   neglect the complex distributions in graph data, resulting in per-
+                                                                                    formance degradation. ProNoG [36] proposes a heterophily-aware
+   We evaluate the efficiency of DAGPrompT on the Chameleon                         prompting method but is limited to GraphCL and cannot adapt
+dataset, as shown in Table 6. The results demonstrate that DAG-                     GNN encoders for specific domains.
+PrompT is generally efficient, exhibiting fast running speed, low
+GPU memory consumption, and a small number of tunable parame-
+ters. Overall, DAGPrompT ranks highly in terms of time efficiency,
+                                                                                    6.2    Heterophily Graph Learning
+memory usage, and parameter efficiency.                                             Traditional GNNs typically assume homophily (similarity between
+                                                                                    connected nodes) [20] and are less effective in heterophily graphs,
+5.7     Ablation Study (Q6)                                                         where connected nodes differ significantly [42]. To address this,
+                                                                                    models such as H2GCN [42] and GPR-GNN [4] enhance message-
+                                                                                    passing with high-order re-weighting techniques to improve com-
+        Table 7: Ablation Study. "w/o" denotes without.
+                                                                                    patibility with heterophily. LINKX, a simpler model, is optimized for
+                                                                                    large-scale heterophily learning [15]. There are more approaches
+                                     Texas        Cornell       Chameleon           refine graph convolution for heterophilous data [3, 5, 14, 18, 30, 41].
+  DAGPrompT                         80.64±3.75    84.09±1.57        52.86±1.35      However, most heterophily-aware models are designed for training
+  w/o GLoRA                         78.12±4.41    82.18±2.20        50.38±1.29      from scratch in label-rich scenarios and face generalization and
+  w/o Layer-Specific Prompts        78.30±3.25    82.63±4.07        52.06±2.08      over-fitting issues in few-shot settings.
+  w/o Coefficients 𝛾                77.19±3.08    83.31±2.95        50.30±1.95
+
+                                                                                    7     Conclusion
+   We perform an ablation study to assess the impact of each com-
+ponent in DAGPrompT in Table 7, by disabling them individually.                     In this paper, we push the limits of the graph prompting paradigm
+For the Layer-Specific Prompts, we adopt the last layer only. For                   to graphs with complex distributions, such as heterophily graphs.
+the coefficients 𝛾 in Equation 8, we fix all values to 1. Overall, each             We observe that current methods struggle to generalize in these
+component contributes to performance to varying extents.                            settings and are, in some cases, outperformed by simple models
+                                                                                    trained from scratch. We identify two key challenges for better
+6 Related Works                                                                     generalization on complex graphs: (i) adapting the model to new
+                                                                                    distributions in downstream tasks to reduce discrepancies between
+6.1 Graph Pre-training and Prompting                                                pre-training and fine-tuning due to heterophily, and (ii) aligning
+In recent years, significant advancements have been made in the                     model prompts to the hop-specific needs of different nodes. To
+development of pre-trained Graph Neural Networks (GNNs). These                      address these challenges, we propose Distribution-aware Graph
+methods can be broadly categorized into three main types: (i) Graph                 Prompt Tuning (DAGPrompT), which includes a GLoRA module
+Property Reconstruction-Based Methods, which focus on reconstruct-                  and a Hop-specific Graph Prompting module, corresponding to the
+ing specific graph properties such as node attributes [8, 10] or links              two challenges outlined above. Our experiments across 10 datasets
+[12, 17]; (ii) Sub-Graph Contrastive Methods, which distinguish posi-               and 14 baselines demonstrate the state-of-the-art performance of
+tive subgraphs from negative ones [33, 39, 44]; and (iii) Local-Global              DAGPrompT, achieving up to a 4.79% improvement in accuracy.
+DAGPrompT: Pushing the Limits of Graph Prompting with a Distribution-aware Graph Prompt Tuning Approach                 WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia
+
+
+Acknowledgments                                                                             [23] Shai Shalev-Shwartz and Shai Ben-David. 2014. Understanding machine learning:
+                                                                                                 From theory to algorithms. Cambridge university press.
+This work was supported by the National Natural Science Founda-                             [24] Fan-Yun Sun, Jordan Hoffmann, Vikas Verma, and Jian Tang. 2019. Infograph: Un-
+tion of China (Grant No. 62276006)                                                               supervised and semi-supervised graph-level representation learning via mutual
+                                                                                                 information maximization. arXiv preprint arXiv:1908.01000 (2019).
+                                                                                            [25] Mingchen Sun, Kaixiong Zhou, Xin He, Ying Wang, and Xin Wang. 2022. Gppt:
+                                                                                                 Graph pre-training and prompt tuning to generalize graph neural networks. In
+                                                                                                 Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and
+References                                                                                       Data Mining. 1717–1727.
+ [1] Armen Aghajanyan, Sonal Gupta, and Luke Zettlemoyer. 2021. Intrinsic Di-               [26] Xiangguo Sun, Hong Cheng, Jia Li, Bo Liu, and Jihong Guan. 2023. All in one:
+     mensionality Explains the Effectiveness of Language Model Fine-Tuning. In                   Multi-task prompting for graph neural networks. In Proceedings of the 29th ACM
+     Proceedings of the 59th Annual Meeting of the Association for Computational Lin-            SIGKDD Conference on Knowledge Discovery and Data Mining. 2120–2131.
+     guistics and the 11th International Joint Conference on Natural Language Processing,   [27] Petar Velickovic, William Fedus, William L Hamilton, Pietro Liò, Yoshua Bengio,
+     ACL/IJCNLP 2021, (Volume 1: Long Papers), Virtual Event, August 1-6, 2021.                  and R Devon Hjelm. 2019. Deep graph infomax. ICLR (Poster) 2, 3 (2019), 4.
+ [2] Deyu Bo, Xiao Wang, Chuan Shi, and Huawei Shen. 2021. Beyond low-frequency             [28] Shaowen Wang, Linxi Yu, and Jian Li. 2024. LoRA-GA: Low-Rank Adaptation
+     information in graph convolutional networks. In Proceedings of the AAAI confer-             with Gradient Approximation. arXiv preprint arXiv:2407.05000 (2024).
+     ence on artificial intelligence, Vol. 35. 3950–3957.                                   [29] Zonghan Wu, Shirui Pan, Fengwen Chen, Guodong Long, Chengqi Zhang, and
+ [3] Ming Chen, Zhewei Wei, Zengfeng Huang, Bolin Ding, and Yaliang Li. 2020.                    S Yu Philip. 2020. A comprehensive survey on graph neural networks. IEEE
+     Simple and deep graph convolutional networks. In International conference on                transactions on neural networks and learning systems 32, 1 (2020), 4–24.
+     machine learning. PMLR, 1725–1735.                                                     [30] Zhe Xu, Yuzhong Chen, Qinghai Zhou, Yuhang Wu, Menghai Pan, Hao Yang,
+ [4] Eli Chien, Jianhao Peng, Pan Li, and Olgica Milenkovic. 2020. Adaptive universal            and Hanghang Tong. 2023. Node classification beyond homophily: Towards a
+     generalized pagerank graph neural network. arXiv preprint arXiv:2006.07988                  general solution. In Proceedings of the 29th ACM SIGKDD Conference on Knowledge
+     (2020).                                                                                     Discovery and Data Mining. 2862–2873.
+ [5] Siddhartha Shankar Das, SM Ferdous, Mahantesh M Halappanavar, Edoardo Serra,           [31] Yuchen Yan, Peiyan Zhang, Zheng Fang, and Qingqing Long. 2024. Inductive
+     and Alex Pothen. 2024. AGS-GNN: Attribute-guided Sampling for Graph Neural                  Graph Alignment Prompt: Bridging the Gap between Graph Pre-training and
+     Networks. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge                     Inductive Fine-tuning From Spectral Perspective. In Proceedings of the ACM on
+     Discovery and Data Mining. 538–549.                                                         Web Conference 2024. 4328–4339.
+ [6] P Kingma Diederik. 2014. Adam: A method for stochastic optimization. (No Title)        [32] Zhilin Yang, William Cohen, and Ruslan Salakhudinov. 2016. Revisiting semi-
+     (2014).                                                                                     supervised learning with graph embeddings. In International conference on ma-
+ [7] Taoran Fang, Yunchao Zhang, Yang Yang, Chunping Wang, and Lei Chen. 2024.                   chine learning. PMLR, 40–48.
+     Universal prompt tuning for graph neural networks. Advances in Neural Infor-           [33] Yuning You, Tianlong Chen, Yongduo Sui, Ting Chen, Zhangyang Wang, and
+     mation Processing Systems 36 (2024).                                                        Yang Shen. 2020. Graph contrastive learning with augmentations. Advances in
+ [8] Zhenyu Hou, Xiao Liu, Yukuo Cen, Yuxiao Dong, Hongxia Yang, Chunjie Wang,                   neural information processing systems 33 (2020), 5812–5823.
+     and Jie Tang. 2022. Graphmae: Self-supervised masked graph autoencoders. In            [34] Xingtong Yu, Yuan Fang, Zemin Liu, and Xinming Zhang. 2024. Hgprompt:
+     Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and                    Bridging homogeneous and heterogeneous graphs for few-shot prompt learning.
+     Data Mining. 594–604.                                                                       In Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 38. 16578–
+ [9] Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean               16586.
+     Wang, Lu Wang, and Weizhu Chen. 2021. Lora: Low-rank adaptation of large               [35] Xingtong Yu, Zhenghao Liu, Yuan Fang, Zemin Liu, Sihong Chen, and Xinming
+     language models. arXiv preprint arXiv:2106.09685 (2021).                                    Zhang. 2024. Generalized graph prompt: Toward a unification of pre-training
+[10] Ziniu Hu, Yuxiao Dong, Kuansan Wang, Kai-Wei Chang, and Yizhou Sun. 2020.                   and downstream tasks on graphs. IEEE Transactions on Knowledge and Data
+     Gpt-gnn: Generative pre-training of graph neural networks. In Proceedings of                Engineering (2024).
+     the 26th ACM SIGKDD international conference on knowledge discovery & data             [36] Xingtong Yu, Jie Zhang, Yuan Fang, and Renhe Jiang. 2024. Non-homophilic
+     mining. 1857–1867.                                                                          graph pre-training and prompt learning. arXiv preprint arXiv:2408.12594 (2024).
+[11] Thomas N Kipf and Max Welling. 2016. Semi-supervised classification with graph         [37] Xingtong Yu, Chang Zhou, Yuan Fang, and Xinming Zhang. 2024. MultiGPrompt
+     convolutional networks. arXiv preprint arXiv:1609.02907 (2016).                             for multi-task pre-training and prompting on graphs. In Proceedings of the ACM
+[12] Thomas N Kipf and Max Welling. 2016. Variational graph auto-encoders. arXiv                 on Web Conference 2024. 515–526.
+     preprint arXiv:1611.07308 (2016).                                                      [38] Xingtong Yu, Chang Zhou, Yuan Fang, and Xinming Zhang. 2024. Text-Free
+[13] Nils Kriege and Petra Mutzel. 2012. Subgraph matching kernels for attributed                Multi-domain Graph Pre-training: Toward Graph Foundation Models. arXiv
+     graphs. Proceedings of the 29th International Conference on Machine Learning,               preprint arXiv:2405.13934 (2024).
+     ICML 2012, Edinburgh, Scotland, UK, June 26 - July 1, 2012 (2012).                     [39] Jiaqi Zeng and Pengtao Xie. 2021. Contrastive self-supervised learning for graph
+[14] Xiang Li, Renyu Zhu, Yao Cheng, Caihua Shan, Siqiang Luo, Dongsheng Li, and                 classification. In Proceedings of the AAAI conference on Artificial Intelligence,
+     Weining Qian. 2022. Finding global homophily in graph neural networks when                  Vol. 35. 10824–10832.
+     meeting heterophily. In International Conference on Machine Learning. PMLR,            [40] Haihong Zhao, Aochuan Chen, Xiangguo Sun, Hong Cheng, and Jia Li. 2024. All
+     13242–13256.                                                                                in one and one for all: A simple yet effective method towards cross-domain graph
+[15] Derek Lim, Felix Hohne, Xiuyu Li, Sijia Linda Huang, Vaishnavi Gupta, Omkar                 pretraining. arXiv preprint arXiv:2402.09834 (2024).
+     Bhalerao, and Ser Nam Lim. 2021. Large Scale Learning on Non-Homophilous               [41] Zhengyang Zhou, Qihe Huang, Gengyu Lin, Kuo Yang, Lei Bai, and Yang Wang.
+     Graphs: New Benchmarks and Strong Simple Methods. Advances in Neural                        2023. Greto: Remedying dynamic graph topology-task discordance via target
+     Information Processing Systems 34 (2021).                                                   homophily. In The eleventh international conference on learning representations.
+[16] Zemin Liu, Xingtong Yu, Yuan Fang, and Xinming Zhang. 2023. Graphprompt:               [42] Jiong Zhu, Yujun Yan, Lingxiao Zhao, Mark Heimann, Leman Akoglu, and Danai
+     Unifying pre-training and downstream tasks for graph neural networks. In Pro-               Koutra. 2020. Beyond homophily in graph neural networks: Current limitations
+     ceedings of the ACM Web Conference 2023. 417–428.                                           and effective designs. Advances in neural information processing systems 33 (2020),
+[17] Yuanfu Lu, Xunqiang Jiang, Yuan Fang, and Chuan Shi. 2021. Learning to pre-                 7793–7804.
+     train graph neural networks. In Proceedings of the AAAI conference on artificial       [43] Yun Zhu, Yaoke Wang, Haizhou Shi, Zhenshuo Zhang, Dian Jiao, and Siliang
+     intelligence, Vol. 35. 4276–4284.                                                           Tang. 2024. GraphControl: Adding Conditional Control to Universal Graph Pre-
+[18] Xiaojun Ma, Qin Chen, Yuanyi Ren, Guojie Song, and Liang Wang. 2022. Meta-                  trained Models for Graph Domain Transfer Learning. In Proceedings of the ACM
+     Weight Graph Neural Network: Push the Limits Beyond Global Homophily. In                    on Web Conference 2024. 539–550.
+     Proceedings of the ACM Web Conference 2022. 1270–1280.                                 [44] Yanqiao Zhu, Yichen Xu, Feng Yu, Qiang Liu, Shu Wu, and Liang Wang. 2020.
+[19] Yihong Ma, Ning Yan, Jiayu Li, Masood Mortazavi, and Nitesh V Chawla. 2024.                 Deep graph contrastive representation learning. arXiv preprint arXiv:2006.04131
+     Hetgpt: Harnessing the power of prompt tuning in pre-trained heterogeneous                  (2020).
+     graph neural networks. In Proceedings of the ACM on Web Conference 2024. 1015–
+     1023.
+[20] Miller McPherson, Lynn Smith-Lovin, and James M Cook. 2001. Birds of a feather:        A     Algorithm of DAGPrompT
+     Homophily in social networks. Annual review of sociology 27, 1 (2001), 415–444.
+[21] Hongbin Pei, Bingzhe Wei, Kevin Chen-Chuan Chang, Yu Lei, and Bo Yang.                 We detail the DAGPrompT algorithm from pre-training to prompt-
+     2020. Geom-gcn: Geometric graph convolutional networks. arXiv preprint                 ing in Algorithms algorithm 1 and algorithm 2. For clarity, we
+     arXiv:2002.05287 (2020).
+[22] Benedek Rozemberczki, Carl Allen, and Rik Sarkar. 2021. Multi-scale attributed         present the algorithm using a for-loop structure, though in practice,
+     node embedding. Journal of Complex Networks 9, 2 (2021), cnab014.                      we process data in batches. The example provided focuses on node
+WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia                                                                                            Trovato et al.
+
+
+classification, with graph classification requiring only a straightfor-      Algorithm 2: DAGPrompT stage two: prompting and tun-
+ward adjustment: feeding entire graphs instead of sampling node              ing, taking the node classification as an example.
+neighborhoods.
+                                                                              Input: Node attributes X, adjacency A, training set D train ,
+                                                                                       pre-trained GNN 𝑓 with parameter Θ∗ , GLoRA
+ Algorithm 1: DAGPrompT stage one: pre-training.                                                                                           𝐿 ,
+                                                                                       parameter Θglora , layer-specific prompts {Θ (𝑙 ) }𝑙=0
+  Input: Node attributes X, adjacency A, GNN 𝑓 with                                                          𝐿 , temperature 𝜏, learning rate 𝜂.
+                                                                                       coefficients {𝛾 (𝑙 ) }𝑙=0
+          parameter Θ, temperature 𝜏, learning rate 𝜂.                        Output: Downstream labels Ŷ.
+  Output: Tuned parameter Θ∗ .                                                // Construct the node tokens
+  for 𝑖 ← 1 to 𝑁 do                                                           for 𝑖 ← 1 to 𝑁 ; // 𝑁 is the number of nodes in the
+      // Construct positive and negative samples.                               graph
+      𝑣 ← 𝑖; 𝑎 ← 𝑗 | 𝑗 ∈ N (𝑖); 𝑏 ← 𝑘 | 𝑘 ∉ N (𝑖);
+                                                                               do
+      // Generate embeddings
+                                                                                  X𝑖 , A𝑖 ← SampleNeighborhood(X, A, 𝑖);
+      H ← 𝑓 (X, A; Θ);
+                                                                                  for 𝑙 ← 0 to 𝐿 do
+      H ← matmul(H, A);
+                                                                                       H𝑖 ← 𝑓 (X𝑖 , A𝑖 ; Θ∗, Θglora ; 𝑙) ; // embeddings of
+                                                                                         (𝑙 )
+      s𝑣 ← H[𝑖]; s𝑎 ← H[𝑎]; s𝑏 ← H[𝑏];
+  // Loss calculation and parameter optimization                                        layer 𝑙
+                               exp(sim(s𝑣 ,s𝑎 )/𝜏 )
+  Lpt (Θ) ← − (𝑣,𝑎,𝑏 ) ln Í        exp(sim(s ,s )/𝜏 ) ;                       for 𝑙 ← 0 to h𝐿 do
+                Í
+                                  𝑢 ∈{𝑎,𝑏}            𝑣 𝑢                                                                    i
+    Θ ← Θ − 𝜂∇Θ (Lpt (Θ));                                                        H (𝑙 ) ← H1 ∥H2 || · · · ∥H𝑁 ∈ R𝑁 ×𝑑 ;
+                                                                                              (𝑙 )    (𝑙 )              (𝑙 )
+
+                                                                              // Construct the class tokens, only calculated once
+    For extremely large graphs where 𝑁 ≫ 𝑟𝑑, we enhance effi-                 for 𝑐 ← 1 to 𝐶 ;       // 𝐶 is the number of classes in
+                                             (𝑙 ) ⊤                             the graph
+ciency of GLoRA by reducing PA QA to a unified edge-weight
+                                      (𝑙 )
+
+vector. We then apply this edge-weight only to edges connected to              do
+nodes in the training set. This approach reduces the total number                 for 𝑙 ← 0 to 𝐿 do
+                                                                                                   1      Í | D𝑐train |
+of parameters while maximizing the use of information from the                           (𝑙 )
+                                                                                       P𝑐 ← train                   train H𝑣
+                                                                                                                               (𝑙 )
+                                                                                                                                    + Θ𝑐 ∈ R𝑑 ;
+                                                                                                                                       (𝑙 )
+                                                                                                 | D𝑐   |    𝑣 ∈ D𝑐
+training data.
+                                                                              for 𝑙 ← 0 toh𝐿 do                   i
+B    Complexity Analysis                                                          P (𝑙 ) ← P1 ∥P2 || · · · ∥P𝐶 ∈ R𝐶 ×𝑑 ;
+                                                                                            (𝑙 ) (𝑙 )        (𝑙 )
+
+Consider a graph with 𝑁 nodes and 𝐸 edges, where 𝑑 is the hidden              // Prompting
+dimension, 𝐿 the number of GNN encoder layers, and 𝐶 the number               for 𝑙 ← 0 to 𝐿 do
+of classes.                                                                                                      
+                                                                                  S (𝑙 ) ← Similarity H (𝑙 ) , P (𝑙 ) ;
+    The pre-training complexity of the GNN encoder is O ((𝐿𝐸 +
+𝑁 𝐾)𝑑), where 𝐾 is the number of negative samples. In this work,                          𝛾 S ;
+                                                                                    Í𝐿 (𝑙 ) (𝑙 )
+                                                                              S̃ ← 𝑙=1
+we set 𝐾 = 1.                                                                 Ŷ ← arg max𝑐 S̃𝑐 ;
+    For prompting, the complexity of DAGPrompT arises from three              // Calculate loss and optimize parameters
+components: (i) generating layer-wise embeddings from the GNN                                                              
+                                                                                                                    exp Sim H𝑥𝑖 ,P𝑦𝑖 /𝜏
+                                                                                                                              (𝑙 ) (𝑙 )
+                                                                                                                                         
+
+encoder 𝑓 , (ii) generating layer-wise class tokens, and (iii) per-                                                                          ;
+                                                                                         Í𝐿 Í
+                                                                              Lds = − 𝑙=0 (𝑥𝑖 ,𝑦𝑖 ) ∈ D train Í𝐶             
+                                                                                                                      𝑐=1 exp Sim H𝑥𝑖 ,P𝑐
+                                                                                                                                  (𝑙 ) (𝑙 )
+forming similarity calculations. Step (i) incurs a complexity of                                                                            /𝜏
+O (𝐿(𝐸 + 𝑁𝑑 2 )), driven by message passing and embedding projec-             Θglora ← Θglora − 𝜂∇Θglora (Lds (Θglora ));
+tion. Step (ii) has a lighter complexity of O (𝐿𝐶𝑑), involving matrix         for 𝑙 ← 0 to 𝐿 do
+addition. Step (iii) incurs a complexity of O (𝐿𝑁𝐶𝑑), dominated by                Θ (𝑙 ) ← Θ (𝑙 ) − 𝜂∇Θ (𝑙 ) (Lds (Θ (𝑙 ) ));
+similarity calculations.                                                          𝛾 (𝑙 ) ← 𝛾 (𝑙 ) − 𝜂∇𝛾 (𝑙 ) (Lds (𝛾 (𝑙 ) ));
+    The overall complexity of DAGPrompT is O (𝐿(𝑁𝐶 +𝐿𝐶 +𝑁𝑑)𝑑 +
+𝐿𝐸). Given that 𝐿 ≪ 𝑁 and 𝐶 ≪ 𝑑, this simplifies to O (𝐿𝑁𝑑 2 +𝐿𝐸𝑑),
+yielding near-linear complexity with respect to graph size, making
+it efficient for large-scale applications.
+                                                                            where ℓ (ℎ(𝑥), 𝑦) denotes a bounded loss function, satisfying 0 ≤
+                                                                            ℓ (ℎ(𝑥), 𝑦) ≤ 𝐵. This measures the expected loss of the hypothesis
+C     Details of Theorem 1                                                  over the distribution of the data.
+Let H be a hypothesis class, and let D = {(𝑥 1, 𝑦1 ), . . . , (𝑥𝑚 , 𝑦𝑚 )}       In practice, however, we do not have access to the true distri-
+represent a dataset of 𝑚 independent and identically distributed            bution. Instead, we rely on the available sample D to estimate the
+(i.i.d.) samples drawn from an unknown distribution. The goal is to         performance of ℎ through the empirical risk (or training error),
+evaluate the performance of a hypothesis ℎ ∈ H , which we do by             which is given by:
+assessing its true risk (or expected error). The true risk is defined
+                                                                                                                𝑚
+as:                                                                                                          1 ∑︁
+                                                                                                  𝐿ˆ D (ℎ) =       ℓ (ℎ(𝑥𝑖 ), 𝑦𝑖 ).                       (11)
+                    𝐿(ℎ) = E (𝑥,𝑦)∼D [ℓ (ℎ(𝑥), 𝑦)],                  (10)                                    𝑚 𝑖=1
+DAGPrompT: Pushing the Limits of Graph Prompting with a Distribution-aware Graph Prompt Tuning Approach                  WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia
+
+
+This empirical risk approximates the true risk by averaging the loss                                                         1-hop              2-hop             3-hop
+over the observed data points.                                                                  0.8
+
+
+
+
+                                                                                   Percentage
+   To understand the capacity of the hypothesis class H in fitting                              0.6
+the data, we consider its empirical Rademacher complexity, which                                0.4
+                                                                                                0.2
+quantifies how well H can adapt to random noise. The empirical                                    0
+Rademacher complexity is defined as:                                                                       [0, 0.2)       [0.2, 0.4) [0.4, 0.6) [0.6, 0.8) [0.8, 1.0]
+                                        𝑚
+                                     1 ∑︁                                                                    Node-level Homophily Ratio Intervals: Texas
+                              "                     #
+               R D (H ) = E𝜎 sup           𝜎𝑖 ℎ(𝑥𝑖 ) ,          (12)
+                               ℎ∈ H 𝑚 𝑖=1                                                                                    1-hop              2-hop             3-hop
+
+
+
+
+                                                                                   Percentage
+where 𝜎𝑖 are i.i.d. Rademacher variables, each taking values in ±1                              0.4
+with equal probability. This measure helps us understand the rich-
+                                                                                                0.2
+ness of the hypothesis class by evaluating its ability to fit random
+labels on the sample D, providing insights into potential over-                                   0
+fitting and generalization behavior.                                                                       [0, 0.2)       [0.2, 0.4) [0.4, 0.6) [0.6, 0.8) [0.8, 1.0]
+    The generalization bound for the hypothesis class H [23] can                                            Node-level Homophily Ratio Intervals: Cornell
+be formulated as:
+                                                                                                                             1-hop              2-hop             3-hop
+                                                log(2/𝛿)                                        0.8
+                                             √︂
+            𝐿(ℎ) ≤ 𝐿ˆ D (ℎ) + 2R D (H ) + 3𝐵
+
+
+
+                                                                                   Percentage
+                                                         ,        (13)                          0.6
+                                                   2𝑚
+                                                                                                0.4
+which holds with probability at least 1 − 𝛿. Here, the terms are                                0.2
+defined as follows:                                                                               0
+                                                                                                           [0, 0.2)       [0.2, 0.4) [0.4, 0.6) [0.6, 0.8) [0.8, 1.0]
+     • 𝐿(ℎ): the true risk (expected test error), which reflects the
+       hypothesis’ error on unseen data,                                                                 Node-level Homophily Ratio Intervals: Chameleon
+     • 𝐿ˆ D (ℎ): the empirical risk (training error), representing the
+       observed performance on the given dataset,                                               Figure 6: Hop-wise Local Heterophily Distributions.
+     • R D (H ): the empirical Rademacher complexity of the hy-
+       pothesis class H , capturing the class’s capacity to fit random
+       noise,                                                                         The ArXiv-year dataset [15] is a large-scale citation network with
+     • 𝐵: the upper bound on the loss function ℓ (ℎ(𝑥), 𝑦), ensuring               high heterophily. Nodes represent research papers, node features
+       the loss is bounded within [0, 𝐵],                                          are embeddings from paper titles and abstracts, and edges represent
+     • 𝛿: the confidence level, determining the probability that the               citation relationships. The labels correspond to publication years,
+       bound holds,                                                                grouped into five intervals.
+     • 𝑚: the number of training samples in the dataset D.                            The MUTAG dataset consists of 188 chemical compounds, catego-
+   This bound shows that the true risk 𝐿(ℎ) is upper-bounded by                    rized into two classes based on mutagenic effects on bacteria. Here,
+the empirical risk 𝐿ˆ D (ℎ), adjusted by the model’s complexity (as                vertices represent atoms, and edges represent chemical bonds. The
+captured by the empirical Rademacher complexity R D (H )) and                      COX2 dataset contains molecular structures of 467 cyclooxygenase-
+a term that decreases with the number of training samples, 𝑚,                      2 inhibitors, and the ENZYME dataset focuses on classifying 600
+providing insight into how well the model generalizes to unseen                    enzymes into six top-level EC classes [13].
+data.                                                                                 We provide a statistical analysis of hop-wise distributional vari-
+                                                                                   ance from the perspective of local homophily, adapted from the
+                                                                                   homophily measurement in section 2:
+D     Dataset Details
+In this section, we describe the datasets used in our study.                                           | { (𝑣𝑖 , 𝑣 𝑗 ) : (𝑣𝑖 , 𝑣 𝑗 ) ∈ EN (𝑘 ) (𝑖 ) ∧ y𝑖 = y 𝑗 | 𝑗 ∈ N (𝑘 ) (𝑖 ) } |
+                                                                                                                                                                                       , (14)
+                                                                                            (𝑘 )
+                                                                                        ℎ𝑖         =
+   The Cora dataset [32] is a widely used citation network charac-                                                                    | EN (𝑘 ) (𝑖 ) |
+terized by strong homophily [20]. In Cora, nodes represent papers,
+                                                                                   where N (𝑘 ) (𝑖) denotes the 𝑘-hop neighborhood of node 𝑣𝑖 , and
+node features are bag-of-words representations derived from the
+                                                                                   (𝑢, 𝑣) ∈ E N (𝑘 ) (𝑖 ) if and only if there exists a shortest path of length
+content, and edges correspond to citation links. The labels indicate
+the subject categories of the papers.                                              𝑘 between 𝑢 and 𝑣 in the subgraph induced by N (𝑘 ) (𝑖). The value
+   The Texas, Wisconsin, Cornell, Chameleon, and Squirrel datasets                 ℎ𝑖 represents the distribution within each node’s 𝑘-hop neigh-
+                                                                                     (𝑘 )
+
+[21] consist of web pages, where nodes represent individual pages,                 borhood.
+node features are word embeddings, and edges reflect hyperlinks.                       The results in Figure 6 indicate that the distributions vary signif-
+Labels for Texas, Cornell, and Wisconsin represent web page cate-                  icantly across different hops, highlighting the need for a decoupled
+gories, while Chameleon and Squirrel labels capture average monthly                graph prompting procedure. Each hop may carry unique and diverse
+web traffic, grouped into five ranges. Notably, Chameleon and Squir-               information, contributing to the final representations to different
+rel are complex Wikipedia networks, exhibiting a mix of homophily                  degrees. Moreover, the distributions vary across different graphs,
+and heterophily [18].                                                              emphasizing the need for hop-specific approaches.
+WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia                                                                                                                  Trovato et al.
+
+
+               0.1      0.3    0.5      0.7       0.9                8       16        32
+                                                                                                                60
+
+
+
+
+                                                                                               Percentage (%)
+
+
+
+
+                                                                                                                                         Percentage (%)
+                                                                                                                                                          40
+                                                                                                                40
+Accuracy (%)
+
+
+
+
+               80                                       80
+                                                        70                                                                                                20
+                                                                                                                20
+               60                                       60
+                                                                                                                  0                                       0
+                                                        50
+                      Texas    Cornell Chameleon
+
+
+
+
+                                                                                                                0.9 8
+                                                                                                                0.9 6
+                                                                                                                0.9 4
+                                                                                                                1.0 3
+                                                                                                                1.0 1
+                                                                                                                1.0 9
+                                                                                                                    17
+
+
+
+
+                                                                                                                                                          0.9 9
+                                                                                                                                                          0.9 4
+                                                                                                                                                          0.9 0
+                                                                                                                                                          1.0 6
+                                                                                                                                                          1.0 2
+                                                                                                                                                          1.0 7
+                                                                                                                                                              43
+                                                             Texas        Cornell Chameleon
+
+
+
+
+                                                                                                                    6
+                                                                                                                    7
+                                                                                                                    8
+                                                                                                                    9
+                                                                                                                    0
+                                                                                                                    0
+
+
+
+
+                                                                                                                                                              4
+                                                                                                                                                              6
+                                                                                                                                                              8
+                                                                                                                                                              9
+                                                                                                                                                              1
+                                                                                                                                                              2
+                                                                                                                0.9
+
+
+
+
+                                                                                                                                                          0.9
+                              Alpha 𝛼                                     Rank 𝑟
+                                                                                                                       Weight-Texas                            Weight-Cornell
+                              Figure 7: Parameter analysis.
+                                                                                                                Figure 8: GLoRA weights distributions of A + PA Q⊤
+                                                                                                                                                                 A
+
+E Additional Experiments
+E.1 DAGPrompt with GAT as Backbone
+To evaluate the generalization capability of DAGPrompt, we con-
+duct 5-shot and 10-shot node classification experiments using GAT
+as the backbone encoder2 . The results in Table 8 show that DAG-
+Prompt consistently outperforms all baselines, providing strong
+evidence of its robust generalization performance.
+
+E.2                  Full-shot Experiments
+
+Table 9: Summary of the mean and standard deviation of
+accuracy across all runs on full-shot node classification tasks.
+                                                                                                                Figure 9: Loss curve of DAGPrompT on Chameleon.
+The best results for each dataset are highlighted in gray. GCN
+is used as the backbone model.
+
+                               Chameleon (0.20)         Squirrel (0.22)       Cora (0.81)      𝛼 values, up to 0.9, while Chameleon favors smaller values, down
+        GCN                          48.57±2.76              38.67±2.10           78.57±1.23
+                                                                                               to 0.1. This indicates that Texas and Cornell benefit more from
+        H2GCN                        69.54±1.24              57.31±2.47           77.65±0.84   distant hop information (as larger 𝛼 assigns greater weight to them),
+        GPR-GNN                      70.22±1.45              58.19±3.40           79.56±0.87   whereas Chameleon relies more on local hop information with a
+        ALT-GNN                      70.51±1.23              59.34±1.38           78.45±1.85   smaller 𝛼. Additionally, variations in the rank 𝑟 impact performance
+                                                                                               differently across datasets.
+        Finetune-LP                  50.73±2.45              39.61±1.98           76.67±1.37
+        GPPT                         59.61±1.23              36.63±1.65           63.71±2.12
+        GraphPrompt                  69.63±1.67              51.23±1.74           78.58±1.04   E.4                Visualization of GLoRA Weights
+        GPF-LP                       61.49±2.53              50.09±2.08           74.16±1.47   We visualize the weight distributions of GLoRA on the Texas and
+        GPF-Plus-LP                  68.46±1.90              58.65±1.45           79.51±1.36
+                                                                                               Cornell datasets in Figure 8. For clarity, we present the final result
+        All-In-One                   69.56±1.08              58.46±1.80           77.76±0.86
+                                                                                               of A + PA Q⊤A , representing the edge weights used during message
+        HGPrompt                     68.50±2.48              53.65±1.97           78.15±0.74
+        GCOPE                        70.03±1.35              56.24±2.03           80.09±1.85   passing in GNNs. As shown, GLoRA strengthens certain connec-
+                                                                                               tions by assigning weights greater than 1, while weakening others
+        DAGPrompt                    74.30±0.78              62.78±1.29           81.10±0.72   with weights less than 1. This suggests that GLoRA refines the
+        Improvement                    3.79                    3.44                 1.01
+                                                                                               graph message-passing scheme to better align with downstream
+                                                                                               tasks.
+We further evaluate DAGPrompt under the full-shot setting, us-
+ing a training-validation-test split of approximately 50%-25%-25%.                             E.5                Pre-training Helps the Convergence
+The results in Table 9 show that, although the performance im-                                 To examine the effect of pre-training on model convergence, we
+provement is less pronounced compared to the few-shot settings in                              conduct experiments with varying hidden sizes of DAGPrompT on
+Table 3, DAGPrompt consistently achieves the best results across                               the Chameleon dataset. For each configuration, the model is pre-
+all datasets, particularly on those with strong heterophily.                                   trained either sufficiently (200 epochs) or minimally (30 epochs).
+                                                                                               As shown in Figure 9, the results demonstrate that sufficient pre-
+E.3                  Parameter Analysis                                                        training not only accelerates convergence (evident from a faster
+We conduct a parameter analysis for 𝛼 and 𝑟 in Figure 7. The results                           reduction in loss) but also improves final performance (achieving
+show that Texas and Cornell generally perform better with larger                               a lower loss). This aligns with findings in NLP fields, where suf-
+2 Baselines incompatible with GAT are excluded from these experiments. The number              ficient pre-training reduces the intrinsic dimension of the model,
+of heads is set to 4.                                                                          simplifying the learning process for downstream tasks [1].
+DAGPrompT: Pushing the Limits of Graph Prompting with a Distribution-aware Graph Prompt Tuning Approach           WWW ’25, April 28-May 2, 2025, Sydney, NSW, Australia
+
+
+Table 8: Summary of the mean and standard deviation of accuracy over all runs on few-shot node classification tasks. The best
+results for each dataset are highlighted in gray. GAT is used as the backbone encoder.
+
+                   Texas (0.11)         Cornell (0.31)       Wisconsin (0.20) Chameleon (0.20)            Squirrel (0.22)     Arxiv-year (0.22)         Cora (0.81)
+                 5-shot     10-shot    5-shot     10-shot     5-shot     10-shot   5-shot     10-shot    5-shot     10-shot 5-shot 10-shot           5-shot     10-shot
+ Label Ratio     13.6%       27.3%     13.6%       27.3%       9.9%       19.9%    1.09%       2.19%     0.48%       0.96% 0.0147% 0.0295%           1.29%       2.58%
+ GAT            52.22±4.22 53.81±5.80 61.36±4.34 64.36±3.58 54.35±3.45 53.40±3.14 28.53±3.24 30.09±3.60 21.35±2.34 23.47±2.98 21.38±1.30 23.75±2.31 62.14±1.08 65.86±1.37
+ Finetune-LP 50.41±5.80 54.89±7.13 60.72±3.58 65.72±3.97 56.36±3.19 52.13±2.78 30.24±3.10 33.58±2.89 23.45±1.37 23.87±2.45 22.15±2.34 25.36±2.80 65.47±1.35 68.37±2.01
+ GPPT        57.59±3.02 59.54±5.57 65.57±3.68 64.83±2.98 50.35±2.97 52.41±1.98 40.56±2.94 47.67±3.01 25.67±2.46 29.46±2.09 23.27±3.27 25.35±1.72 58.46±2.85 63.84±1.36
+ Gprompt     72.98±5.37 73.27±3.56 76.37±4.83 83.32±2.76 67.84±3.03 69.83±2.75 45.65±3.93 52.07±2.90 31.47±1.09 31.64±1.47 28.46±2.37 29.35±1.36 70.06±2.94 72.55±1.83
+ GPF-LP      68.42±2.39 70.28±4.29 72.12±4.58 78.34±3.85 62.47±3.84 67.45±3.53 40.61±6.04 41.56±4.24 29.46±1.75 30.15±3.73 28.10±3.65 28.34±2.31 68.04±1.86 69.74±1.46
+ GPF-Plus-LP 73.78±3.21 75.37±3.27 80.36±3.85 82.46±3.01 69.43±2.41 71.34±3.08 45.45±3.85 51.39±2.97 32.57±2.01 34.27±2.71 28.84±2.72 31.01±2.34 68.53±1.47 70.86±1.55
+ All-In-One 72.36±3.46 74.91±4.27 82.18±2.98 83.49±3.27 70.34±2.80 70.76±3.10 45.96±2.57 51.90±3.08 31.35±2.08 33.46±1.90 27.65±2.02 30.74±1.83 69.52±1.95 72.44±2.38
+ HGPrompt 72.53±2.96 73.41±3.87 76.45±3.84 81.35±3.56 66.53±2.54 69.47±3.98 44.47±3.01 46.76±3.41 30.37±1.65 32.40±2.42 28.41±2.64 30.01±2.55 67.75±2.31 71.96±1.94
+ DAGPrompt 78.27±3.03 82.25±2.61 86.05±1.77 88.73±1.99 76.55±1.22 77.22±2.47 49.98±2.31 54.11±1.96 34.80±1.42 37.03±2.17 29.37±2.84 32.56±1.62 70.48±1.41 73.18±0.82
+ Improvement 4.49       5.84       3.87       4.19       5.31       4.48       3.81       2.04       2.23       2.76       0.53       1.55       0.33       0.34
+
+
+Table 10: Summary of the mean and standard deviation of                                 E.6      DAGPrompT with Full-parameter Tuning
+accuracy across all runs for 5-shot node classification tasks.
+                                                                                        We conducted an experiment with two variants of DAGPrompT:
+                                                                                        DAGPrompT-Full and DAGPrompT-Freeze. DAGPrompT-Full re-
+                       Texas (0.11)    Wisconsin (0.20)     Chameleon (0.22)            moves the GLoRA module and fine-tunes all GNN encoder pa-
+  DAGPrompT               81.64±3.75       73.86±2.45           52.86±1.35              rameters during prompting, while DAGPrompT-Freeze removes
+  DAGPrompT-Full          79.17±3.42       72.18±3.51           48.19±3.54
+                                                                                        the GLoRA module and freezes all GNN encoder parameters dur-
+  DAGPrompT-Freeze        79.12±4.10       70.04±2.17           49.37±3.70
+                                                                                        ing prompting. The results show that both DAGPrompT-Full and
+                                                                                        DAGPrompT-Freeze perform worse than DAGPrompT. This sup-
+                                                                                        ports the theory from section 4 that neither zero-parameter nor
+                                                                                        full-parameter tuning is optimal in few-shot settings.
+

@@ -1,0 +1,1085 @@
+                                                 GraphPrompter: Multi-stage Adaptive Prompt
+                                                 Optimization for Graph In-Context Learning
+                                                                          Rui Lv1 , Zaixi Zhang1 , Kai Zhang1 , Qi Liu1 *, Weibo Gao1 ,
+                                                                            Jiawei Liu1 , Jiaxia Yan1 , Linan Yue1 , Fangzhou Yao1
+                                                        1
+                                                            State Key Laboratory of Cognitive Intelligence, University of Science and Technology of China
+                                                                  {lvrui2018, zaixi}@mail.ustc.edu.cn, kkzhang08@ustc.edu.cn, qiliuql@ustc.edu.cn,
+                                                                       {weibogao, ljw1222, jiaxianyan, lnyue, fangzhouyao}@mail.ustc.edu.cn
+
+
+                                           Abstract—Graph In-Context Learning, with the ability to             Inpur Graph 𝑮:
+                                                                                                                                      Chris
+                                                                                                                                      Evans                                                           Prompt Examples 𝑺:
+                                                                                                                                                                        subgraph
+                                        adapt pre-trained graph models to novel and diverse downstream                                          Iron Man                embeddings
+arXiv:2505.02027v1 [cs.LG] 4 May 2025
+
+
+
+
+                                                                                                                                                                   𝐯𝐱                    film/actor       Input 𝒙               Label 𝒚
+                                        graphs without updating any parameters, has gained much                                                                                      T   𝐯𝐲           (       ,         )
+                                        attention in the community. The key to graph in-context learning                                                                                              ( Robert Downey,              ( film/
+                                                                                                                                                                                                        Iron Man )                    actor )
+                                        is to perform downstream graphs conditioned on chosen prompt               America                                              …
+                                                                                                                                                                                                              …                       …
+                                        examples. Existing methods randomly select subgraphs or edges                                                                                    F            (       ,         )
+                                                                                                                                                  Robert
+                                        as prompts, leading to noisy graph prompts and inferior model                                            Downey Jr.                                           (           ,     )
+                                        performance. Additionally, due to the gap between pre-training                                                                          ?                     Queries 𝑸:
+
+                                        and testing graphs, when the number of classes in the testing                                             Ireland                            ?
+                                                                                                                                                                                          person/
+                                                                                                                                                                                                          (       ,         )   ?
+                                                                                                                                                                                          religion
+
+                                        graphs is much greater than that in the training, the in-                                                                                                         (       ,         )   ?
+                                                                                                                    Cillian
+                                                                                                                    Murphy
+                                        context learning ability will also significantly deteriorate. To                                                                                                  ( Cillian Murphy,
+                                                                                                                                                                                                            Ireland )                  ?
+                                                                                                                                              Data Graphs          Task Graphs
+                                        tackle the aforementioned challenges, we develop a multi-stage
+                                        adaptive prompt optimization method GraphPrompter, which                 input nodes (head)           input nodes (tail)          sample         data nodes                   label nodes
+
+                                        optimizes the entire process of generating, selecting, and using
+                                        graph prompts for better in-context learning capabilities. Firstly,   Fig. 1: Graph In-Context Learning (edge classification as an
+                                        Prompt Generator introduces a reconstruction layer to highlight       example) with random prompts selection. The graph prompts
+                                        the most informative edges and reduce irrelevant noise for graph      are sampled l-hop subgraphs (left) and the downstream tasks
+                                        prompt construction. Furthermore, in the selection stage, Prompt      are reformulated as the edge label predictions between the
+                                        Selector employs the k-nearest neighbors algorithm and pre-
+                                        trained selection layers to dynamically choose appropriate sam-       query data graph and label nodes (right).
+                                        ples and minimize the influence of irrelevant prompts. Finally,
+                                        we leverage a Prompt Augmenter with a cache replacement
+                                        strategy to enhance the generalization capability of the pre-
+                                        trained model on new datasets. Extensive experiments show             the given source graph G, randomly selected head/tail nodes
+                                        that GraphPrompter effectively enhances the in-context learning       consist of the input prompt examples S and Queries Q. After
+                                        ability of graph models. On average across all the settings, our      constructing context subgraph embeddings for each pair of
+                                        approach surpasses the state-of-the-art baselines by over 8%. Our     nodes by Data Graph, these data nodes vx will be connected
+                                        code is released at https://github.com/karin0018/GraphPrompter.       with their label nodes vy in the Task Graph. The downstream
+                                           Index Terms—Data Mining, Graphs, Networks.
+                                                                                                              tasks (e.g., node/graph classifications and link predictions) are
+                                                                  I. I NTRODUCTION                            unified as predicting the edge labels connecting the label nodes
+                                                                                                              and the query data graph or comparing the prediction values
+                                           One of the most fascinating properties of Large Language
+                                                                                                              of the label nodes. For example, sample ”(Robert Downdey
+                                        Models (LLMs) is its In-Context Learning capability [1], [2].
+                                                                                                              Jr., Iron Man) → film/actor” and ”(Chris Evans, America) →
+                                        It refers to the ability of a pre-trained LLM to achieve com-
+                                                                                                              person/religion” as prompts, the query is to get the relationship
+                                        petitive results on downstream tasks given only a few prompt
+                                                                                                              (edge label) between ”Cillian Murphy” and ”Ireland”.
+                                        examples during the prediction phase, without updating the
+                                        model weights through fine-tuning approaches. Recently, there            However, the limitations of prompt generation and selec-
+                                        have been efforts to transfer this In-Context learning capability     tion strategies of existing graph in-context learning works
+                                        from large language models to graph models [3]–[5]. Out of            severely restrict their generalization ability. For instance, in
+                                        these methods, Prodigy [3] and One For All (OFA) [5] stand            the prompt generation stage, Prodigy [3] uses the random
+                                        out as the most effective frameworks that unify diverse lev-          walk algorithm to construct the prompt subgraph, which does
+                                        els of graph-related tasks and achieve competitive in-context         not consider to optimal subgraph structure. However, there is
+                                        learning performance. Generally, the graph in-context learning        task-irrelevant information mixed into nodes’ neighborhoods,
+                                        architecture can be divided into two main parts including             making learned models suffer from sub-optimal generalization
+                                        data/prompt graph construction and task graph prediction              performance [6]–[10]. In the prompt selection stage, as shown
+                                        (see Figure 1 as an example for edge classification). For             in Figure 1, when selecting prompts from the candidate set for
+                                                                                                              each query, existing methods also randomly select k examples.
+                                          *Corresponding author                                               Such a method does not adapt to the query’s unique character-
+istics, which further limits the graph in-context learning ability.   of task graph inputs, we used a cache to store these on-
+Furthermore, in the context of few-shot scenarios, due to the         line samples and designed the least frequently used (LFU)
+limited number of labeled samples and the gap between pre-            replacement strategy to update it. Despite its simplicity, this
+training and testing graphs, when the number of classes in the        method can leverage knowledge about the target domain by
+testing graphs is much greater than that in the training, the         using off-the-shelf test-time data and improve performance.
+in-context learning ability of the pre-trained model will also        Our method has been shown to effectively enhance the in-
+significantly decrease.                                               context learning ability of graph models through empirical
+   The prompt optimization strategy has been extensively              evidence. On average across all setups, our approach surpasses
+studied in LLMs and proved to be effective in improving the           the baseline in-context learning accuracy by 8%.
+generalization ability of the language models. However, there            Overall, our contributions are summarized below:
+is a lack of prompt optimization strategies on graph models.
+                                                                        • To the best of our knowledge, we are the first research
+In the task of domain generalization of graphs, the pre-trained
+                                                                          to explore the concept of prompt optimization on graph
+and tested graph data structures are completely different, and it
+                                                                          models and propose a novel framework in this area that
+is difficult for a graph model to be able to map both upstream
+                                                                          combines offline and online strategies, which optimizes
+and downstream data samples into the same hidden space as
+                                                                          the entire process of generating, selecting, and using
+LLMs. This limits the ability of graph models to in-context
+                                                                          graph prompts for better graph in-context learning ca-
+learning. To tackle the above challenges, we develop a novel
+                                                                          pabilities.
+multi-stage prompt optimization method GraphPrompter, to
+                                                                        • Our experimental results demonstrate that we are able to
+adaptively construct the most appropriate in-context prompt
+                                                                          improve performance by an average of 8% on all datasets
+graphs for each query.
+                                                                          compared to baseline.
+   Specifically, we have designed corresponding modules to
+                                                                        • We provide technical and performance insights on the
+improve the model during the generation, selection, and use
+                                                                          use of prompt optimization in the graph domain, which
+stages of the prompt, named Prompt Generator, Prompt
+                                                                          is instructive for research and practice in related areas.
+Selector, and Prompt Augmenter. First, in the prompt gener-
+ation stage, the Prompt Generator utilizes the pre-trained graph
+reconstruction layers to learn the weights of the edges of the                             II. R ELATED W ORK
+subgraphs obtained by sampling, reconstructing the weights
+                                                                      A. Graph Pretraining
+of the neighboring nodes to the target nodes, thereby filtering
+some task-irrelevant nodes and edges, enhancing the quality              Most existing Graph Neural Networks (GNNs) [16]–[21]
+of the generated prompt.                                              adopt the message-passing framework and use permutation-
+   The main challenge for the Prompt Selector is how to               invariant local aggregation schemes to update node represen-
+judge the suitable examples for queries (nodes/edges) in graph        tations. For example, Graph Convolutional Networks (GCNs)
+models. We first design the selection layers to learn the             [18] average features from neighboring nodes, while Graph
+importance of each prompt for the category center during              Attention Networks (GATs) [17] use an attention mechanism
+pre-training. However, since the downstream graphs is quite           to assign different weights to neighbors. GraphSAGE [22]
+different with the pre-training graph, the pre-trained selection      samples a fixed-size set of neighbors and aggregates their
+layers limit the models generalization on these test graphs.          features, allowing for faster and more scalable GNN training.
+Inspired by retrieval augmentation works in LLMs [11]–[15],           [19], [21] focuses on improving the inference speed of GNNs,
+which using semantic similarity of sentences as a criterion           while [20] introduces a novel approach that applies reinforce-
+to evaluate the quality of prompts and making pre-trained             ment learning to denoise graph structures. However, these
+models adapt to different downstream domain effectively, we           models often experience a significant performance drop in
+use k-Nearest Neighbor (kNN) algorithm to calculate the               domain adaptation settings. Recent work in graph pretraining
+similarity of each prompt for the query and choose the top-k          has aimed at improving this issue by learning better encoders
+similar prompt graph. This method can be used effectively and         that can perform specific pretraining tasks. Most of these
+doesn’t need to update any parameters in inference. Finally,          methods [23]–[27] focus on tasks such as masked feature
+we combine the selection layers output and kNN algorithm              prediction [23] and paired graph classification [24]. To adapt
+to adaptive filter the appropriate prompts, making the prompt         these pre-trained models to different downstream graphs, a
+selection process more accurate and efficient.                        large amount of task-specific data is typically required to fine-
+   When dealing with a large number of categories in the test         tune a classification head on top of the encoder. In contrast,
+dataset, using fixed candidate prompts can limit the model’s          Prodigy [3] has been introduced as a pretraining approach
+adaptive ability. So, we aim to obtain a dynamic candidate            that aims to equip the model with general in-context learning
+prompts set to enhance the generalization ability of the pre-         capabilities. This allows the pre-trained model to be used
+trained model on new datasets. To achieve that, we propose an         directly for various downstream graphs without the need for
+online prompts augmentation method in Prompt Augmenter.               gradient-based updates. However, the generalization ability of
+Specifically, we incorporate test samples with predicted labels       Prodigy is limited by its prompt selection strategy, leaving
+(pseudo-labels) into the prompt set. To control the quantity          room for further improvement.
+B. Graph prompt learning                                             information from the target dataset by incorporating off-the-
+   Graph In-Context Learning is a kind of graph prompt               shelf test-time data, resulting in performance improvement.
+learning. Inspired by prompt learning in natural language            Building upon these inspiring studies, we have introduced an
+processing (NLP), which effectively utilizes prior knowledge         online prompts augmentation approach that leverages a cache
+for various NLP tasks, researchers in the graph domain have          replacement strategy to augment the prompt sets and enhance
+recently explored graph prompt learning [3], [28]–[38]. It           the generalization capacity of pre-training graph models.
+reformulates downstream graph tasks into those solved during
+the pre-training phase using graph prompts and bridges the gap                                III. P RELIMINARIES
+between pre-trained models and different graph tasks. Existing
+graph prompt learning approaches can be divided into two
+                                                                       Notation                   Description
+types based on prompt design [31]: Prompt Token methods                V, E, R                    The set of nodes, edges, and relations
+and Prompt Graph methods. The former method treats the                 e = (u, r, v) ∈ E          An edge consists of u ∈ V, r ∈ R, v ∈ V
+graph prompt as additional features added to the original graph        G = (V, E, R)              The input graph
+features, like GraphPrompt [34] and All-in-One (ProG) [32].            X                          The input subgraph set
+                                                                       xi = (Vi , Ei , Ri ) ∈ X   An input node/edge
+These methods focus on cross-task research and achieve                 GD                         Data graph: l-hop neighborhood of input xi
+                                                                         i
+effective adaptation to downstream tasks through prompt fine-          GT                         Task graph
+tuning. However, they can hardly work in challenging cross-            Y                          A set of classes
+domain tasks, where the downstream task dataset and the                S                          Prompt set
+                                                                       C                          Cache
+pre-training dataset differ completely. It becomes particularly        Q                          Query set
+evident in scenarios with limited labeled samples.                     N                          The size of candidate prompt set
+   Compared to Prompt Token methods that treat prompts as              k                          The number of used prompts (k-shot)
+learnable vectors, the Prompt Graph methods employ sub-                n                          Query number
+                                                                       l                          The distance of neighbors, i.e., l-hop
+graphs surrounding the target nodes as prompts, which allows           m                          Classes number
+for preserving the structural information of the graph within          p                          One of graph prompt in S
+the prompt (e.g., Prodigy [3] and One-For-All (OFA) [5]). It           q                          One of query in Q
+also facilitates the efficient transfer of the in-context learning                  TABLE I: Frequently-used notations.
+paradigm from LLMs to the graph domain. Particularly in
+low-resource scenarios, these approaches can achieve impres-
+sive results without the need for fine-tuning any parame-               In this study, our primary emphasis is on leveraging graph
+ters [3]. This is something that Prompt Token methods cannot         in-context learning (GICL) to tackle node and edge classifi-
+achieve [32]–[34]. However, existing methods commonly em-            cation problems, employing the proposed adaptive prompting
+ploy simple approaches for subgraph selection and construc-          techniques (GraphPrompter). In this section, we first introduce
+tion, such as random sampling and prompt selection. In this          the concrete definition of graph and GICL. Then, we further
+paper, we propose a novel method called GraphPrompter to             describe the formulations of data graphs and task graphs.
+enhance the construction, selection, and online augmentation
+of the prompt graph, which aims to improve the overall               A. Task Definition
+performance of graph models in in-context learning.
+                                                                        The tasks of the GICL framework are defined as follows:
+C. In-context Example Selection of Large Language Models.            Definition 1: Graph. A graph can be defined as
+   In-context learning with large language models has recently       G = (V, E, R), where V, E, R represents the set of nodes,
+received an increasing amount of interest, partly due to its         edges, and relations. An edge e = (u, r, v) ∈ E consist of
+flexibility and sample efficiency [11], [39]. Several recent         a subject u ∈ V, a relation r ∈ R, and an object v ∈ V.
+works proposed methods to improve in-context learning in             Definition 2: Graph In-Context Learning. Given a set of
+many aspects: e.g., meta-training [40], [41] or task formu-          classes Y, a normal classification task is to predict the label
+lation [42]. In this paradigm, the choice of in-context (i.e.,       y ∈ Y of each input xi ∈ X, where xi = (Vi , Ei , Ri ). For ex-
+demonstration) examples has been shown crucial [13]–[15],            ample, for the node classification task, xi only consists of the
+[39], [43], [44]. Inspired by these research, we propose an          input node that we aim to make predictions on, i.e., |Vi | = 1,
+adaptive method based on graph topology (GraphPrompter) to           |Ei | = 0 and |Ri | = 0; for edge classification, it consists of
+construct appropriate prompts for every query.                       node pair (head, tail), i.e., |Vi | = 2, |Ei | = 1 and |Ri | = 1. For
+                                                                     the GICL framework, the classification tasks over graphs are
+D. Test-time adaptation.                                             defined with few-shot prompting. Such as a k-shot prompt with
+   Test-time adaptive methods are recently proposed to utilize       a downstream m-way classification, |Y| = m, we use a small
+target samples, which adjust model parameters based on un-           number of input-label pairs S = {(xi , yi )}m·k   i=1 as the prompt
+supervised objectives such as entropy minimization [45], [46]        examples, and the queries is a set of nodes Q = {xi }ni=1 that
+or update a prototype for each class [47]. These methods are         we want to predict labels for. Both the prompts S and queries
+easily integrated with classification algorithms and can utilize     Q are the inputs given to the graph model.
+                          (a) Prompt Generator                                       (b) Prompt Selector                                    (c) Prompt Augmenter
+                       𝐺𝑖𝐷                                   𝐺𝑖 ′𝐷
+ Prompts: 𝑺
+
+                                                                        Pairs         Cos similarity   Importance       Score                                     Task graph
+                   𝑣                                     𝑣             (𝑞𝑖 , 𝑠1 )         0.21            0.86           1.07                                 T
+              𝑢               𝒱𝑖 (𝑢)               𝑢                   (… , … )            ···             …              …                                                     𝒀
+                                                                      (𝑞𝑖 , 𝑠𝑚∗𝑁 )        0.56            0.08           0.64               ෡
+                                                                                                                                            𝓢
+                                                                                       Retrieval                                                …
+                       ℰ𝑖 (𝑢, 𝑣)                                                      KNN                                           top 𝒌                                   F
+                  …                                     …
+                                             𝑤𝑢𝑣
+                                                                                           𝑄                                                𝓒             ? ?
+ Queries: 𝑸
+
+
+
+
+                                       MLP
+                              𝒱𝑖 (𝑣)                                 prompts                                     Selection Layers                             Online Prompts
+                                                                                                                                                              Augmentation
+
+                                                                                          GNN Layers                                            (    ,    )     (𝑄 , 𝑌෨ )
+
+              input nodes (head)               input nodes (tail)                                data nodes                                 label nodes           pseudo labels
+
+Fig. 2: An overview of the GraphPrompter method. Overall the method can be divided into three components: (a) Prompt
+Generator. We select candidate prompt subgraphs S and query subgraphs Q and filter their edges by the pre-training edge
+weights(represented by varying shades). (b) In Prompt Selector stage, after obtaining embeddings for subgraphs through GNN
+layers, we computed the probability (Score) of each prompt being selected as the combination of the kNN similarity and the
+importance value obtained from the pre-trained selection layer to adaptively select the top-k suitable prompts. These prompts
+form the new prompt set Ŝ. (c) In Prompt Augmenter, we utilize a cache C to store online test samples and their pseudo
+labels, which helps enhance the prompt set dynamically. We predict the query using adaptive prompt selection and optionally
+consider prompts from the cache. All the model parameters are learned in the pretraining phase.
+
+
+B. Prompting graph representation                                                      Generator (Section IV-A), Prompt Selector (Section IV-B),
+   As we introduced in Section I, a k-shot prompt over graphs                          and Prompt Augmenter (Section IV-C). In the first stage,
+for a m-way classification task is composed of data graphs                             we random sample a set of candidate prompts, denoted as S,
+and task graphs. The two graphs are defined as follows:                                from the source graph G. To generate subgraph embeddings
+Data Graphs. We defined the data graphs are the contex-                                with higher equality, we employ reconstruction layers to learn
+tualization of each datapoint xi = (Vi , Ei , Ri ) in inputs                           new edge weights. Then, we leverage GNN layers to obtain
+by sampling l-hop neighborhood of V in the source graph                                the embeddings of the reconstructed subgraph. In the second
+G, which can be represented as GD           = (ViD , EiD , RD                          stage, we aim to construct an improved prompt set, denoted
+                                        i                   i ) ∼
+⊕i=0 Neighbor(Vi , G, i), where Vi ⊆ ViD ⊆ V, Ei ⊆ EiD ⊆
+  l                                                                                    as Ŝ. Specifically, we design the pre-trained selection layers
+E, Ri ⊆ RD                                                                             for learning the importance of each prompt node, and we
+             i ⊆ R, and Neighbor is a function that returns
+the exact i-hop neighbors of each node in Vi . Then, we                                introduce an adaptive k-nearest neighbor approach to retrieve
+use reconstruction layers to learn the edge weight WiD =                               the most appropriate k prompts to enhance the generalization
+                                                              D                        ability in unseen downstream graphs. In the last stage, we
+wuv , ∀euv ∈ EiD , the final data graphs is represented as G′ i =
+    D   D     D                                                                        proposed an online strategy to further dynamically enhance
+(Vi , Ei , Ri ).
+                                                                                       the prompt set in the task graph. Specifically, we make use of
+Task Graphs. After achieving contextual data graphs for each
+                                                                                       a cache, represented as C, to store online test samples along
+input xi , we construct task graph GT to capture the connection
+                                                                D                      with their pseudo labels and use the least frequently used
+among the inputs and the labels. For each data graph G′ i ,
+                                                                                       (LFU) replacement algorithm to update it. This multi-stage
+we use Gi to represent the embedding after aggregating by
+                                                                                       graph prompt optimization strategy allows us to effectively
+GNNs. Overall, a task graph contains m · k + n data nodes
+                                                                                       utilize relevant prompts and leverage the cache to augment
+(m · k prompts and n queries) and m label nodes, as shown in
+                                                                                       the prompt set, resulting in more accurate and contextually
+Figure 1. Specifically, task graph is a bipartite graph composed
+                                                                                       appropriate predictions. Figure 2 illustrates the overall process
+of data nodes and label nodes. Each edge has two attributes:
+                                                                                       of our proposed method.
+one distinguishes query from prompts, the other indicates the
+class. For example, each prompt node connects to all label                             A. Prompt Generator
+nodes, with edge attributes set to ”T” for the true label and                             1) Prompt graph generation.: We first randomly select N
+”F” otherwise.                                                                         data points as the candidate prompts nodes and n data points
+                                                                                       as the queries. The data graphs are contextualization by using
+                                   IV. M ETHODOLOGY
+                                                                                       the random walk algorithm to sample l-hop neighborhood in
+   In this section, we present our proposed GraphPrompter,                             source graph G. The random walk algorithm starts from the
+the multi-stage adaptive graph prompt optimization strategy to                         selected node, adds its neighboring nodes to the subgraph.
+enhance the in-context learning ability over graph models. Our                         Then, randomly chooses a direction to move to the next node.
+method can be divided into three stages, including Prompt                              The neighbors of this node are added to the subgraph, with
+duplicates removed. This process is repeated l times, and the       prompt graph. Specifically, for each candidate subgraph em-
+algorithm terminates if the number of nodes in the subgraph         bedding Gp ∈ GS , where GS noted the all candidate subgraph
+reaches the preset limit. For each datapoint xi , the sampled       embeddings, 1 ≤ p ≤ N . We get their importance from the
+subgraph GD i can be represented as:                                selection layers:
+      GD     D    D    D      l
+       i = (Vi , Ei , Ri ) ∼ ⊕i=0 Neighbor(Vi , G, i).       (1)                          Ip = σ(MLPθ (Gp )),                      (5)
+   2) Prompt graph reconstruction.: Instead of directly us-
+ing the sampled l-hop subgraphs, like previous works (e.g.,         where σ is a sigmoid function and MLP is a multi-layer neural
+Prodigy [3] and OFA [5]), we reconstruct the weights of the         network with parameters θ. Then, we use the importance value
+edges in each subgraph to adaptively extract the most useful        to get the weighted data node embeddings as the input of the
+topological information and filter the noise. The edge weights      task graph, note as GSI = {G′p |G′p = Gp ∗ Ip , ∀Gp ∈ GS }.
+are assigned based on the node/edge embedding and we jointly        However, the selection layers are not updated in the test phase,
+train the reweighting modules along with the graph model.           limiting its generalization performance on unseen downstream
+Specifically, the reconstruction method can be split into the       graphs, so we need an offline algorithm in the inference phase
+following 3 steps:                                                  to improve it.
+(1) Let Vi (u), u ∈ ViD be the node u embedding of the                 2) k-nearest neighbor retrieval.: In order to enhance the
+subgraph GD  i , Ei (u, v), v ∈ Neighbor(u) is the edge (u, v)      generalization performance of large-scale pre-training models
+embedding,                                                          on test graphs, we leverage retrieval-enhanced techniques to
+                                                                    dynamically determine the most appropriate in-context prompt
+             zuv = MLPϕ (Vi (u), Vi (v), Ei (u, v)),         (2)    examples for each query during the inference stage. As we
+where MLP is a multi-layer neural network with parameters           introduced in Section IV-A, we can achieve subgraph embed-
+ϕ. Specifically, for the node classification task, we use the       dings for both prompts and queries after data graph neural
+concat of Vi (u) and Vi (v) as the input of MLP, for the            network GN N D . At this step, we proposed to utilize the
+edge classification task, each edge have its specific initial       k-nearest neighbors algorithm to compute the similarity of
+embedding, so we use the Ei (u, v) as the input.                    embeddings between the query and prompt, using it as one
+(2) ∀v ∈ Neighbor(u), we use a sigmoid function to compute          of the criteria for selecting prompts. Specifically, as illustrated
+the weights of the edge wuv :                                       in Figure 2, for each query q ∈ Q, we compute the similarity
+                                                                    between each prompt Gp ∈ GSI :
+                                   1
+                      wuv =              .               (3)
+                               1 + e−zuv                                               sim(p, q) = Cos(Gp , Gq ),                  (6)
+(3) Finally, we achieve a single subgraph embedding Gi by
+using a GNN to aggregate the data graph with edge weights           where Gp is the subgraph embedding of the pth candidate
+   D
+G′ i = (ViD , EiD , RD    D             D               D
+                     i , Wi ), where Wi = wuv , ∀euv ∈ Ei :         prompts, Gq is the subgraph embedding of qth query. Note that
+                                       D                            we use cosine similarity to calculate the similarities, which
+                     Gi = GNND (G′ i ),                      (4)
+                                                                    can be substituted by other distance metrics, like Euclidean
+where GNND denote a message passing GNN module.                     distance or Manhattan distance.
+Gi used in the subgraph embeddings in the subsequent mod-              Then, we combine the pre-trained selection layers out-
+ule, and the parameters in GNND are trained by the total            put and kNN retrieval results to filter the most appropriate
+optimization object.                                                prompts. Specifically, for each query q, the probabilities of
+                                                                    the candidate prompts p is:
+B. Prompt Selector
+   1) Pre-training selection layers.: In the generation                            score(p, q) = sim(p, q) + Ip ∗ Iq ,             (7)
+paradigm of in-context learning, the quality of prompts has a
+significant impact on the final prediction results. This has been   Furthermore, we take a voting mechanism to consider the
+validated in related research on large language models [14],        overall preferred prompts for all the queries from the set Q,
+[15], [43]. This intuition also holds in the network structure      where |Q| = n. Specifically, each query casts votes for the k
+of Prodigy, because the label embeddings in the task graph          importance prompts to it, with the number of votes determined
+are aggregated from prompts, and the final prediction of the        by the corresponding score(p, q) value:
+query is determined by computing the similarity with label                                    X
+embeddings. Therefore, in the graph model, the selection                         Votes(p) =         1[p∈T (q)] score(p, q),        (8)
+of prompts also affects the performance of the pre-trained                                    q∈Q
+model on downstream graphs. However, Prodigy’s approach of
+randomly selecting prompts ignores the contextual information       where T (q) = top-k-prompts{score(pi , q), ∀pi ∈ S}. Finally,
+of the query, thereby limiting the model’s performance. Instead     we select the top k prompts with the highest number of votes
+of randomly selecting prompts from the candidate prompt set,        to form the set Ŝ, which along with the embeddings of all
+we decided to use learnable layers to choose the most relevant      queries, serves as the input to the next component.
+C. Prompt Augmenter                                                 Algorithm 1 GraphPrompter: Training Stage
+                                                                    Input: Source Graph G, all training steps
+   As mentioned in Section I, the model’s in-context learning
+                                                                    Output: Pre-trained parameters
+ability greatly depends on the quality and diversity of the graph
+                                                                     1: Initialize all parameters;
+dataset used for pre-training. To ensure robust performance,
+                                                                     2: for step = 1, 2, . . . , Steps do
+the pre-training dataset should be extensive and encompass a
+wide range of graph structures. Nevertheless, due to limitations     3:    Sample the subgraphs from source graph G via Eq 1;
+in available datasets and models, the model may not encounter        4:    Calculating the edge weights of subgraphs via Eq 2,3;
+all possible graph structures during pre-training. Consequently,     5:    Calculating their embeddings via GNN in Eq 4;
+the model’s heavy reliance on the pre-training data results in       6:    Using selection layers to obtain the importance of
+weaker generalization when applied to new graph datasets. For              prompts via Eq 5;
+instance, Prodigy achieved over 88% accuracy on prediction           7:    Construct Task graph;
+tasks with 5 labels in new datasets (such as FB15K-237 [48]          8:    Joint optimization of GraphPrompter to minimize task
+and NELL [48]) when it was pre-trained on a dataset with only              loss via Eq 14;
+                                                                     9: end for
+15 labeled categories for edge classification. However, when
+                                                                    10: return All parameters;
+the prediction task involved more than 15 categories i.e.,40,
+the accuracy dropped to just 60%.
+   Inspired by research of test-time adaptation [45], [47], [49],
+[50], we propose a novel online prompting sample augmenta-          where H is the embedding matrix for each node in the
+tion based on cache replacement strategy [51] to mitigate this      task graph. Subsequently, a nearest neighbor algorithm is
+issue. Specifically, as shown in Figure 2, we aim to incorporate    employed to discern the class affiliation of a given query. This
+test samples with predicted labels (pseudo-labels) Ŷ into the      entails computing the cosine similarity (Cos(·, ·)) between the
+prompts set Ŝ. To manage the quantity of task graph inputs,        query node embedding within the task graph and the label
+we have devised a cache C of size c to store the online test        embeddings. Ultimately, the label exhibiting the highest value
+sample embeddings Q̂ along with their pseudo-labels Ŷ, where       of similarity to the query hq is selected as the prediction yq :
+Q̂ consists of the query sample in Q which have the most                               yq = arg max Cos(hq , hy ),              (11)
+confidence probability in its predicted labels, we can achieve                                  y∈Y
+|Q̂| ≤ m (m is the number of labels). Thus, the set of prompts      D. Pretrain task
+used online prompts augmentation can be represented by:
+                                                                       Following [3], we use two pretraining tasks, namely Neigh-
+                          Ŝ ′ = Ŝ ∪ C,                     (9)    bor Matching and Multi-Task are leveraged in our method. The
+                                                                    primary objective of the Neighbor Matching task is to classify
+where |Ŝ ′ | = k + c, and the details of cache size setting will   the local neighborhood to which a given node belongs. Each
+be discussed in Sec V-D.                                            local neighborhood is defined by the set of example nodes
+   In addition, by leveraging the spatial locality of graph         that are associated with that particular neighbor. The query
+data sampling, we employ the LFU (Least Frequently Used)            set is defined as QN M and the loss function employed for the
+replacement algorithm [51] to dynamically update these online       Neighbor Matching task is:
+samples. Specifically, we calculate the similarity between
+                                                                            LN M =       E      CrossEntropy(PN Mq , yN Mq ),   (12)
+qj ∈ Q and the embeddings of prompts in the cache qc ∈ C,                              q∈QN M
+and entries with the top-k highest similarity scores are con-       where PN Mq is the probability of predicted by the prompt
+sidered hits. We use this information to update the usage           graph, yN Mq is the corresponding label of query q.
+frequency of entries in the cache. Although straightforward            Multi-Task focuses on constructing supervised tasks in the
+in its approach, the online prompts augmentation technique          form of few-shot prompts along with their corresponding
+possesses the capacity to harness valuable knowledge about          labels. The objective is to enable the model to learn from
+the target domain by incorporating readily available test-time      limited examples and generalize to new instances. The query
+data, leading to performance enhancement. By implementing           set is defined as QM T and the loss function utilized for the
+this procedure, the adapted decision boundary steers clear of       Multi-Task is as follows:
+the densely populated regions within the target domain, con-
+sequently diminishing ambiguity (or entropy) in predictions,                 LM T =      E      CrossEntropy(PM Tq , yM Tq ),   (13)
+                                                                                       q∈QM T
+which is closely linked to reducing classification errors [45].
+   Finally, we input the obtained prompt set SI (in pertaining)     where PM Tq is the probability of predicted by the prompt
+or Ŝ ′ (in testing) and query set Q together into the task graph   graph, yM Tq is the corresponding label of query q. Overall,
+GT to obtain the prediction, where GT enabling the fusion           the final loss function is as follows:
+of prompts associated with each class, thereby yielding the                               L = LN M + LM T .                     (14)
+corresponding label embedding:
+                                                                    Alg 1 provides the process of the training stage of Graph-
+                 H = GNNT (GT (SI |Ŝ ′ , Q)),              (10)    Prompter, and the Alg 2 shows the inference processing.
+Algorithm 2 GraphPrompter: Inference Stage                                        TABLE II: Statistics of datasets.
+Input: All pre-trained parameters, test Graph G, cache C, k
+                                                                        Dataset          Nodes            Edges        Classes
+(number of selected prompts), c (cache size), the number of
+test samples n                                                        MAG240M         244,160,499     1,728,364,232      153
+Output: Predicted labels for queries                                    Wiki           4,838,244        5,859,240        639
+  1: Initialize all parameters;
+                                                                        arXiv           169,343         1,166,243         40
+                                                                      ConcepNet          791k             2.5M            14
+  2: Ypre = ∅
+                                                                      FB15K-237         14,541           310,116         200
+  3: for step = 1, 2, . . . , n do                                      NELL            68,545           181,109         291
+  4:    Obtain subgraphs using Prompt Generator, including
+        candidate prompts S and queries Q;
+  5:    Get their embeddings via pre-trained GNN in Eq 4;
+                                                                      In the case of arXiv, the downstream task entails an m-way
+  6:    Compute prompt importance scores using pre-trained
+                                                                   node classification, predicting the category of the given paper.
+        selection layers via Eq 5;
+                                                                   Conversely, for knowledge graph datasets such as ConceptNet,
+  7:    Calculate cosine similarity scores between candidates
+                                                                   FB15K-237, and NELL, the downstream task involves an m-
+        prompts and queries via Eq 6;
+                                                                   way relation type classification, projecting the relationship
+  8:    Select the top-k prompts based on the combined simi-
+                                                                   between the two input nodes.
+        larity and importance scores;
+                                                                      2) Evaluation: We evaluate the in-context learning per-
+  9:    if cache is not empty then
+                                                                   formance on various downstream datasets within the same
+ 10:       Augment the selected prompts by retrieving addi-
+                                                                   domain as the pre-training dataset. For instance, we pre-train
+           tional prompts from cache C;
+                                                                   on Wiki and evaluate on ConceptNet, FB15K-237, and NELL.
+ 11:    end if
+                                                                   Each downstream classification dataset is accompanied by its
+ 12:    Update cache C using the LFU strategy to maintain
+                                                                   original train, validation, and test partitions.
+        relevant prompts;
+ 13:    Predict the label y                                           To simulate the scenarios where labeled data is limited in
+ 14:    Ypre = y ∪ Ypre                                            the downstream task, we select N (= 10) nodes or edges
+ 15: end for
+                                                                   from the training partition per category as candidate prompt
+ 16: return Predicted labels for queries Ypre ;
+                                                                   examples with known labels. Subsequently, we construct a k-
+                                                                   shot l (= 1) prompt for test nodes or edges from the test
+                                                                   partition, by selecting k (= 3) examples per category from
+                                                                   these available instances. Unlike Prodigy, which chooses both
+                      V. E XPERIMENTS                              candidate prompt examples and prompts randomly, we employ
+                                                                   our proposed multi-stage adaptive approach for their selection.
+   Within this section, we perform comprehensive experiments
+                                                                   All our pre-training and testing settings are consistent with
+that encompass node classification and link classification tasks
+                                                                   Prodigy. Therefore, we extract some results from Prodigy for
+as both pre-training and downstream evaluations. These assess-
+                                                                   comparison.
+ments are carried out on 4 large-scale benchmark datasets with
+                                                                      3) Baselines: We consider four baseline models for com-
+up to 240 million nodes to evaluate the effectiveness of the
+                                                                   parative analysis:
+proposed methods.
+                                                                      • NoPretrain: This baseline employs a model with the same
+                                                                         architecture as the pre-trained models, but with randomly
+A. Experimental Setup
+                                                                         initialized weights.
+   1) Datasets: In our study, we adopt two datasets for pre-          • Contrastive [24]: Utilizing a standard contrastive learning
+training, following the approach outlined in Prodigy [3]. The            approach with self-supervised augmentation, this baseline
+first dataset is MAG240M [52], which consists of a vast                  adapts to the in-context learning setting by implementing
+citation network, including over 200 million vertices and more           a hard-coded nearest neighbor algorithm. More specifi-
+than 100 million edges, making it the largest dataset used               cally, we classify the query by comparing its pre-trained
+in related works [19]–[21]. For such large-scale graph data,             embedding against the average embedding of the example
+we use a batch sampling method to randomly select target                 inputs for each class.
+nodes and then construct subgraphs using random walks based           • Finetune [23]: This baseline extends upon the graph en-
+on the adjacency matrix. The second dataset is Wiki [48], a              coder pre-trained with contrastive learning by training an
+knowledge graph derived from Wikipedia. Then, we assess the              additional linear classification head, following common
+model’s in-context learning capabilities using four benchmark            practice.
+graph datasets: arXiv [53], ConcepNet [54], FB15K-237 [48],           • Prodigy [3]: This baseline randomly selects both candi-
+and NELL [48]. Detailed statistics are presented in Table II             date prompt examples and prompts, without employing
+where the last column refers to the number of node or edge               any augmentation strategy during the testing stage.
+classes. We utilize subsets from the knowledge graph datasets,        • All-in-One (ProG) [32]: The baseline introduces an addi-
+as previously employed in [48].                                          tional learnable subgraph as a prompt, which uses meta-
+TABLE III: The in-context learning accuracy (%) for arXiv paper category classification is evaluated on 500 sampled test data
+using 3-shot prompts. Bold indicates the best approach. GraphPrompter was pre-trained on MAG240M and is then applied
+in-context to arXiv, which has a completely different structure and a different set of paper categories.
+
+       Classes       NoPretrain           Contrastive              Finetune            Prodigy            ProG              OFA           GraphPrompter
+          3        33.16 ±0.30            65.08 ±0.34           65.42 ±5.53          73.09 ±0.36      50.0 ±0.0        72.24 ±3.81        78.57 ±15.21
+          5        18.33 ±0.21            51.63 ±0.29           53.49 ±4.61          61.52 ±0.28     58.33 ±8.33       59.78±2.51         68.85 ±13.05
+          10        9.19 ±0.11            36.78 ±0.19           30.22 ±3.77          46.74 ±0.20     53.33 ±6.67             -            54.53 ±10.12
+          20        4.72 ±0.06            25.18 ±0.11           17.68 ±1.15          34.41 ±0.12     35.0 ±22.91             -             40.74 ±6.68
+          40        2.62 ±0.02            17.02 ±0.07           8.04 ±3.00           25.13 ±0.07     47.50 ±6.67             -             29.47 ±3.82
+
+TABLE IV: On 500 sampled test data, the in-context learning accuracy (%) evaluations are conducted on ConceptNet, FB15K-
+237, and NELL datasets (ordered from top to bottom) using 3-shot prompts. Bold indicates the best approach. GraphPrompter
+was pre-trained on Wiki, which has completely different node and relation types from graphs it is then applied on in-context.
+
+     Classes       NoPretrain            Contrastive             Finetune              Prodigy            ProG               OFA            GraphPrompter
+         4        30.40 ±0.63        44.01 ±0.61               53.85 ±9.29           53.97 ±0.63             -                 -             58.46 ±15.2
+         5        33.54 ±0.61        81.35 ±0.58               82.01 ±12.83          88.02 ±0.48      41.67 ±8.33              -             99.65 ±1.31
+        10        20.00 ±0.35        70.88 ±0.48                71.97 ±6.16          81.10 ±0.39     43.33 ±13.33        89.68 ±1.38         89.52 ±4.07
+        20         9.20 ±0.18        59.80 ±0.35                64.01 ±4.66          72.04 ±0.33     50.00 ±12.90        81.33 ±2.54         83.78 ±3.51
+        40         2.5 ±0.08         49.39 ±0.23                57.27 ±3.33          59.58 ±0.22     34.17 ±20.05              -             66.94 ±3.12
+         5        33.44 ±0.57        84.08 ±0.54               87.22 ±12.75          87.02 ±0.44     75.00 ±25.00              -             93.34 ±5.37
+        10        18.82 ±0.31        76.54 ±0.45                71.90 ±5.90          81.06 ±0.41     44.00 ±12.00              -             87.47 ±4.83
+        20         7.42 ±0.16        66.56 ±0.35                66.19 ±8.46          72.66 ±0.32     47.67 ±31.69              -             81.46 ±4.09
+        40         3.04 ±0.07        57.44 ±0.24                55.06 ±4.19          60.02 ±0.22     47.16 ±22.37              -             75.74 ±2.86
+
+
+TABLE V: The in-context learning accuracy (%) on FB15K-                                       the cross-domain settings. As the OFA’s prediction results
+237 and NELL datasets with 3-shots, which consit of 50,60,80                                  are unstable due to dataset partitioning in the few-shot
+and 100 classes respectively. Bold indicates the best approach.                               scenario1 , we extract the results from OFA claimed for
+                                            FB15K-237                                         comparison, and we present our test results in VI.
+    Classes           50              60                  80              100
+                                                                                           4) Models configurations: We follow the Prodigy [3]
+    Prodigy       55.34 ±4.01     49.54 ±3.81        37.06 ±2.95       27.39±2.34
+     ProG        34.66 ±21.40    48.33 ±21.23        30.65 ±24.9      25.23 ±18.42      settings to pre-trained the graph models.
+ GraphPrompter   62.735 ±2.98     53.95 ±2.83        42.96 ±2.62       28.03±2.17          • Training, MAG240M: The pretraining task we used con-
+                                               NELL                                           sisted of 30 ways, 3 shots, and 4 queries per task.
+    Classes           50              60                  80              100
+                                                                                              This specific task configuration was carefully selected to
+    Prodigy       56.72 ±4.08     50.25 ±3.86         40.64 ±4.94      28.47 ±3.64
+     ProG         22.0 ±20.39    22.78 ±24.14        26.54 ±19.26     24.13 ±20.05            strike a balance between complexity and diversity in the
+ GraphPrompter    66.36 ±2.91     61.16 ±2.78        53.73 ±5.13      35.95 ±4.42             training data, without overwhelming the GPU memory.
+                                                                                              We checkpoint the model every 500 steps.
+TABLE VI: The in-context learning accuracy (%) on arXiv                                    • Training, Wiki: Our pretraining setup included a model
+
+and FB15K-237 datasets with 3-shots.                                                          with an input dimension of 768 and an embedding
+                                                                                              dimension of 256, the AdamW optimizer with a learning
+    Classes           3              5
+                                             arXiv
+                                                        10               20                   rate of 1 × 10−3 and weight decay of 1 × 10−3 , the
+     OFA         46.16 ±14.84   32.73 ±15.15      19.8 ±11.69       12.03 ±8.32               pretraining task settings are similar with MAG240M.
+ GraphPrompter   78.57 ±15.21   68.85 ±13.05     54.53 ±10.12       40.74 ±6.68            • GNN architecture: We use GraphSAGE [22] to generate
+                                           FB15K-237                                          the embeddings for data graph prompts in Eq 4, which
+    Classes           5              10                 20               40
+     OFA         75.43 ±27.38   65.67 ±33.11     55.56 ±35.42       45.17 ±33.17
+                                                                                              has been proven to have good scalability on large-scale
+ GraphPrompter    99.65 ±1.31    89.52 ±4.07      83.78 ±3.51        66.94 ±3.12              graphs. For the Task Graph, we use the attention-based
+                                                                                              graph model following Prodigy [3].
+
+    learning to tune the prompt in testing.                                             B. Main Results
+  • One-For-All (OFA) [5]: This baseline describes nodes                                   Following the Prodigy approach, we commence our eval-
+    and edges with natural language uses LLMs to encode                                 uation by assessing the in-context learning efficacy in node
+    the diverse and possibly cross-domain text attributes,                              classification and link prediction tasks, considering different
+    and uses text feature nodes to construct prompt graph.                              numbers of ways (referring to the number of classes to be
+    Following our few shots and cross-domain tasks, we use
+    the OFA low resource version (OFA-joint-lr), which is in                              1 https://github.com/LechengKong/OneForAll/issues/11
+classified among). In the edge classification task, we employed                       w/o Reconstruction      w/o SelectionLayers        w/o kNN
+the online prompts augmentation strategy to enhance the                               w/o Augmenter           Full
+generalization capability of the pre-trained model on the test              100
+dataset.                                                                     90
+   1) Enhanced In-Context Learning Performance: As il-
+                                                                             80
+
+
+
+
+                                                                  ACC (%)
+lustrated in Table III and Table IV, the best score is Bolded,
+                                                                             70
+our approach consistently surpasses all other baselines in this
+particular scenario, showcasing stronger in-context learning                 60
+performance. On the arXiv dataset, it achieves the highest                   50
+average accuracy across most ways, improving by 48% on
+                                                                             40
+average and up to 54.43% over the best-performing Prodigy                             5       10         20      40       5         10        20   40
+baseline. On KG datasets, GraphPrompter raises Prodigy’s                                         FB15K-237                               NELL
+
+score from 68.4% to 81.82%. Furthermore, our method excels        Fig. 3: Ablation study on FB15K-237 and NELL with 3-shots
+in comparison to Finetune, which necessitates additional train-   wrt. the number of ways from 5 to 40.
+ing on downstream tasks. On the arXiv dataset, we observe
+an average improvement of 19.6% across all ways. Similarly,
+on KG datasets, we achieve over 15% improvements across                                            GAT                   GraphPrompter
+all ways, surpassing the performance of all classes, even in
+                                                                  100
+settings where Prodigy does not perform well (e.g., NELL-
+20-way). This can be attributed to Prodigy’s incorporation         90
+
+of a diverse range of pretraining tasks, enabling the model        80
+to avoid overfitting on specific tasks and acquire contextual      70
+knowledge. We also compare with Contrastive [24], which            60
+adapts a standard contrastive learning method using a hard-
+                                                                   50
+coded nearest-neighbor classifier. Our method outperforms it
+by over 14% on KGs, indicating that while simple nearest-          40
+                                                                                  5         10       20        40        5          10       20    40
+neighbor approaches are not optimal for in-context learning,                                 FB15K-237                                   NELL
+they still retain some effectiveness.
+   In fact, we can prove that, hard-code nearest neighbor         Fig. 4: The comparison of different GNN architectures on
+may not perform well to learning in-context information, but      FB15K-237 and NELL datasets.
+it is not just useless, it can be adaptively integrated into
+Graph models and enhance the graph in-context learning
+ability. In the same few-shot scenario, the performance of        method can achieve favorable outcomes without introducing a
+the ProG [32] in cross-domain tasks is average 48.24%. This       significant burden.
+can be understood as the learnable prompt-based methods              2) Enhanced Generalization Ability in Multi-Class Tasks:
+requiring more samples for fine-tuning the prompt tokens.         In Sections I and IV-C, we discussed how the in-context
+Although ProG shows a brief improvement on 10 to 20               learning capability of the model is influenced by both the
+classes, but performance drops as the number of classes           quality and diversity of the graph dataset used during pretrain-
+increases (see Table V). We attribute this to ProG’s fine-        ing. Due to limitations in the availability of comprehensive
+tuning, which slightly improves with larger data volumes.         datasets and the inherent constraints of the models, it is likely
+However, its performance still lags behind ours and demon-        that the model has not been exposed to the full range of
+strates instability in predictions. For OFA [5], which has a      possible graph structures during pretraining. This limitation
+similar prompt structure to Prodigy, we also achieved better      can result in challenges when predicting labels for test datasets
+performance on the arXiv and FB15K-237 datasets. This             that involve a large number of diverse classes. To assess
+suggests that the prompt optimization strategy we proposed        the robustness of both the Prompt Token and Prompt Graph
+has great application potential in methods related to prompt      methods, we evaluate three models—ProG [32], Prodigy [3],
+graphs. Table VI presents the comparison of experimental          and our proposed method—across a broader spectrum of class
+results between our GraphPrompter and OFA [5] under the           categories. The results, presented in Table V, focus on the
+same settings. For OFA, we use the same random category           FB15K-237 and NELL datasets, which contain 50, 60, 80
+selection method as our experiment and employ the OFA-            and 100 classes, respectively. As the number of categories
+joint-lr approach (which trains and evaluates a single model      increases, we observe a noticeable decline in the model’s pre-
+using all datasets simultaneously) to align with our cross-       dictive performance, indicating insufficient generalization by
+domain task. The experimental results show that our method        the graph pretraining model when handling multiple classes.
+performs more stably and better when randomly selecting           However, when applying our multistage prompt optimization
+categories. Furthermore, we analyze the inference time, shown     method, the model’s learning ability in context improves ap-
+in the Table VIII. The experimental results indicate that our     proximately 8%, underscoring the simplicity and effectiveness
+          100
+                                                                                                                         FB15K-237 - 20 ways                                                          NELL - 20 ways
+                                                                                                       90                                                                             90
+          95
+                                                                                                       85                                                                             85
+
+          90
+
+
+
+
+                                                                                             ACC (%)
+
+
+
+
+                                                                                                                                                                            ACC (%)
+                                                                                                       80                                                                             80
+ACC (%)
+
+
+
+
+          85                                                                                           75                                                                             75
+
+                                                                                                       70                                                                             70
+                                                                                                                        PRODIGY                   GraphPrompter                                    PRODIGY             GraphPrompter
+          80
+                                                                                                       65                                                                             65
+                                                                                                            0       8        16        24        32        40     48                       0   8     16      24       32     40        48
+          75                                                                                                                            Shots                                                                 Shots
+                      FB_ways = 5              FB_ways = 10
+          70          FB_ways = 20             NELL_ways = 5
+                                                                                                                              arXiv - 20 ways                                                        ConcepNet - 4 ways
+                      NELL_ways = 10           NELL_ways = 20                                          45                                                                             68
+
+          65                                                                                           40                                                                             64
+                  1     2       3         4      5      6       7        8      9     10
+
+
+
+
+                                                                                             ACC (%)
+
+
+
+
+                                                                                                                                                                            ACC (%)
+                                                                                                       35                                                                             60
+                                              Cache Size
+                                                                                                       30                                                                             56
+
+
+Fig. 5: Analysis of cache size from 1 to 10. FB noted FB15K-                                           25
+                                                                                                                        PRODIGY                   GraphPrompter
+                                                                                                                                                                                      52
+                                                                                                                                                                                                   PRODIGY             GraphPrompter
+
+                                                                                                       20                                                                             48
+237 dataset and NELL means NELL dataset.                                                                    0   4        8        12        16        20    24    28   32                  0   8     16      24       32     40        48
+                                                                                                                                        Shots                                                                 Shots
+
+
+TABLE VII: Random select sample as a pseudo-label using                                     Fig. 6: In-context learning accuracy on FB15K-237, NELL,
+different random seeds on FB15K-237-20ways and NELL-                                        arXiv, and ConcepNet datasets wrt. the number of prompt
+20ways dataset.                                                                             examples(shots), respectively.
+  random-seed            10          30        50       70          90       Avg. ± std.
+   FB15K-237            79.98       82.05     82.01    78.93    80.34        80.66 ± 1.21   Figure 5. The results reveal that when the cache size exceeds
+           NELL         80.95       80.47     76.68    78.67    79.89        79.33 ± 1.53   3, model performance declines to varying extents, indicating
+                                                                                            that the noise introduced by additional pseudo-label samples
+                                                                                            outweighs their benefits. Therefore, we chose a cache size of
+of our approach in improving the generalization capacity of                                 3 for our experiments. Additionally, we explored the impact
+the model in complex multiclass tasks.                                                      of pseudo-label quality on GraphPrompter performance. In
+                                                                                            the main experiment, we used the highest-confidence samples
+C. Ablation study                                                                           as pseudo-labels in the cache. In this section, we randomly
+   To verify the effectiveness of our methods, we conducted                                 selected pseudo-labels to test the robustness of our method.
+ablation studies on the FB15k-237 and NELL datasets. The                                    Table VII shows the results of random pseudo-label selec-
+“w/o ·” note that our method without a specific component,                                  tion, with experiments conducted on the FB15K-237 and
+which is introduced in Section IV. The results of these                                     NELL datasets using different random seeds and a setting
+studies are presented in Figure 3. The experimental findings                                of 20 ways. The results indicate a 2% performance drop
+demonstrate the efficacy of our approach in the reconstruction                              when using random pseudo-labels compared to the highest-
+of prompt graphs in the Prompt Generator stage. Additionally,                               confidence ones, but the performance still exceeds the baseline.
+we evaluate the effects of removing kNN retrieval and the se-                               This demonstrates that our pseudo-label selection method is
+lection layer separately. The experimental results indicate that,                           effective and robust to variations in the pseudo-labels.
+as we discussed in Section I, the methods of selecting prompts                                 2) Comparison with different GNN architectures: We use
+using either kNN alone or the pre-trained selection layer alone                             the GraphSAGE [22] as the GNND in Eq 4. The reconstruction
+are not perfect. When both are used simultaneously, they                                    process is a kind of graph structures learning, as is GAT
+can have a complementary effect. Furthermore, the Prompt                                    [17], which emphasizes the importance of edges by learning
+Augmentor not only improves predictive performance when                                     their weights. We complement our experiments using GAT
+there are many categories(e.g., 40 ways) in the downstream                                  as a prompt generator, shown in Figure 4. As a result, our
+data, but it is also effective when there are few categories(e.g.,                          generator performance is better than GAT, we suppose that
+5 ways). This demonstrates the effectiveness of the method we                               the GraphSAGE can scale better in large pre-training graphs.
+proposed. Overall, by combining these methods, we achieve                                      3) Evaluation using different numbers of in-context ex-
+state-of-the-art results. It’s worth noting that the ”w/o kNN”                              amples: To evaluate the contextual learning capability of our
+model only performs 1% better than the baseline. While kNN                                  method, we conducted performance analyses across varying
+does add some time cost, the performance boost it brings is                                 numbers of prompt examples. The results are presented in
+quite valuable. We can manage the time impact of kNN by                                     Figure 6, which observed that as the number of prompts
+adjusting the candidate set size to find a balance between speed                            increases, both Prodigy and our proposed method initially
+and performance.                                                                            improve and then diminish performance. Especially for the
+                                                                                            arXiv dataset, when the number of prompts exceeds 10, the
+D. Hyperparameter analysis                                                                  performance of Prodigy significantly declines. This can be
+  1) Analysis of cache size and quality: In the Prompt                                      understood as more prompt graphs introducing more noise,
+Augmentor stage, we tested different cache sizes, as shown in                               thereby affecting the predictive performance of the model. We
+   6                                     4    4                                   4                                                            4      20                                                4
+                                                                                       15                                                             15
+   4                                          2
+                                         3                                        3    10                                                      3      10                                                3
+                                              0
+   2                                                                                    5                                                              5
+                                         2    2                                   2                                                            2       0                                                2
+   0                                          4                                         0
+                                                                                                                                                       5
+   2                                     1    6                                   1     5                                                      1      10                                                1
+                                              8                                        10                                                             15
+   4                                                                                                                                                  20
+          8 6 4 2 0 2 4 6 8              0        10 8   6   4   2 0   2   4      0               20    10 0      10     20       30           0             20       10   0    10       20   30        0
+        (a) Prodigy - 20 shots on NELL       (b) GraphPrompter - 20 shots on NELL          (c) Prodigy - 50 shots on NELL                           (d) GraphPrompter - 50 shots on NELL
+
+                                         4    3                                4                                                           4                                                        4
+  7.5                                                                                 10                                                             10
+                                              2
+  5.0                                    3    1                                3                                                           3                                                        3
+                                                                                       0                                                              5
+  2.5                                         0
+  0.0                                    2    1                                2                                                           2          0                                             2
+                                                                                      10
+  2.5                                         2
+                                         1    3                                1      20                                                   1          5                                             1
+  5.0
+                                              4
+  7.5                                         5                                                                                                      10
+          10 8 6 4 2 0 2 4 6             0         2 1 0 1 2 3 4 5             0      30           20 15 10 5 0 5 10 15                    0               6 4 2 0 2 4 6 8 10                       0
+        (e) Prodigy - 20 shots on FB         (f) GraphPrompter - 20 shots on FB              (g) Prodigy - 50 shots on FB                            (h) GraphPrompter - 50 shots on FB
+
+Fig. 7: Distribution of data node embeddings, including prompts and query, with different numbers of shots by using Prodigy
+and our GraphPrompter, on NELL and FB15K-237 (notes ”FB”) datasets with 5 ways setting. The data node embeddings
+denote the subgraph embeddings of sampled subgraphs, which are the output of ”Data graphs” in Figure 1 and the input of
+”Task graphs”. The different colors noted different labels about each data node.
+
+
+consider the reason is that the distribution of the pre-training                                             Prodigy-FB           Prodigy-NELL               Ours-FB           Ours-NELL
+dataset and test dataset are very different when the number of
+prompts is too large, it is difficult for the pre-trained task graph                              100
+
+to aggregate them, and thus the classification performance of                                     90
+the model deteriorates.                                                                           80
+                                                                                        ACC (%)
+
+
+
+
+   Nonetheless, our method consistently outperforms Prodigy,                                      70
+even with an equivalent number of prompts, thus substantiating
+                                                                                                  60
+the effectiveness of our proposed approach. In Figure 7,
+                                                                                                  50
+we display the distribution of data node embeddings by
+using the t-SNE [55] algorithm with the different number of                                       40
+                                                                                                         1        2           3        1              2           3        1         2        3
+prompts. We can see that with the same number of prompts,                                                      10-ways                             20-ways                     40-ways
+e.g.shots=50, our GraphPrompter get tighter classification re-
+sults than the baseline Prodigy, which makes it easier to                             Fig. 8: Experiment with multi-hop (1/2/3-hop) subgraph on
+aggregate the task graphs to get better prediction.                                   FB15k-237 (note as “FB”) and NELL dataset.
+
+E. Multi-hop Analyis
+                                                                                      figure, our model performs comparably to the baseline in
+   To evaluate the performance of our method on multi-
+                                                                                      terms of both convergence speed and accuracy. Both the re-
+hop problems, we conducted experiments on 1, 2, and 3-
+                                                                                      construction layers and selection layers do not incur significant
+hop subgraphs, shown as Figure 8, comparing our approach
+                                                                                      computational costs during pretraining, as we use a two-layer
+with the baseline. The results show that as the subgraph size
+                                                                                      neural network and the same pretraining steps as Prodigy. The
+increases (i.e., as the logical chain becomes longer), model
+                                                                                      additional computational complexity introduced by the MLP
+performance declines. This may be due to the limitations
+                                                                                      is negligible compared to the overall cost of the GNNs. All
+of GNNs, where larger graphs make it more challenging to
+                                                                                      of our experiments were conducted using a single NVIDIA
+capture relationships between nodes. Nevertheless, our method
+                                                                                      A100 (40GB) GPU. A single pretraining run of 10k steps
+still outperforms the baseline, demonstrating its effectiveness
+                                                                                      typically takes approximately 3 hours, which is consistent with
+on multi-hop subgraphs.
+                                                                                      Prodigy’s performance.
+F. Time Efficiency Analysis                                                              Our inference time overhead primarily stems from prompt
+                                                                                      retrieval in the selector and augmentator in Task graphs. For
+  We present the training details of our model in Figure 9
+                                                                                      N candidates, k prompts, m ways, and d dimensions:
+and compare it with Prodigy, including the loss convergence
+curve and the increase in training accuracy. As shown in the                                                           TProdigy = O((k + q)md2 ),                                                 (15)
+TABLE VIII: The inference time of per query on FB15K-237                                                            Input Graph 𝑮:                                                                                    Prompt Examples 𝑺:
+and NELL dataset with 10, 20, and 40 classes respectively.                                                                         Paramount
+                                                                                                                                                                         Universal
+                                                                                                                                                                                                                      Input 𝒙                               Label 𝒚
+                                                                                                                                                                         Pictures
+                                                                                                                                    Pictures
+                                                                                                                    film/                       film/                          film/                                    Robert
+                                                                                                                                                                                                                                         The Avengers        film/actor
+                                           FB15K-237                                 NELL                           distributor                 distributor                    distributor                             Downey Jr.
+
+
+
+          Classes              10             20             40           10          20               40              Iron Man                  The Avengers        Oppenheimer
+                                                                                                                                                                                         film/          Christopher
+                                                                                                                                                                                                                       Christopher
+                                                                                                                                                                                                                         Nolan
+                                                                                                                                                                                                                                     Oppenheimer
+                                                                                                                                                                                                                                                               film/
+                                                                                                                                                                                                                                                              director
+                                                                                                                                                                                         director         Nolan
+
+                                                                                                                                                                                                                                     …                         …
+        Prodigy            34ms             68ms            106ms       26ms         42ms           82ms                                       film/
+                                                                                                                                                                                                                        Robert                                person/
+                                                                                                                                               actor                                                                   Downey Jr.
+                                                                                                                                                                                                                                          America
+                                                                                                                                                                                                                                                              religion
+ GraphPrompter             90ms             150ms           280ms       80ms        120ms           240ms
+                                                                                                                                                                                                                        Cillian                               person/
+                                                                                                                                                                                          gender                                           Ireland
+                                                                                                                                    person/           Robert      gender                                 Cillian        Murphy                                religion
+                                                                                                                      America                                                  Male
+                                                                                                                                    religion         Downey Jr.                                          Murphy
+
+
+                                                                                                                          person/                                     gender                   person/
+                                                                                                                          religion                                                             religion
+                                                                                                                                                                                                                      Queries 𝑸:
+                    Training Loss on Wiki                     1.0          Training Accuracy on Wiki                                                     film/director
+                                                                                                                      Antonio                                                Robert                                                                     ?    film/actor
+                                    GraphPrompter                                                                                            Pound                                                        Ireland
+                                                                                                                      Fargas                                                Downey Sr.
+                                                                                                                                                                                                                        Robert
+    2.5                                                                                                                                                                                                                                   America
+                                    Prodigy                   0.8                                                               film/actor                                  Entity       relationship       Entity
+                                                                                                                                                                                                                       Downey Sr.
+                                                                                                                                                                                                                                                              person/
+
+    2.0                                                                                                                                                                    (head)                            (tail)                                     ?     religion
+
+
+                                                              0.6
+ Loss
+
+
+
+
+    1.5
+                                                            ACC
+
+
+    1.0                                                       0.4
+                                                                                                                     Fig. 10: A prompt example of Graph In-Context Learning.
+    0.5                                                       0.2
+                                                                                               GraphPrompter
+                                                                                               Prodigy
+    0.0
+           0    2000    4000        6000     8000   10000           0     2000    4000       6000   8000    10000
+                           Steps                                                     Steps                                                                                   VI. C ONCLUSION
+               (a) Training Loss                                        (b) Training Accuracy
+                                                                                                                       To tackle the limitations of prompt construction strategies
+Fig. 9: The Comparison of Training Loss and Training Accu-                                                          of existing graph in-context learning methods and enhance
+racy over 10k steps on Wiki dataset.                                                                                their generalization ability, we have for the first time validated
+                                                                                                                    the impact of prompt quality on the performance of the
+                                                                                                                    graph foundation model based on prompt graphs, and we
+               TOurs = O((N + q)md) + O((2k + q)md2 ).                                                      (16)    proposed a novel multi-stage adaptive prompt optimization
+                                                                                                                    method GraphPrompter, including Prompt Generator, Prompt
+Due to the incorporation of an additional c = 3 pseudo-label                                                        Selector, and Prompt Augmentor. With Prompt Generator and
+prompts via the cache mechanism, where Ŝ = Ŝ ∪ C and                                                              Prompt Selector, we can generate and select the most suitable
+|Ŝ ′ | = 2∗k = 6, the inference time of the model has increased                                                    prompts for each query based on graph topology and semantic
+by a factor of two to three. The retrieval module we use                                                            similarity, thereby significantly improving the predictive ac-
+is pluggable. We can balance model performance and speed                                                            curacy of the model. Furthermore, we also propose Prompt
+based on the specific scenario. In real-world applications, we                                                      Augemntor, a non-parametric adaptive method for testing,
+can remove the retrieval module or reduce the size of the                                                           based on the LFU cache replacement strategy, to enhance
+candidate set to find the optimal solution. The results, shown                                                      the generalization performance of the pre-trained graph model
+in Table VIII, indicate that while GraphPrompter adds some                                                          on new datasets. Our GraphPrompter achieves superior gen-
+additional time for prompt selection, it does not introduce a                                                       eralization to downstream graphs without gradient updates,
+significant computational burden.                                                                                   consistently outperforming all baselines on node classification
+                                                                                                                    and link prediction tasks.
+                                                                                                                       Futher Discussion: We have for the first time validated the
+G. Prompt Examples                                                                                                  impact of prompt quality on the performance of the graph
+                                                                                                                    foundation model based on prompt graphs, and proposed
+   Figure 10 shows a specific prompt example to illustrate
+                                                                                                                    improved solutions from the generation, selection, and use
+the process of Graph In-Context Learning. First, the input
+                                                                                                                    stages of prompts. The framework we proposed has excellent
+graph G is a knowledge graph containing multi-hop logical
+                                                                                                                    applicability and scalability. Specifically, the reconstruction
+relationships. Our goal is to predict the edge category of a
+                                                                                                                    layer in the prompt generator can be replaced with networks
+query q ∈ Q, where Q ⊂ G, represented in the graph as
+                                                                                                                    other than just MLP. In the retrieval stage, we can also
+the relationship between ”Robert Downey Sr.” and ”America.”
+                                                                                                                    use other clustering methods to dynamically and adaptively
+We then randomly sample some triples from G and extract
+                                                                                                                    select prompts. Similarly, we can replace the cache in the
+subgraphs, where their embeddings are denoted as x and edge
+                                                                                                                    prompt augmenter with other caching solutions. Extensive
+categories as y, forming a bipartite Task Graph, as described
+                                                                                                                    results reflect the advantages of the method we proposed and
+in Section IV. Finally, our algorithm infers the answer to the
+                                                                                                                    demonstrate the potential of graph in-context learning.
+query based on the examples provided in the prompt. It is
+important to note that the main contribution of GraphPrompter
+                                                                                                                                                                  VII. ACKNOWLEDGMENT
+lies in optimizing the prompt. Specifically, we optimize the
+generation of embeddings, the selection, and supplementation                                                          This research was supported by grants from the National
+of prompts. For example, our method tends to select ”Robert                                                         Key Research and Development Program of China (Grant No.
+Downey Jr., America” as the prompt rather than ”Robert                                                              2024YFC3308200), the Key Technologies R & D Program of
+Downey Jr., The Avengers,” since the former is closer to the                                                        Anhui Province (No. 202423k09020039), and the Fundamental
+query in the latent space.                                                                                          Research Funds for the Central Universities.
+                              R EFERENCES                                        [21] Y. Zhou, S. Gong, F. Yao, H. Chen, S. Yu, P. Liu, Y. Zhang, G. Yu, and
+                                                                                      J. X. Yu, “Fast iterative graph computing with updated neighbor states,”
+ [1] T. Brown, B. Mann, N. Ryder, M. Subbiah, J. D. Kaplan, P. Dhariwal,              in 2024 IEEE 40th International Conference on Data Engineering
+     A. Neelakantan, P. Shyam, G. Sastry, A. Askell, et al., “Language mod-           (ICDE), pp. 2449–2462, IEEE, 2024.
+     els are few-shot learners,” Conference on Neural Information Processing     [22] W. Hamilton, Z. Ying, and J. Leskovec, “Inductive representation
+     Systems, 2020.                                                                   learning on large graphs,” Conference on Neural Information Processing
+ [2] Q. Dong, L. Li, D. Dai, C. Zheng, Z. Wu, B. Chang, X. Sun,                       Systems, vol. 30, 2017.
+     J. Xu, and Z. Sui, “A survey for in-context learning,” arXiv preprint       [23] W. Hu*, B. Liu*, J. Gomes, M. Zitnik, P. Liang, V. Pande, and
+     arXiv:2301.00234, 2022.                                                          J. Leskovec, “Strategies for pre-training graph neural networks,” in
+ [3] Q. Huang, H. Ren, P. Chen, G. Kržmanc, D. Zeng, P. Liang, and                   International Conference on Learning Representations, 2020.
+     J. Leskovec, “Prodigy: Enabling in-context learning over graphs,” Con-      [24] Y. You, T. Chen, Y. Sui, T. Chen, Z. Wang, and Y. Shen, “Graph con-
+     ference on Neural Information Processing Systems, 2023.                          trastive learning with augmentations,” Conference on Neural Information
+ [4] X. Sun, H. Cheng, J. Li, B. Liu, and J. Guan, “All in one: Multi-task            Processing Systems, vol. 33, pp. 5812–5823, 2020.
+     prompting for graph neural networks,” in Proceedings of the 29th ACM        [25] Z. Hu, Y. Dong, K. Wang, K.-W. Chang, and Y. Sun, “Gpt-gnn:
+     SIGKDD Conference on Knowledge Discovery and Data Mining, KDD                    Generative pre-training of graph neural networks,” in Proceedings of the
+     ’23, p. 2120–2131, 2023.                                                         26th ACM SIGKDD International Conference on Knowledge Discovery
+ [5] H. Liu, J. Feng, L. Kong, N. Liang, D. Tao, Y. Chen, and M. Zhang,               & Data Mining, pp. 1857–1867, 2020.
+     “One for all: Towards training one graph model for all classification       [26] J. Qiu, Q. Chen, Y. Dong, J. Zhang, H. Yang, M. Ding, K. Wang,
+     tasks,” in International Conference on Learning Representations, 2024.           and J. Tang, “Gcc: Graph contrastive coding for graph neural network
+ [6] Z. ZHANG, Q. Liu, Q. Hu, and C.-K. Lee, “Hierarchical graph trans-               pre-training,” in Proceedings of the 26th ACM SIGKDD international
+     former with adaptive node sampling,” in Advances in Neural Information           conference on knowledge discovery & data mining, pp. 1150–1160,
+     Processing Systems (S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave,              2020.
+     K. Cho, and A. Oh, eds.), vol. 35, pp. 21171–21183, Curran Associates,      [27] Q. Zhang, L. Xia, X. Cai, S.-M. Yiu, C. Huang, and C. S. Jensen, “Graph
+     Inc., 2022.                                                                      augmentation for recommendation,” in 2024 IEEE 40th International
+ [7] C. Zheng, B. Zong, W. Cheng, D. Song, J. Ni, W. Yu, H. Chen, and                 Conference on Data Engineering (ICDE), pp. 557–569, 2024.
+     W. Wang, “Robust graph representation learning via neural sparsifica-       [28] Y. Zhu, Y. Wang, H. Shi, Z. Zhang, and S. Tang, “Graphcontrol: Adding
+     tion,” in International Conference on Machine Learning, 2020.                    conditional control to universal graph pre-trained models for graph
+ [8] D. Zha, Z. P. Bhat, K.-H. Lai, F. Yang, and X. Hu, “Data-centric ai:             domain transfer learning,” in Proceedings of the ACM Web Conference,
+     Perspectives and challenges,” in SDM’23, pp. 945–948, SIAM, 2023.                2024.
+ [9] L. Dongsheng, C. Wei, Y. Wenchao, Z. Bo, N. Jingchao, C. Haifeng,
+                                                                                 [29] L. Yue, Q. Liu, Y. Liu, W. Gao, F. Yao, and W. Li, “Cooperative classi-
+     and Z. Xiang, “Learning to drop: Robust graph neural network via
+                                                                                      fication and rationalization for graph generalization,” in Proceedings of
+     topological denoising,” in The ACM International Conference on Web
+                                                                                      the ACM Web Conference 2024, WWW ’24, p. 344–352, Association
+     Search and Data Mining, 2021.
+                                                                                      for Computing Machinery, 2024.
+[10] W. Jin, Y. Ma, X. Liu, X. Tang, S. Wang, and J. Tang, “Graph structure
+                                                                                 [30] T. Fang, Y. M. Zhang, Y. Yang, C. Wang, and L. CHEN, “Universal
+     learning for robust graph neural networks,” in SIGKDD’20, 2020.
+                                                                                      prompt tuning for graph neural networks,” in Conference on Neural
+[11] J. Liu, D. Shen, Y. Zhang, B. Dolan, L. Carin, and W. Chen, “What
+                                                                                      Information Processing Systems, 2023.
+     makes good in-context examples for GPT-3?,” in Proceedings of Deep
+                                                                                 [31] X. Sun, J. Zhang, X. Wu, H. Cheng, Y. Xiong, and J. Li, “Graph
+     Learning Inside Out (DeeLIO 2022): The 3rd Workshop on Knowledge
+                                                                                      prompt learning: A comprehensive survey and beyond,” arXiv preprint
+     Extraction and Integration for Deep Learning Architectures, pp. 100–
+                                                                                      arXiv:2311.16534, 2023.
+     114, Association for Computational Linguistics, May 2022.
+[12] Z. Zhao, E. Wallace, S. Feng, D. Klein, and S. Singh, “Calibrate            [32] X. Sun, H. Cheng, J. Li, B. Liu, and J. Guan, “All in one: Multi-task
+     before use: Improving few-shot performance of language models,” in               prompting for graph neural networks,” in Proceedings of the 29th ACM
+     International Conference on Machine Learning, 2021.                              SIGKDD Conference on Knowledge Discovery and Data Mining, KDD
+[13] O. Rubin, J. Herzig, and J. Berant, “Learning to retrieve prompts for in-        ’23, p. 2120–2131, 2023.
+     context learning,” in Proceedings of the 2022 Conference of the North       [33] M. Sun, K. Zhou, X. He, Y. Wang, and X. Wang, “Gppt: Graph
+     American Chapter of the Association for Computational Linguistics:               pre-training and prompt tuning to generalize graph neural networks,”
+     Human Language Technologies, pp. 2655–2671, Association for Com-                 in Proceedings of the 28th ACM SIGKDD Conference on Knowledge
+     putational Linguistics, 2022.                                                    Discovery and Data Mining, pp. 1717–1727, 2022.
+[14] H. SU, J. Kasai, C. H. Wu, W. Shi, T. Wang, J. Xin, R. Zhang,               [34] Z. Liu, X. Yu, Y. Fang, and X. Zhang, “Graphprompt: Unifying pre-
+     M. Ostendorf, L. Zettlemoyer, N. A. Smith, and T. Yu, “Selective anno-           training and downstream tasks for graph neural networks,” in Proceed-
+     tation makes language models better few-shot learners,” in International         ings of the ACM Web Conference 2023, p. 417–428, 2023.
+     Conference on Learning Representations, 2023.                               [35] C. Gong, X. Li, J. Yu, C. Yao, J. Tan, C. Yu, and D. Yin, “Prompt
+[15] Z. Wu, Y. Wang, J. Ye, and L. Kong, “Self-adaptive in-context learning:          tuning for multi-view graph contrastive learning,” arXiv preprint
+     An information compression perspective for in-context example selec-             arXiv:2310.10362, 2023.
+     tion and ordering,” in ACL’22, 2022.                                        [36] Z. Tan, R. Guo, K. Ding, and H. Liu, “Virtual node tuning for few-shot
+[16] Z. ZHANG, Q. Liu, H. Wang, C. Lu, and C.-K. Lee, “Motif-based graph              node classification,” in Proceedings of the ACM SIGKDD International
+     self-supervised learning for molecular property prediction,” in Advances         Conference on Knowledge Discovery & Data Mining, 2023.
+     in Neural Information Processing Systems (M. Ranzato, A. Beygelzimer,       [37] Q. Ge, Z. Zhao, Y. Liu, A. Cheng, X. Li, S. Wang, and D. Yin,
+     Y. Dauphin, P. Liang, and J. W. Vaughan, eds.), vol. 34, pp. 15870–              “Enhancing graph neural networks with structure-based prompt,” arXiv
+     15882, Curran Associates, Inc., 2021.                                            preprint arXiv:2310.17394, 2023.
+[17] P. Veličković, G. Cucurull, A. Casanova, A. Romero, P. Liò, and          [38] Y. Ma, N. Yan, J. Li, M. Mortazavi, and N. V. Chawla, “Hetgpt:
+     Y. Bengio, “Graph attention networks,” in International Conference on            Harnessing the power of prompt tuning in pre-trained heterogeneous
+     Learning Representations, 2018.                                                  graph neural networks,” in Proceedings of the ACM Web Conference,
+[18] T. N. Kipf and M. Welling, “Semi-supervised classification with graph            2024.
+     convolutional networks,” in International Conference on Learning Rep-       [39] P. Liu, W. Yuan, J. Fu, Z. Jiang, H. Hayashi, and G. Neubig, “Pre-
+     resentations, 2017.                                                              train, prompt, and predict: A systematic survey of prompting methods
+[19] H. Li, S. Di, L. Chen, and X. Zhou, “E2gcl: Efficient and expressive             in natural language processing,” ACM Computing Surveys, vol. 55, no. 9,
+     contrastive learning on graph neural networks,” in 2024 IEEE 40th                2023.
+     International Conference on Data Engineering (ICDE), pp. 859–873,           [40] S. Min, M. Lewis, L. Zettlemoyer, and H. Hajishirzi, “MetaICL:
+     2024.                                                                            Learning to learn in context,” in Proceedings of the 2022 Conference
+[20] T. Peng, W. Wu, H. Yuan, Z. Bao, Z. Pengru, X. Yu, X. Lin, Y. Liang,             of the North American Chapter of the Association for Computational
+     and Y. Pu, “Graphrare: Reinforcement learning enhanced graph neural              Linguistics: Human Language Technologies, pp. 2791–2809, July 2022.
+     network with relative entropy,” in 2024 IEEE 40th International Con-        [41] Y. Chen, R. Zhong, S. Zha, G. Karypis, and H. He, “Meta-learning via
+     ference on Data Engineering (ICDE), pp. 2489–2502, 2024.                         language model in-context tuning,” in Proceedings of the 60th Annual
+     Meeting of the Association for Computational Linguistics (Volume 1:
+     Long Papers), pp. 719–730, May 2022.
+[42] A. Holtzman, P. West, V. Shwartz, Y. Choi, and L. Zettlemoyer, “Surface
+     form competition: Why the highest probability answer isn’t always
+     right,” arXiv preprint arXiv:2104.08315, 2021.
+[43] T. B. Hashimoto, K. Guu, Y. Oren, and P. S. Liang, “A retrieve-and-
+     edit framework for predicting structured outputs,” Advances in Neural
+     Information Processing Systems, vol. 31, 2018.
+[44] J. Bai, H. Guo, J. Liu, J. Yang, X. Liang, Z. Yan, and Z. Li, “Griprank:
+     Bridging the gap between retrieval and generation via the generative
+     knowledge improved passage ranking,” in Proceedings of the 32nd ACM
+     International Conference on Information and Knowledge Management,
+     CIKM ’23, p. 36–46, Association for Computing Machinery, 2023.
+[45] D. Wang, E. Shelhamer, S. Liu, B. Olshausen, and T. Darrell, “Tent:
+     Fully test-time adaptation by entropy minimization,” in International
+     Conference on Learning Representations, 2021.
+[46] M. M. Zhang, S. Levine, and C. Finn, “MEMO: Test time robustness
+     via adaptation and augmentation,” in NeurIPS 2021 Workshop on
+     Distribution Shifts: Connecting Methods and Applications, 2021.
+[47] Y. Iwasawa and Y. Matsuo, “Test-time classifier adjustment module
+     for model-agnostic domain generalization,” in Conference on Neural
+     Information Processing Systems (A. Beygelzimer, Y. Dauphin, P. Liang,
+     and J. W. Vaughan, eds.), 2021.
+[48] W. Xiong, M. Yu, S. Chang, X. Guo, and W. Y. Wang, “One-shot
+     relational learning for knowledge graphs,” in EMNLP’17, 2018.
+[49] A. Dubey, V. Ramanathan, A. Pentland, and D. Mahajan, “Adaptive
+     methods for real-world domain generalization,” in Proceedings of the
+     IEEE/CVF Conference on Computer Vision and Pattern Recognition,
+     pp. 14340–14349, 2021.
+[50] Y.-F. Zhang, X. Wang, K. Jin, K. Yuan, Z. Zhang, L. Wang, R. Jin,
+     and T. Tan, “Adanpc: Exploring non-parametric classifier for test-time
+     adaptation,” in Proceedings of the 40th International Conference on
+     Machine Learning, 2023.
+[51] D. Mátáni, K. Shah, and A. Mitra, “An O(1) algorithm for implementing
+     the LFU cache eviction scheme,” CoRR, 2021.
+[52] W. Hu, M. Fey, H. Ren, M. Nakata, Y. Dong, and J. Leskovec, “Ogb-lsc:
+     A large-scale challenge for machine learning on graphs,” arXiv preprint
+     arXiv:2103.09430, 2021.
+[53] W. Hu, M. Fey, M. Zitnik, Y. Dong, H. Ren, B. Liu, M. Catasta, and
+     J. Leskovec, “Open graph benchmark: Datasets for machine learning on
+     graphs,” Conference on Neural Information Processing Systems, vol. 33,
+     pp. 22118–22133, 2020.
+[54] R. Speer, J. Chin, and C. Havasi, “Conceptnet 5.5: An open multilingual
+     graph of general knowledge,” in AAAI’17, 2017.
+[55] S. Arora, W. Hu, and P. K. Kothari, “An analysis of the t-sne algorithm
+     for data visualization,” in Conference on learning theory, pp. 1455–1462,
+     PMLR, 2018.
+

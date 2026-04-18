@@ -1,0 +1,864 @@
+                                         Pre-Training and Prompting for Few-Shot Node Classification on
+                                                             Text-Attributed Graphs
+                                                           Huanjing Zhao†                                               Beining Yang†‡                                     Yukuo Cen
+                                                    Tsinghua University                                            University of Edinburgh                                 Zhipu AI
+                                                       Beijing, China                                                  Edinburgh, UK                                    Beijing, China
+                                              hwangyeong@mail.tsinghua.edu.cn                                      B.Yang-32@sms.ed.ac.uk                            yukuo.cen@zhipuai.cn
+
+                                                                Junyu Ren                                              Chenhui Zhang                                     Yuxiao Dong
+                                                       Tsinghua University                                               Zhipu AI                                    Tsinghua University
+                                                          Beijing, China                                              Beijing, China                                    Beijing, China
+arXiv:2407.15431v1 [cs.SI] 22 Jul 2024
+
+
+
+
+                                                  renjy19@mails.tsinghua.edu.cn                                  chenhui.zhang@zhipuai.cn                          yuxiaod@tsinghua.edu.cn
+
+                                                        Evgeny Kharlamov                                                     Shu Zhao                                       Jie Tang∗
+                                                   Bosch Center for Artificial                                         Anhui University                               Tsinghua University
+                                                          Intelligence                                                  Anhui, China                                     Beijing, China
+                                                     Renningen, Germany                                             zhaoshuzs@ahu.edu.cn                           jietang@tsinghua.edu.cn
+                                                evgeny.kharlamov@de.bosch.com
+
+                                         ABSTRACT                                                                                    KEYWORDS
+                                         The text-attributed graph (TAG) is one kind of important real-world                         graph self-supervised learning, text-attributed graphs, few-shot
+                                         graph-structured data with each node associated with raw texts.                             node classification, graph neural networks
+                                         For TAGs, traditional few-shot node classification methods directly
+                                                                                                                                     ACM Reference Format:
+                                         conduct training on the pre-processed node features and do not
+                                                                                                                                     Huanjing Zhao, Beining Yang, Yukuo Cen, Junyu Ren, Chenhui Zhang,
+                                         consider the raw texts. The performance is highly dependent on                              Yuxiao Dong, Evgeny Kharlamov, Shu Zhao, Jie Tang. 2024. Pre-Training
+                                         the choice of the feature pre-processing method. In this paper, we                          and Prompting for Few-Shot Node Classification on Text-Attributed Graphs.
+                                         propose P2TAG1 , a framework designed for few-shot node classi-                             In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery
+                                         fication on TAGs with graph pre-training and prompting. P2TAG                               and Data Mining (KDD ’24), August 25–29, 2024, Barcelona, Spain. ACM, New
+                                         first pre-trains the language model (LM) and graph neural network                           York, NY, USA, 12 pages. https://doi.org/10.1145/3637528.3671952
+                                         (GNN) on TAGs with self-supervised loss. To fully utilize the abil-
+                                         ity of language models, we adapt the masked language modeling
+                                                                                                                                     1    INTRODUCTION
+                                         objective for our framework. The pre-trained model is then used
+                                         for the few-shot node classification with a mixed prompt method,                            The few-shot node classification task involves identifying the classes
+                                         which simultaneously considers both text and graph information.                             of nodes in a given graph structure using only a limited number of
+                                         We conduct experiments on six real-world TAGs, including paper                              labeled examples. This task has practical applications in areas such
+                                         citation networks and product co-purchasing networks. Experimen-                            as social network analysis, recommendation systems, and more.
+                                         tal results demonstrate that our proposed framework outperforms                             Inspired by the successful experiences in the field of Computer Vi-
+                                         existing graph few-shot learning methods on these datasets with                             sion (CV), several works, such as G-Meta and TENT [7, 16, 34, 43],
+                                         +18.98% ∼ +35.98% improvements.                                                             apply meta-learning to graphs to address the few-shot node classifi-
+                                                                                                                                     cation problem. These methods learn transferable knowledge from
+                                         CCS CONCEPTS                                                                                meta-tasks, enabling rapid adaptation to new, unseen labels. Unlike
+                                                                                                                                     images, graphs represent a form of structured data. Through graph
+                                         • Mathematics of computing → Graph algorithms; • Comput-
+                                                                                                                                     pre-training, models can also accumulate a substantial amount of
+                                         ing methodologies → Learning latent representations.
+                                                                                                                                     domain-specific knowledge.
+                                         † Both authors contributed equally to this research.                                           Recently, a series of graph pre-training methods [30, 40, 50, 54,
+                                         ‡ This work was done when the author was interned at Zhipu AI..                             57] emerged with self-supervised learning (SSL) to yield generalized
+                                         ∗ Corresponding author: JT.
+                                         1 Our code is available at https://github.com/THUDM/P2TAG.                                  node representations in the absence of labels. These methods mainly
+                                                                                                                                     include contrastive and generative ones. Contrastive SSL methods
+                                         Permission to make digital or hard copies of part or all of this work for personal or       utilize data augmentation to generate multiple views of data for
+                                         classroom use is granted without fee provided that copies are not made or distributed       contrastive loss. Generative SSL methods such as GraphMAE [15]
+                                         for profit or commercial advantage and that copies bear this notice and the full citation
+                                         on the first page. Copyrights for third-party components of this work must be honored.      aim to reconstruct the (masked) attributes of the graph. These self-
+                                         For all other uses, contact the owner/author(s).                                            supervised learning methods have greatly contributed to many
+                                         KDD ’24, August 25–29, 2024, Barcelona, Spain                                               aspects, such as graph augmentation and graph-based pretext tasks.
+                                         © 2024 Copyright held by the owner/author(s).
+                                         ACM ISBN 979-8-4007-0490-1/24/08                                                            They only consider part of the self-supervised learning on TAGs,
+                                         https://doi.org/10.1145/3637528.3671952                                                     making the training of GNNs independent of LMs text encoding.
+KDD ’24, August 25–29, 2024, Barcelona, Spain                                                                                 Huanjing Zhao et al.
+
+
+    Table 1: Related works of few-shot learning on TAGs.                 to the GNNs to aggregate the information from neighbors through
+                                                                         graph propagation. For the masked language modeling, we incor-
+      Method               Few-shot       Text   Prompt Type             porate the aggregation of neighbor information into the outputs of
+      G-Meta [16]                         -      -                       [MASK] tokens. Finally, the cross-entropy loss of the outputs and
+      TENT [34]                           -      -                       the original tokens is computed.
+      Prog [29]                           -      Graph Prompt               In the prompting phase, to bridge the gap between pre-train
+      TAPE [13]            -                     Hard Text Prompt        tasks and the downstream ones, we process with a mixed approach
+      ENG [47]                                   Hard Text Prompt        of LM and GNN, which differs from previous works as shown in
+      GPrompt [17]                               Hard Text Prompt        Table 1. Specifically, we jointly concatenate the label text initialized
+      G2P2 [36]                                  Soft Text Prompt        graph prompt and a simple LM output initialized text prompt to
+                                                                         mimic the training paradigm. As illustrated in Figure 2, by leverag-
+      P2TAG (Ours)                               Mixed Prompt
+                                                                         ing the label text embedding, we can easily align the node to the
+                                                                         downstream label space without discrete and intuitive hand-craft
+   The nodes in the graph usually contain rich textual informa-
+                                                                         prompts. The empirical results presented in Section 4.3 attest to the
+tion [18] such as titles and abstracts in citation networks. Some
+                                                                         superior efficacy of our prompt design, which achieves a substantial
+recent works [3, 41, 51] attempt to integrate the training of LMs
+                                                                         improvement of 11.1% ∼ 25.2% over the existing soft text prompted
+and GNNs. These methods directly deal with the original texts and
+                                                                         G2P2 method [36].
+the topological structure in the graph, and achieve better perfor-
+                                                                            The key contributions of our framework are summarized in the
+mance on the downstream tasks. GIANT [3] aims to obtain stronger
+                                                                         following.
+textual representations by the language model with neighborhood
+prediction in TAGs. Although GIANT utilizes graph information to             • We propose a unified framework to jointly train language mod-
+fine-tune the language models, the text encoding and graph prop-               els and graph neural networks via the masked language model-
+agation steps are still independent. GraphFormer [41] proposes a               ing objective.
+nested architecture of LMs and GNNs and jointly trains them with a           • We propose a new graph-text mixed prompt learning method
+link-prediction-based objective. GLEM [51] alternatively optimizes             with text and structure information to mitigate the gap between
+LMs and GNNs using label information from the downstream tasks.                pre-training and few-shot downstream tasks.
+   In few-shot node classification, prompting helps guide the pre-           • Our proposed P2TAG achieves an improvement with +18.98% ∼
+trained model to generalize from a few examples by providing                   +35.98% over meta-learning methods across six TAG datasets.
+specific input cues. Prog [29] constructs prompts at the graph level,
+which is not directly applicable to TAGs. With the leapfrog devel-       2     PRELIMINARIES
+opment of large language models (LLMs), some works attempt to            In this section, we introduce the background of our paper including
+construct prompts by processing raw texts in the TAG, the name           text-attributed graph and few-shot node classification.
+we refer to as hard text prompt, exemplified by TAPE [13] and
+                                                                         Notations. Denote a graph 𝐺 = (V, E), where V is a set of 𝑛
+ENG [47]. GPrompt [17] leverages the GNN model as a downstream
+                                                                         nodes and E is a set of edges between nodes. 𝑨 ∈ R𝑛×𝑛 is the
+adapter, using hard text prompts to improve adaptation efficiency.
+                                                                         adjacency matrix where its entry 𝑨(𝑖, 𝑗) ≥ 0, if nonzero, denotes
+These works rely on the quality of constructed prompts. It is highly
+                                                                         there is an edge between node 𝑖 and 𝑗 with edge weight 𝑨(𝑖, 𝑗). In
+challenging since there are both text (LM side) and structure infor-
+                                                                         practice, the network could be either directed or undirected. If 𝐺
+mation (GNN side) on TAGs. G2P2 [36] tries to solve this problem
+                                                                         is directed, we have 𝑨(𝑖, 𝑗) . 𝑨( 𝑗, 𝑖); if 𝐺 is undirected, we have
+solely from the LM side, named soft text prompt. They reweight the
+                                                                         𝑨(𝑖, 𝑗) ≡ 𝑨( 𝑗, 𝑖).
+pre-trained GNN embedding by the neighboring nodes’ texts and
+label texts. However, the potential capability of GNN is neglected
+                                                                         2.1      Text-Attributed Graph
+in this way and may lead to sub-optimal results.
+                                                                            Definition 1 (Text-Attributed Graph). A text-attributed
+Present work: P2TAG. In this paper, we propose the Pre-training          graph (TAG) is a graph 𝐺 = (V, E, S), where each node 𝑣𝑖 ∈ V
+and Prompting for few-shot node classification on TAGs. In the           is associated with a text sequence 𝒔𝑖 ∈ S and E represents the set of
+pre-training phase, different from previous works, our framework         edges between nodes.
+integrates the LM and GNN effectively with joint training in a
+self-supervised way. Some solutions are proposed to address the             Given the above definition, we can formally define our problem
+challenges of integration of LMs and GNNs. We incorporate the            for self-supervised learning on TAG.
+encoder of GNNs as a supplement to LMs and keep the original                Problem 1 (Self-supervised Learning on TAGs). Given a TAG
+self-supervised loss of the LM model, i.e., the masked language mod-     𝐺 = (V, E, S), the problem of self-supervised learning (SSL) on
+eling objective, which is a very hard pretext task and can alleviate     TAG is to learn a unified low-dimensional space representation of
+the over-fitting issue. To train the GNNs and the LMs jointly, our       each text-attributed node 𝑣𝑖 ∈ 𝑉 with text sequence 𝒔𝑖 . The goal is to
+framework first samples mini-batch subgraphs through a random-
+                                                                         find a function 𝑓 : V → R𝑑 , where 𝑑 ≪ |V |.
+walk-based sampler. Each mini-batch will be fed to the LMs for
+text encoding, and the output of the classification token (i.e., [CLS]      Previous methods implement self-supervised learning on TAG
+token) will be considered as the representation of the node (or the      through separated text encoders and GNNs. Built upon these works,
+text sequence). The output embeddings of [CLS] tokens will be fed        we explore self-supervised learning by integrating LMs and GNNs.
+Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs                                        KDD ’24, August 25–29, 2024, Barcelona, Spain
+
+
+The joint training for the problem of SSL on TAGs can be formulated                     is to help make better node representations. In our framework,
+as follows:                                                                             we mainly use the DeBERTa-base [12] with 100M parameters as
+                                                                 
+        𝜃 1∗, 𝜃 2∗, 𝜃 3∗ = arg min L𝑆𝑆𝐿 𝑓𝜃𝐺𝑁 𝑁 , 𝑓𝜃𝐿𝑀 , 𝑓𝜃𝐻𝑒𝑎𝑑 , 𝐺 ,
+                                                                                        the LM of our framework. DeBERTa utilizes two techniques based
+                                                   1          2        3                on BERT [6] and RoBERTa [22] and significantly improves the
+                            𝜃 1 ,𝜃 2 ,𝜃 3
+                                                                                        performance on the natural language understanding and generation
+ where 𝑓𝜃𝐺𝑁 𝑁 , 𝑓𝜃𝐿𝑀 , and 𝑓𝜃𝐻𝑒𝑎𝑑 are the GNN encoder, LM encoder,                      tasks. The choice of the LMs is flexible, and we also explore other
+         1        2          3
+and the prediction head for the SSL. Then we can obtain the final                       LMs in our experiments.
+embeddings via the following:                                                              The pre-training of LMs and GNNs is much more challenging
+               𝒁 = 𝑓𝜃𝐺𝑁
+                     ∗
+                        𝑁
+                          (𝐺, 𝑿 ) , where 𝑿 = 𝑓𝜃𝐿𝑀
+                                                 ∗ (S) .                                because we need to 1) choose an appropriate self-supervised training
+                        1                                         2
+                                                                                        objective to avoid over-fitting and 2) sample small mini-batches to
+2.2     Few-shot Node Classification                                                    address the high computational and space costs of large LMs.
+Few-shot node classification are tasks that involve training a ma-                      Self-supervised training objective. The training objective plays
+chine learning model with a limited number of labeled nodes,                            an important role in self-supervised learning. Different from con-
+and subsequently predicting the classes of other nodes based on                         ventional graph self-supervised learning, the design of self-supervised
+these initial labels. The 𝑁 -way 𝐾-shot few-shot node classification                    objective for TAGs are more challenging. Our model architecture
+tasks T on a graph is described as follows with the node label set                      contains two different modules with different scales of model pa-
+C. Each task T𝑡 ∈ T selects 𝑁 labels from C, forming a subset                           rameters (large LM v.s. small GNN), making the training much
+C𝑡 = {C1, C2, ..., C𝑁 } ∈ C. The T𝑡 consists of two parts as follows:                   more difficult. Simple self-supervised objectives will probably make
+                                                                                        the model overfitted. To make a harder self-supervised objective,
+                                        T𝑡 = {S𝑡 , Q𝑡 },
+                                                                                        we adopt the masked language modeling (MLM) introduced in [6]
+where S𝑡 means the support set and Q𝑡 means the query set. The                          as our objective. Given a node 𝑣𝑖 , we first feed the text sequence
+machine learning model is trained on S𝑡 and subsequently evalu-                         𝒔𝑖 = [𝑇1,𝑇2, . . . ,𝑇𝑛𝑖 ] into a language model to get the hidden rep-
+ated on Q𝑡 . Both the support set and the query set consist of nodes                    resentations associated with 𝑣𝑖 where 𝑇𝑡 is 𝑡-th token of 𝒔𝑖 and 𝑛𝑖
+and their corresponding labels, which shown as follows:                                 is the length of 𝒔𝑖 . In the training stage, we randomly mask a pre-
+           S𝑡 = {(𝑣 1, 𝑐 1 ), (𝑣 2, 𝑐 2 ), ..., (𝑣 𝑁 ×𝐾 , 𝑐 𝑁 ×𝐾 )},                    defined portion of tokens by replacing them with a special token
+                                                                                        named [MASK]. We use 𝒔𝑖′ = [𝑇1′,𝑇2′, . . . ,𝑇𝑛′𝑖 ] to denote the text
+                                                         ′
+           Q𝑡 = {(𝑣 1′ , 𝑐 1′ ), (𝑣 2′ , 𝑐 2′ ), ..., (𝑣 𝑁        ′
+                                                           ×𝑄 , 𝑐 𝑁 ×𝑄 )},              sequence after masking and each token 𝑇𝑡′ is a random variable
+where 𝑣 and 𝑣 ′ represent nodes, their corresponding labels are                         with the following distribution:
+denoted as 𝑐 and 𝑐 ′ . In the support and query sets, each label C𝑖 ∈
+                                                                                                  Pr 𝑇𝑡′ = [𝑀𝐴𝑆𝐾] = 𝑝 and Pr 𝑇𝑡′ = 𝑇𝑡 = 1 − 𝑝.
+                                                                                                                                           
+C𝑡 associated with 𝐾 nodes and 𝑄 nodes, respectively. For the                                                                                              (1)
+support set, there exists 𝑐 (𝑖 −1)∗𝐾+𝑗 ∈ C𝑖 , where 𝑖 ∈ {1, 2, .., 𝑁 }
+and 𝑗 ∈ {1, 2, .., 𝐾 }. Similarly, there exists 𝑐 ′(𝑖 −1)∗𝑄+𝑗 ∈ C𝑖 , where              Here, 𝑝 ∈ (0, 1) is a hyper-parameter representing the mask rate.
+                                                                                        When working with BERT-like language models, we usually add
+𝑖 ∈ {1, 2, .., 𝑁 } and 𝑗 ∈ {1, 2, .., 𝑄 } for the query set.
+                                                                                        a starting token (e.g., [CLS]) and an ending token (e.g., [SEP]) to
+3     METHODOLOGY                                                                       the sequence. Therefore, each node is represented as a sequence of
+                                                                                        hidden vectors:
+We tackle few-shot node classification by adhering to the pre-                                                                                                        
+training and prompting paradigm, as depicted in Figure 1. To better                       [𝒐 0, 𝒐 1, . . . , 𝒐𝑛𝑖 , 𝒐𝑛𝑖 +1 ] = 𝑓 𝐿𝑀 [[𝐶𝐿𝑆],𝑇1′,𝑇2′, . . . ,𝑇𝑛′𝑖 , [𝑆𝐸𝑃]] ,
+leverage the unique characteristics of the TAGs, we propose a new
+                                                                                                                                                                         (2)
+self-supervised framework for pre-training.
+                                                                                        where 𝒐𝑡 ∈ R𝑑 is the hidden representations of 𝑡-th token of 𝒔𝑖′ .
+                                                                                        Notice that the first hidden vector 𝒐 0 corresponds to the special
+3.1     Pre-training Framework
+                                                                                        token [CLS] and can be treated as the “summary” representation
+In this part, we introduce our proposed pre-training framework in                       of the whole text sequence 𝒔𝑖 . To capture the correlations among
+detail. For self-supervised learning on TAGs, previous works usually                    nodes, we then use a graph neural network to propagate the hidden
+take two separate steps. The first step is to encode the raw texts to                   representations of nodes where the input of node 𝑣𝑖 , denoted as
+node features using bag-of-words, word2vec [24], or pre-trained                         𝒙𝑖 , is the first hidden vector 𝒐 0 of 𝒔𝑖 . The node representations
+language models [4, 6, 8, 12, 19, 22, 42]. Most graph self-supervised                   after passing a GNN encoder are denoted as 𝑯 = 𝑓 𝐺𝑁 𝑁 (𝐺, 𝑿 ).
+methods [15, 30, 50, 54, 57] use the node features pre-processed                        The propagated node presentations are exploited to construct the
+in the first step to construct a self-supervised objective. The two-                    self-supervised training objective.
+step process can bring non-negligible information loss. To address                          For each node 𝑣𝑖 , we concatenate the hidden representation 𝒉𝑖
+this issue, we propose an end-to-end self-supervised framework to                       with the output vector 𝒐𝑡 of each token and then feed the concate-
+train directly on the TAGs. Inspired by the recent prosperity of pre-                   nated vector to an MLP as:
+trained language models (LM), we choose an effective LM to encode
+the raw texts. To model the relations between nodes (texts), we can                                 𝒛𝑡 = MLP([𝒉𝑖⊤, 𝒐𝑡⊤ ]), where 𝑡 = 0, · · · , (𝑛𝑖 + 1).               (3)
+utilize powerful graph neural networks (GNNs). As illustrated in
+Figure 1, our framework consists of two core modules, including a                          The objective of the masked language model (MLM) is to predict
+pre-trained language model and a GNN encoder. The GNN encoder                           the masked tokens in the original text sequence 𝒔𝑖 , which can be
+KDD ’24, August 25–29, 2024, Barcelona, Spain                                                                                                                                                                             Huanjing Zhao et al.
+
+
+
+                        "Charlie and the                                                          Pre-training
+                                                                                                                                           and                 chocolate                                         three-way
+                       chocolate factory"
+                                                                                                                                                                                                           classification problem
+                                                                                                                                                   Mask Decoder
+                                                                                                                                                                                                                  "Animals"
+                                                                                               GNN                                                                                                                 label 0
+                                                                                              Encoder
+                                                                                                                                                                                                       "Science Fiction and Fantasy"
+
+                                                                                                                                               Transformer Layers
+                                                                                                                                                           Layers                                                  label 1
+                                                                                                                                              Transformer
+                                                                                                                                              Transformer Layers
+                                                                                                                                                                                                       "Activities, Crafts and Games"
+                                                      A mini-batch graph
+          A TAG                                                                                                    [CLS]       Charlie    [MASK]         the    [MASK]         factory     [SEP]                   label 2
+
+                       Prompting
+                                                                                                              initialize via label text                                                                                MLP
+            [CLS]                                                                                                                                [CLS]     Animals     [SEP]     [PAD]     [PAD]   [PAD]
+                                                                      6
+                                                          1
+            Charlie
+                                              2                                   ？           2
+                                                                                                         5                                       [CLS]     Science Fiction        and    Fantasy   [SEP]        graph
+             and                                                  0                                                                                                                                           embedding
+                                                                                                   1               construct                     [CLS] Activities Crafts          and    Games     [SEP]
+                        Transformer                                       5
+                                                                                  ？
+              the
+                           Layers                 3                                                       0                                                                                                           Pooling
+           chocolate                                                                      4                                                                                       Layers
+                                                                                                                                                                      TransformerLayers
+                                                                                                                                                                     Transformer
+                                                                                                                                                                     Transformer Layers
+                                                                                                                  randomly
+                                                              4
+            factory                                                                                3               initialize                                                                                         GNN
+                                                                          insert graph prompt                                                                    label text encoding                                 Encoder
+            [SEP]                                                                                                               tokens
+                                             ego graph                                                 prompt graph                                              graph encoding
+
+
+
+
+Figure 1: Our proposed framework P2TAG. A toy example illustrating the 3-way classification of children’s books. (1) In the pre-training
+phase, we jointly train the LM and GNN using a masked language modeling objective. For the GNN module, a subgraph-based sampler
+employing random walks generates mini-batch subgraphs for training. (2) In the prompting phase, we construct the ego graph for each
+target node and generate node features with the pre-trained LM. Graph tokens are utilized to learn the graph structure and create a prompt
+graph. These tokens are initialized either by encoding label text or through a random initialization process.
+
+expressed as:                                                                                                              There are several genres of mini-batch training techniques for
+                        𝑛𝑖                                                                                                 GNNs. To trade off the efficiency and flexibility, we choose a subgraph-
+                               1 𝑇𝑡′ = [𝑀𝐴𝑆𝐾] log Pr (𝑇𝑡 | 𝒛𝑡 ) .
+                        ∑︁                            
+               L𝑖 =                                                                                     (4)                based method, GraphSAINT [48], as our training strategy. At every
+                        𝑡 =1                                                                                               training step, GraphSAINT constructs a mini-batch by sampling a
+   The indicator 1 (𝑇𝑡′ = [𝑀𝐴𝑆𝐾]) ensures that the loss is only                                                            subgraph from the original graph and generates node representa-
+applied on masked tokens. We can control the difficulty of the SSL                                                         tions according to the sampled subgraph. In this work, we adopt
+task via a flexible hyperparameter, i.e., mask rate.                                                                       the random walk sampler to preserve the connectivity of the whole
+                                                                                                                           graph. The sampling process starts by selecting 𝑟 root nodes from
+                                                                                                                           the whole node set V uniformly at random. Starting from each
+ Algorithm 1: The pre-training stage of our framework.
+                                                                                                                           root node, a random walk of length 𝑙 is sampled from the original
+1  Input TAG 𝐺 = (V, E, S), training steps 𝑀, mask rate 𝑝,                                                                 graph structure. We then have a sampled node set V𝑠 by adding
+    GraphSAINT sampler Sample;                                                                                             all the nodes that occurred in the random walks and the subgraph
+ 2 Output Model parameters 𝜃 of both the LM and GNN;                                                                       𝐺𝑠 induced by V𝑠 is used in the GNN encoder to generate node
+ 3 Pre-processing: compute normalization coefficient 𝛼 and 𝜆                                                               representations in the minibatch.
+    according to GraphSAINT sampler [48];
+ 4 for step ← 1 to 𝑀 do                                                                                                    3.3           Graph-Text Mixed Prompt Learning
+ 5    𝐺𝑠 = (V𝑠 , E𝑠 ) ← Sample(𝐺);                                                                                         To prevent tuning the whole pre-trained model in the few-shot
+ 6     𝑺 ← {𝒔𝑖 : 𝑣𝑖 ∈ V𝑠 };                                                                                                downstream tasks, we adopt the prompt learning paradigm, i.e.,
+ 7     𝑺 ′ ← {MaskToken(𝒔𝑖 , 𝑝) : 𝒔𝑖 ∈ 𝑺};                                                                                 using a few trainable parameters to be the substitution of full-scale
+ 8     𝑶 ← 𝑓 𝐿𝑀 (𝑺 ′ );                                                                                                    model parameters. The goal of prompt design is to mitigate
+ 9     𝑯 ← 𝑓 𝐺𝑁 𝑁 (𝐺𝑠 , 𝑶 [:, 0]);                                                                                         the gap between the pre-train objective and the downstream
+10     𝑶 ← Concat(𝑶, 𝑯 );                                                                                                  tasks. It is highly challenging since there are both text (LM side)
+                                                                                                                           and structure information (GNN side) on TAG graphs. We try to
+11     𝒁 ← MLP(𝑶);
+                                                                                                                           investigate the joint prompting method, namely the graph prompt
+12     Compute the loss via Equation 4;
+                                                                                                                           and the text prompt, the detailed design as follows. To simplify
+13     Update 𝜃 based on the gradient of the loss;                                                                         the discussion, we start with a target node 𝑣 (e.g., the 0-th node in
+14   return Model parameters 𝜃 ;                                                                                           Figure 1). We further introduce the concept of the ego graph node
+                                                                                                                           set V𝑒𝑔𝑜 . We select up to 100 first-order neighbors of the given
+                                                                                                                           node, along with the node itself, to form the node set of the ego
+                                                                                                                           graph. Then we define the induced ego graph from V𝑒𝑔𝑜 as 𝐺𝑒𝑔𝑜 .
+3.2     Mini-batch Training
+Due to the heavy language models, we need to adopt a mini-batch                                                            3.3.1 Graph prompt design. Inspired by the recently proposed
+training strategy even if we train our model on small graph datasets.                                                      graph prompt literature [28, 29], we aim to bridge gap through
+Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs                                                KDD ’24, August 25–29, 2024, Barcelona, Spain
+
+
+a small yet informative prompt graph. We first craft a prompt graph                                                      (
+𝐺𝑝 = (V𝑝 , E𝑝 ) serving as an ancillary component connected to the                                             (0)           𝑓 𝐿𝑀 (𝒔 𝑦𝑖 )          if 𝑖 ≤ 𝑁 ,
+target ego node set V𝑒𝑔𝑜 . 𝐺𝑝 comprises ∥𝐺𝑝 ∥ nodes (i.e., tokens),                                          𝒑𝑖      =                                                        (7)
+                                                                                                                             Random Initialization otherwise.
+the internal edges between tokens can be defined as:
+                                                                                                              (0)
+                           (                                                                      Here, the 𝒑𝑖 denotes the initial embedding of i-th prompt node,
+                             1 if Sim(𝒑𝑖 , 𝒑 𝑗 ) ≥ 𝜎𝑖𝑛𝑛𝑒𝑟 ,                                       and for the additional prompt nodes, we adopt the random initiliza-
+              A𝐺𝑝 (𝑖, 𝑗) =                                       (5)
+                             0 otherwise,                                                         tion. Then the inner structure of each nodes will be constructed
+                                                                                                  through the Eq. 5. The links among the prompt nodes and the target
+where the Sim(·) denotes the similarity function, and the 𝒑𝑖 denotes
+                                                                                                  ego graph 𝐺𝑒𝑔𝑜 are built by the Eq. 6.
+the feature of 𝑖-th tokens; in this paper, we use dot product as the
+implicit operation. Then, let the 𝒙𝑘 denotes on the 𝑘-th node feature                             3.3.2 Text prompt design. As shown in Equation 3, we use the joint
+of the 𝐺𝑒𝑔𝑜 , the inter-connectivity between 𝐺𝑝 and 𝐺𝑒𝑔𝑜 is given                                 representation of the LM model output (text information) and the
+by:                                                                                               GNN model output (structure information). Therefore, to align the
+                             (
+                               1 if Sim(𝒙𝑘 , 𝒑 𝑗 ) ≥ 𝜎𝑖𝑛𝑡𝑒𝑟 ,                                     pre-train and downstream tasks, we use a similar strategy to concat
+          A𝐺𝑒𝑔𝑜 ,𝐺𝑝 (𝑘, 𝑗) =                                       (6)                            both output features in the downstream scenario.
+                               0 otherwise.
+                                                                                                     Then, instead of making intricate text-based prompts, we use a
+Here, the 𝜎𝑖𝑛𝑛𝑒𝑟 and 𝜎𝑖𝑛𝑡𝑒𝑟 are two hyper-parameters indicating                                   rather simple way: letting the second concat feature be a trainable
+the pruning value, i.e., the entries on the matrix higher than 𝜎𝑖𝑛𝑛𝑒𝑟                             parameter, namely 𝒘𝑡 ∈ R1×𝑑 , i.e., treating the LM model output it-
+and 𝜎𝑜𝑢𝑡𝑒𝑟 are formed as edge respectively.                                                       self as a tunable parameter. The initialization process can be defined
+                                                                                                  similarly as:
+                                                       ②Model Encoding                                                       𝒘𝑡0 = 𝑓 𝐿𝑀 (𝒔 𝑣 ),                       (8)
+               Traditional LM Prompt
+                                                                        Pre-trained label space
+          Input sentence                                                                          the 𝒔 𝑣 shows the text sequence with the target node 𝑣. Our ablation
+                                                            Fixed LM
+                                                             model
+
+
+
+
+  “Charlie and the chocolate factory”                                                             study in Section 4.3 shows our text prompt’s effectiveness.
+                                                                            Masked token
+                                         Prompt
+                   ① Hand-Craft                                               prediction
+                                        “belongs to”
+                                                                            labels (~5M)
+                                                                                                  3.3.3 Final prompt learning forward function. Assuming we have
+                                                                                                  a node ego graph 𝐺 𝑣 and its text 𝒔 𝑣 , the prompt learning forward
+         Homophily hypothesis
+                                          ① Label Text                         Products           function is:
+                                                            Fixed GNN
+
+
+
+
+                                           Initialize                       classification
+                                                              model
+
+
+
+
+                                                                             labels(<10)                     𝒛˜𝑣 = MLP(READOUT(𝑓 𝐺𝑁 𝑁 (𝐺 𝑣 ; 𝐺𝑝 )), 𝒘𝑡 ).                     (9)
+                                                 ②Model
+   Input ego graph        Prompt graph           Encoding               Downstream label space    The parameters of 𝑓 𝐿𝑀 and 𝑓 𝐺𝑁 𝑁 are fixed during prompt learning,
+       Label Text Initialized Graph Prompt                                                        the parameters of 𝐺𝑝 , the 𝒘𝑡 and the task head (e.g., the MLP layers)
+                                                                                                  are all trainable.
+Figure 2: Initialize tokens via the label text. Crafting the prompt
+graph via downstream label texts under the homophily hypothe-                                     3.4    Model Inference
+sis, thereby making the target node embedding more aligned with                                   Finally, we incorporate the pretrained models 𝑓 𝐿𝑀 , 𝑓 𝐺𝑁 𝑁 , and the
+the downstream label space.                                                                       prompt graph 𝐺𝑝 in the model inference stage. We outline three
+                                                                                                  inference methods. The first utilizes the trained LM, referred to as
+Initialize tokens via the label text. While the prompt graph                                      P2TAG (LM). It computes the output of the [CLS] token of the
+servers as an efficient substitute for full-scale model parameters,                               LM for each node in the graph via a mini-batch manner. The sec-
+we empirically find that the naive 𝐺𝑝 performs sub-optimally. We                                  ond method involves further feeding the node [CLS] outputs from
+attribute this to the inconsistency in the pre-trained task objectives                            P2TAG (LM) into a GNN encoder, referred to as P2TAG (GNN).
+between our masked token prediction task and previous graph-                                      In the training stage, the node representation of 𝑣𝑖 is estimated
+based ones [28, 29] (e.g., the link prediction task).                                             according to the sampled neighborhood in the subgraph, and thus,
+   Referencing Figure 2 as an example, during the pre-training                                    varies with the sampling process. The randomness introduced by
+phase where token prediction tasks are undertaken, the model is                                   the sampler is unpleasant during the test stage. To get the exact
+equipped to align input with the pre-trained label space. Conse-                                  node representation, we use the full neighbor sampling strategy
+quently, the prompt should slightly modify the input distribution                                 when performing inference. That is, The node representation of
+to approximate the downstream label space more closely. Hence,                                    𝑣𝑖 at the ℓ-th layer is obtained by aggregating the representations
+unlike traditional cumbersome and hand-crafted text prompt tem-                                   of its full neighborhood at the (ℓ − 1)-th layer. The computation
+plates, we discovered that employing label text embeddings for                                    process is performed layer by layer. Taking the node representa-
+prompt graph initialization is more direct and efficient. Under the                               tions at the (ℓ − 1)-th layer as the input, we can compute a batch of
+homophily hypothesis, the target node’s embedding is im-                                          node representations at the ℓ-th by first loading their full neighbor-
+mediately positioned more closer to the desired label space.                                      hoods and then aggregating the representations of those neighbor
+   Specifically, we utilize the pre-trained 𝑓 𝐿𝑀 as our label text en-                            nodes at the (ℓ − 1)-th layer. The third method involves conducting
+coder, each label text (e.g., “Animals”, “Science Fiction and Fantasy”,                           few-shot node classification through prompting, as described in
+and ”Activities, Crafts and Games”) can be represented as 𝑠 𝑦𝑖 . Then                             Section 3.3. The P2TAG inference loop of our framework is listed
+we can formalize the initialization of 𝐺𝑝 as follows:                                             in Algorithm 2.
+KDD ’24, August 25–29, 2024, Barcelona, Spain                                                                                 Huanjing Zhao et al.
+
+
+ Algorithm 2: The inference of P2TAG                                          the arXiv website, such as transforming "NA" into "Numerical
+                                                                              Analysis". ogbn-products is an undirected and unweighted graph
+1 Input TAG 𝐺 = (V, E, S), batch size 𝑏, the number of GNN
+                                                                              representing an Amazon product co-purchasing network [1].
+   layers 𝐿;
+                                                                            • Amazon Review. Amazon Review includes graphs composed
+2 Output Node embeddings;
+                                                                              of products, which are constructed based on co-purchased
+  /* Obtain [CLS] embeddings from LMs for all                                 and co-viewed patterns. We use Children, History, Comput-
+      nodes in a mini-batch manner.                      */                   ers and Photo datasets compiled by [39]. For the four datasets,
+3 𝑿 ← 0, 𝑖 ← 0, 𝑗 ← min(𝑏, 𝑛);                                                we extract bag-of-words features and utilize principal compo-
+4 while 𝑖 < 𝑗 do                                                              nent analysis (PCA) to reduce dimensions, generating a 100-
+5     𝑶 = 𝑓 𝐿𝑀 (𝑺 [𝑖 : 𝑗]);                                                   dimensional feature for each node.
+6     𝑿 [𝑖 : 𝑗] = 𝑶 [:, 0];
+                                                                           In terms of the class split, ogbn-arxiv adopts the same partitioning
+7     𝑖 ← 𝑗, 𝑗 ← min( 𝑗 + 𝑏, 𝑛)
+                                                                           strategy as TENT [34]. Meanwhile, for other datasets, we employ
+  /* initialize the graph and text prompt.                            */   a random division approach. Notice that our P2TAG differs from
+          (
+    (0)     𝑓 𝐿𝑀 (𝒔 𝑦𝑖 )          if 𝑖 ≤ 𝑁 ,                               meta-learning methods, as it does not require the establishment of
+8 𝒑     =
+    𝑖       Random Initialization otherwise.                               specific training and validation tasks. Instead, we ensure fairness
+       (0)                                                                 using the same test tasks as other baselines.
+    𝒘𝑡 ← 𝑓 𝐿𝑀 (𝒔 𝑣 );
+   /* Propagate node embeddings via a GNN encoder                          Compared methods. We choose three types of methods for com-
+                                                                           parison, all of which can address the problem of few-shot node clas-
+       layer by layer.                                      */
+     (0) ← [𝑿 ; 𝐺 ]                                                        sification. These include methods based on meta-learning on graphs,
+ 9 𝑯                 𝑝                                                     self-supervised pre-training methods on text attribute graphs, and
+10 for ℓ ← 1 to 𝐿 do
+                                                                           methods following the paradigm of pre-training and prompting.
+11     𝑯 (ℓ ) ← 0, 𝑖 ← 0, 𝑗 ← min(𝑏, 𝑛);                                   Specifically, meta-learning methods such as GPN [7], G-Meta [16]
+12     while 𝑖 < 𝑗 do                                                      and TENT [34]; GIANT [3], proposed P2TAG (LM) and P2TAG
+13                                 ˆ : 𝑗]𝑯 (ℓ −1) 𝑾 (ℓ ) );
+            𝑯 (ℓ ) [𝑖 : 𝑗] = ReLU( 𝑨[𝑖                                     (GNN) as self-supervised pre-training methods; G2P2 [36] follows
+14         𝑖 ← 𝑗, 𝑗 ← min( 𝑗 + 𝑏, 𝑛)                                       the same pre-training and prompting paradigm as proposed P2TAG.
+                                                                           In the pre-training phase, we concurrently train both the LM and
+15 𝑯 (𝐿) ← [𝑯 (𝐿) ; 𝑤𝑡 ]                                                   GNN, considering two scenarios during inference. P2TAG (LM) de-
+16 𝒁 ← MLP(𝑯
+               (𝐿) )
+                                                                           rives vector representations from the original text of nodes. Mean-
+17 return Probabilities of the classes 𝒁 ;                                 while, P2TAG (GNN) leverages these node representations as inputs
+                                                                           to the GNN, resulting in the output obtained.
+             Table 2: Dataset statistics of the used TAGs.                 Evaluation. GPN, G-Meta, and TENT are methods based on meta-
+                                                                           learning, where they are learned on train tasks and are subsequently
+                                                                           evaluated on test tasks. In contrast, the proposed P2TAG along
+     Dataset                 #Nodes               #Edges    Avg. Degree
+                                                                           with G2P2 and GIANT, are evaluated exclusively on test tasks.
+     ogbn-arxiv              169,343         1,166,243         13.7        Specifically, P2TAG (LM), P2TAG (GNN), and GAINT infer the
+     ogbn-products         2,449,029        61,859,140         50.5        classes of nodes in the query set by fitting a logistic regression
+     Children                 76,875            1,554,578      40.4        classifier on the support set. Furthermore, P2TAG and G2P2 extend
+     History                  41,551              358,574      17.2        their approach by constructing prompts through the support set.
+     Computers                87,229              721,081      16.5        For a detailed comparison, we conduct experiments in four different
+     Photo                    48,362              500,928      20.7        settings for OGB datasets: 5-way 3-shot, 5-way 5-shot, 10-way 3-
+                                                                           shot, and 10-way 5-shot. Considering the number of labels, we use
+4     EXPERIMENT                                                           three settings for Amazon Review datasets: 3-way 3-shot, 3-way
+                                                                           5-shot, and 3-way 10-shot.
+In this section, we conduct comprehensive experiments to validate
+the effectiveness of our framework, particularly emphasizing the           Parameter configuration. For our framework, the selection of
+enhanced performance for few-shot node classification tasks.               LMs and GNNs is flexible. In our experiment, we choose a represen-
+                                                                           tative LM — DeBERTa-base and a powerful GAT model for the main
+4.1     Experimental Setup                                                 experiments. The DeBERTa-base is a 100M-parameter pre-trained
+                                                                           language model with a hidden size of 768. We keep the same hidden
+Datasets. We conduct experiments across two categories of datasets.        size of the GAT model with DeBERTa-base. We also explore other
+All these datasets are publicly available and widely used in TAG-          LMs in the ablation studies. We use AdamW optimizer [23] with
+related research. The statistics of the datasets are given in Table 2.     learning rate lr = 1e-5 for model optimization. We run 3 epochs for
+  • Open Graph Benchmark (OGB). ogbn-arxiv is a directed                   all datasets. We construct 5 groups of test tasks for each 𝑁 -way
+     citation graph between all computer science (CS) ArXiv papers         𝐾-shot setting, with each group consisting of 50 tasks specifically
+     indexed by Microsoft Academic Graph (MAG) [32]. We con-               formulated from the test set label. In each task, the support set
+     vert the abbreviated labels into their full forms as specified on     length is 𝐾, and the query set length 𝑄 is set to 10. We calculate
+Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs                                KDD ’24, August 25–29, 2024, Barcelona, Spain
+
+
+                                 Table 3: The accuracy of few-shot node classification on two OGB datasets.
+
+ Dataset                                  ogbn-arxiv                                          ogbn-products
+ Setting            5-way 3-shot 5-way 5-shot 10-way 3-shot 10-way 5-shot 5-way 3-shot 5-way 5-shot 10-way 3-shot 10-way 5-shot
+ OGB features         53.24±0.77        59.31±0.71        38.62±0.85         44.59±0.61       44.15±1.30    50.57±1.83       32.79±0.88         38.75±0.61
+ GPN                  61.65±0.67        66.34±0.78        47.36±0.25         53.60±0.86       64.04±1.92    69.86±1.90       52.68±0.66         58.36±0.45
+ G-Meta               60.06±1.56        63.77±2.53        48.36±0.94         52.78±1.04       64.06±1.18    66.02±0.71       51.17±1.48         57.81±1.40
+ TENT                 62.24±0.35        65.80±0.37        45.08±0.54         51.84±0.86       62.69±2.78    66.63±1.48       47.63±0.59         51.53±0.90
+ GIANT                73.50±1.59        78.18±1.25        60.05±1.20         64.96±0.69       69.44±1.40    75.46±1.53       59.23±0.64         65.67±0.38
+ G2P2                 70.93±1.29        73.07±1.22        56.73±0.68         59.47±0.69       > 30 days     > 30 days        > 30 days          > 30 days
+ P2TAG (LM)  78.14±1.18                81.33±1.34         65.21±1.26         69.90±0.94       75.38±1.27    78.66±1.55      61.87±0.91          67.06±0.49
+ P2TAG (GNN) 77.73±1.76                81.31±0.84         66.21±0.82         70.42±0.62       80.95±1.61    83.65±1.24      70.04±0.33          73.67±0.35
+ P2TAG       80.18±0.27                84.76±0.89         67.81±0.97         70.88±0.96       80.54±1.59    83.77±1.45      71.14±0.26          75.99±0.41
+
+                         Table 4: The accuracy of few-shot node classification on four Amazon Review datasets.
+
+    Dataset                                           Childern                                                         History
+    Setting                  3-way 3-shot           3-way 5-shot           3-way 10-shot         3-way 3-shot       3-way 5-shot           3-way 10-shot
+    node features             39.68±0.61             43.33±1.78              49.00±0.77           37.05±1.63         38.16±1.33              40.82±1.07
+    GPN                       54.77±0.42             60.51±1.16              63.89±0.93           38.48±0.74         40.63±0.82              43.88±1.01
+    G-Meta                    54.00±2.38             57.76±1.43              61.62±1.52           40.41±1.32         41.11±0.76              42.50±0.86
+    TENT                      53.23±0.76             60.52±1.73              64.32±0.81           38.30±0.72         37.73±0.43              41.47±2.05
+    G2P2                      51.33±1.84             55.88±1.18              58.85±0.84           47.21±0.37         49.89±0.97              55.63±1.11
+    P2TAG (LM)                73.64±1.13             77.43±1.46              80.53±1.27           68.88±2.10         72.36±1.28              76.81±0.47
+    P2TAG (GNN)               73.20±1.34             76.71±0.82              80.67±1.54           63.33±1.00         68.15±1.41              72.68±0.98
+    P2TAG                     77.35±1.09             81.43±1.24              84.67±1.90           72.35±1.85         76.19±1.25              80.96±0.74
+
+    Dataset                                           Computers                                                        Photo
+    Setting                  3-way 3-shot           3-way 5-shot           3-way 10-shot         3-way 3-shot       3-way 5-shot           3-way 10-shot
+    node features             37.19±1.36             40.11±1.72              44.55±1.11           40.43±0.64         44.41±1.68              50.57±1.38
+    GPN                       71.73±1.67             70.47±1.72              71.56±1.91           74.73±1.75         76.01±1.12              70.77±0.97
+    G-Meta                    71.58±2.19             71.14±2.52              72.36±0.63           69.68±1.08         72.41±1.09              73.54±1.22
+    TENT                      60.68±1.94             62.13±1.17              65.96±1.92           68.24±1.20         71.20±1.30              72.19±2.03
+    G2P2                      61.36±1.20             65.13±1.90              68.56±1.26           70.97±1.51         72.49±1.23              76.52±2.37
+    P2TAG (LM)                66.73±2.16             71.17±0.54              74.77±1.06           73.49±1.77         75.68±0.99              77.89±0.94
+    P2TAG (GNN)               86.95±1.71             88.67±0.51              92.15±0.88           86.47±1.45         88.20±0.49              90.72±0.58
+    P2TAG                     87.24±1.38             89.55±0.54              93.76±0.63           86.73±2.14         88.73±0.98              90.68±0.76
+
+the average performance within each group and report the overall                        few-shot node classification. Pre-training on TAGs often comes
+mean and standard deviation across these 5 groups of tasks.                             with increased time expenditure, such as G2P2 taking over 30 days
+                                                                                        on the ogbn-products dataset. The proposed P2TAG employs a
+4.2     Performance Analysis                                                            more general approach to jointly train LM and GNN, consuming
+Our main results are summarized in Table 3 and Table 4. The                             less than one day on this dataset. The P2TAG, employing mixed
+proposed P2TAG (LM) outperforms the meta-learning methods,                              prompts, further enhances performance on the pre-trained model
+increasing the average accuracy on six datasets from +2.27% ∼                           P2TAG (LM) and P2TAG (GNN). It secures the best outcomes on
++35.51%; the P2TAG (GNN) achieves an average improvement with                           most datasets, with an average enhancement of 2.89% compared
++16.38% ∼ +27.55%; the P2TAG performs best on most datasets,                            to P2TAG (GNN), demonstrating the effectiveness of prompts. On
+with an average improvement of +18.98% ∼ +35.98%. Compared                              the History dataset, P2TAG (LM) achieves the second-best results;
+with the pre-training method that also utilize raw text such as GI-                     however, after passing through the GNN encoder, P2TAG (GNN)
+ANT and G2P2, our P2TAG still has better performance, which                             experiences an average of 4.63% decrease. This might be attributed
+demonstrates its effectiveness. On the ogbn-arxiv dataset, although                     to the quality of the topological structure within the data. This
+G2P2 constructs prompts on the basis of pre-training, its perfor-                       hypothesis is further supported by the minimal improvement ob-
+mance is lower than that of GIANT, P2TAG (LM) and P2TAG (GNN).                          served when comparing meta-learning methods that do not utilize
+This underscores the importance of a well pre-trained model for                         raw texts (GPN, G-Meta, TENT) to the node features method. The
+KDD ’24, August 25–29, 2024, Barcelona, Spain                                                                                         Huanjing Zhao et al.
+
+
+Table 5: Ablation study of language models on ogbn-arxiv                            Table 6: The accuracy of classification by P2TAG with dif-
+dataset. We choose various LMs, then report the classification                      ferent hyperparameters on ogbn-arxiv dataset. We report the
+accuracy achieved with P2TAG (LM).                                                  results with P2TAG (GNN) and P2TAG, where the underscored
+                                                                                    annotations indicate the parameters used in the main result tables.
+                                        5-way                      10-way
+Setting
+                                  3-shot     5-shot           3-shot     5-shot       Setting                        5-way 5-shot    10-way 5-shot
+DeBERTa-base 78.14±1.18 81.33±1.34 65.21±1.26 69.90±0.94                                                        32      79.74±1.32       67.81±0.48
+DeBERTa-large 78.64±1.24 83.55±1.05 66.00±1.12 71.96±1.06                             P2TAG (GNN):              64      81.40±1.26       69.61±0.52
+e5-v2-base    78.62±1.00 82.44±1.22 65.79±0.64 71.02±0.60                             sequence length          128      81.31±0.84      70.42±0.62
+e5-v2-large   77.31±1.68 81.87±1.09 64.60±0.72 70.08±0.60                                                      256     81.61±0.95        70.40±0.70
+                                                                                                              0.15      43.93±0.41       27.02±0.48
+                                                                                      P2TAG (GNN):            0.30      60.66±1.00       46.34±0.48
+proposed graph prompt improvement strategy, which initializes                                                 0.50      80.48±1.10       69.96±0.69
+                                                                                      mask rate
+through label text, mitigates this issue. On the History dataset,                                             0.75     81.31±0.84       70.42±0.62
+P2TAG further enhances performance compared to P2TAG (LM),
+achieving an average improvement of 3.8% across three settings.                                                  5      81.28±1.07       70.18±0.54
+                                                                                      P2TAG (GNN):              10      81.31±0.84      70.42±0.62
+4.3                 Ablation Studies                                                  walk length               20      81.28±1.43       70.20±0.59
+In the previous sections, we demonstrate the powerful performance                                               50     81.70±0.61        70.11±0.74
+of the P2TAG (LM), P2TAG (GNN), and P2TAG. This part analyzes                                                    2      84.31±0.95       70.04±1.42
+the impact of the different types of prompting and LMs.                               P2TAG:                     5     84.76±0.89        70.16±0.78
+                                                                                                                10      84.35±1.07      70.88±0.96
+Effect of LMs. To better analyze the impact of LMs, we explore                        token num
+                                                                                                                20      84.06±1.12       69.71±0.69
+other LMs such as e5-v2-base with 110M parameters [33]. We also
+try larger LMs such as DeBERTa-large with 350M parameters and
+e5-v2-large with 330M parameters. The results are reported in Ta-
+ble 5. Generally, the results of LMs are quite similar, with differences            MLP layers). We report the results on Computers and Photo datasets.
+within 1.5%. The reason that e5-large does not achieve better re-                   The results reveal that our prompting approach outperforms both
+sults may be attributed to insufficient training iterations. This paper             the P2TAG (LM) and baseline G2P2. Furthermore, the absence of
+selects DeBERTa-base, intending to address the joint learning prob-                 𝑃𝐺 has a marginally greater impact than omitting w𝑡 across both
+lem of LMs and GNNs in a more general manner. There remains                         datasets, underscoring the importance of structural effectiveness
+room for further exploration in the specific choice of LMs.                         in the TAG context.
+
+                   100                                                              4.4    Hyperparameter Analysis
+ Performance (%)
+
+
+
+
+                    95                     93.76                                    In this part, we conduct a comprehensive analysis of hyperparame-
+                    90                86.65                              86.73      ters to elucidate their impact on the performance of our framework.
+                    85           84.37                              83.19           We analyze the four key hyperparameters in our experiments. The
+                    80                                                              "sequence length" means the reserved length of raw texts. The
+                            74.77                          73.4974.57
+                    75                                70.97
+                                                                                    "mask rate" represents the proportion of masked tokens in training.
+                    70 68.56                                                        The "walk length" means the length of random walks used in the
+                    65                                                              GraphSAINT sampler for mini-batch training. The "token num"
+                             Computers                       Photo                  denotes the number of tokens in the graph prompt. The results of
+                          G2P2                     P2TAG w/o GP             P2TAG   hyperparameter experiments are shown in Table 6.
+                          P2TAG (LM)               P2TAG w/o wt                     Preprocessing: length of truncated sequences. Since each batch
+                                                                                    will be fed to both the language model and the GNN encoder in
+Figure 3: Effect of different prompt types. We omit label ini-                      training, we need to increase the batch size to better leverage the
+tialization on the prompt graph (w/o 𝑃𝐺 ) and node text embedding                   ability of GNNs. However, the batch size is limited due to the large
+(w/o w𝑡 ) and report the classification results on two datasets.                    memory cost of the LM. Therefore, considering both training effi-
+                                                                                    ciency and information loss, we explore using a smaller truncated
+                                                                                    length in our experiments to utilize a larger batch size.
+Effect of different prompt types. In Section 3.3, we discussed
+two significant enhancements. Here, we further investigate these                    Pre-training: mask rate. A smaller mask rate represents an easier
+improvements by dissecting them and presenting the findings in                      self-supervised task and might make the model overfitted. To make
+Figure 3. We use the P2TAG w/o 𝑃𝐺 when the label text embedding                     the self-supervised task harder, we need to choose a large enough
+is not utilized to initialize our prompt graph, and the P2TAG w/o w𝑡                mask rate to let the model learn better. From the results, we find
+when node text embedding is not employed to bolster the prompted                    that our framework achieves the best performance with a 75% mask
+graph embedding (i.e., the graph embedding is directly inputted into                rate on the ogbn-arxiv dataset.
+Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs                                 KDD ’24, August 25–29, 2024, Barcelona, Spain
+
+
+Sampling: lengths of random walks. For each batch, the sampler                          methods progress in integrating LMs and GNNs, there is still a
+conducts multiple random walks from different root nodes with                           lack of discussions on self-supervised learning on large-scale text-
+the same length. The GNN encoder of our framework relies on                             attribute graphs. Our proposed pre-train framework enhances LMs
+the topology of the sampled mini-batch graph to propagate and                           utilizing GNNs and achieves joint training with the objective of
+aggregate the information between nodes. Therefore, the length of                       self-supervision. Yan et al. [39] release the benchmark on TAGs,
+random walks used to construct the mini-batch will influence the                        and provide multiple clean TAG datasets. These datasets also lay a
+model performance.                                                                      solid foundation for our experiments.
+Prompting: number of tokens. Incorporating the prompt graph
+                                                                                        5.2    Few-shot Node Classification
+as a trainable parameter highlights the importance of token quan-
+tity for downstream tasks. Intuitively, more tokens might create a                      Few-shot node classification on graphs to categorize nodes within
+richer internal structure, offering enhanced information. However,                      a graph with limited labeled nodes. Drawing inspiration from the
+managing more parameters often complicates convergence in few-                          success of meta-learning in few-shot classification tasks within com-
+shot scenarios. To accurately incorporate the textual information                       puter vision [9, 27], several studies apply meta-learning techniques
+of labels into prompting, we typically set the number of tokens to                      to graph-based tasks. GFL [43] and GPN [7] utilize prototype net-
+match the number of classes in the task. Surprisingly, 2 tokens also                    works to learn the distance from nodes to classes. Meta-GNN [55]
+yield results, implying a minimal internal structure. This suggests                     optimizes the graph neural network with model-agnostic meta-
+the effectiveness of token features in improving performance.                           learning. G-Meta [16] addresses the meta-learning problem on both
+                                                                                        single and multiple graphs by extracting local subgraphs. TENT [34]
+5     RELATED WORK                                                                      enhances the model’s generalization capabilities by adapting at
+                                                                                        three levels: nodes, edges, and tasks.
+In this section, we introduce the related work, including graph
+                                                                                           With the increasing attention towards LLMs, several works at-
+representation learning and few-shot node classification.
+                                                                                        tempt to follow the paradigm of pre-training and prompt tuning
+5.1     Graph Representation Learning
+                                                                                        to address the problem of few-shot node classification. Prog [29]
+                                                                                        incorporates both node-level and edge-level tasks by constructing
+Graph neural networks (GNNs) provide the foundation for apply-                          prompts at the graph level, but lacks analysis of the text attribute.
+ing deep learning on graphs and yielding good results on several                        ENG [47] employs LLM with designed prompts to refine node texts
+downstream tasks. The earlier works [5, 31, 35, 38] perform con-                        and reconstructs the adjacency matrix semantically, which is then
+volution on small-scale graphs using all topological relations in a                     used as input for the GNN. G2P2 [36] enhances text information
+semi-supervised way. The subsequent works focus on sampling                             through graph structure, aligning text representations in three
+strategies [2, 10, 48] and model architecture [26, 37] to enhance the                   forms during the pre-training phase. In the tuning phase, it uses
+scalability of GNNs and apply them to large-scale graphs. Graph-                        the neighborhood text of the target node and label text to generate
+SAGE [10] first proposed the idea of neighborhood sampling, and                         the initial parameters of prompts while freezing the parameters of
+later it was applied in a real-world recommendation system by                           the LM and GNN during the tuning process.
+PinSAGE [45]. GraphSAINT [48], first samples subgraphs [20] and
+runs full-batch GNNs on sampled subgraphs. Additionally, there                          6     CONCLUSION
+are works [52, 53] focusing on the hierarchy within the graph to                        Our paper focuses on few-shot node classification on the TAG.
+obtain better representations. The self-supervised learning methods                     We address this problem by employing a graph pre-training and
+on GNNs are developed via contrastive and generative ways. The                          prompting approach. The proposed framework P2TAG utilizes a
+contrastive methods [11, 25, 30, 46, 49, 57] adopt data augmentation                    masked language modeling objective for the joint training of the
+with or without negative sampling to construct samples to optimize                      language model and GNN model. We also propose a new prompting
+the contrastive loss under different augmentations. GRACE [57]                          method that mixes graph and text information, enabling the pre-
+aims to maintain node uniformity across views. BGRL [30] de-                            trained model on TAG to better adapt to downstream few-shot
+signs two encoders for two views with data augmentation. Some                           node classification tasks. We conduct experiments on six real-world
+studies focus on graph generative learning. GraphMAE [15] and                           TAG datasets and our P2TAG framework achieves state-of-the-art
+GraphMAE2 [14] are proposed to reconstruct masked attributes of                         results on the six datasets with +18.98% ∼ +35.98% improvement.
+corrupted nodes for representation learning.
+   The semantics and graph topology of TAGs can express real-                           7     ACKNOWLEDGEMENT
+world relationships between entities or objects. Most GNNs do
+                                                                                        This work is supported by National Key R&D Program of China
+not consider the text processing in the TAG but directly use the
+                                                                                        2021ZD0113304, Natural Science Foundation of China (NSFC) 62276
+numerical features, which are generated through text encoding, as
+                                                                                        148 and 62425601, CCF-Zhipu AI Large Model Fund (Grant 202213),
+attributes of nodes. Recent studies [3, 44] utilize graph topology to
+                                                                                        Zhipu AI - Anhui University Joint Research Center on Foundation
+enhance the representation during text pre-training. Despite the
+                                                                                        Model and the University Synergy Innovation Program of Anhui
+promising results, the language model is still independent of the
+                                                                                        Province (GXXT-2023-050), the New Cornerstone Science Founda-
+GNNs [21, 56]. GraphFormer [41] designs a nested architecture
+                                                                                        tion through the XPLORER PRIZE, and Tsinghua-Bosch Joint ML
+of GNNs and Transformers. GLEM [51] implements the fusion
+                                                                                        Center.
+of LMs and GNNs on large-scale text-attributed graphs with the
+variational expectation-maximization framework. Although these
+KDD ’24, August 25–29, 2024, Barcelona, Spain                                                                                                            Huanjing Zhao et al.
+
+
+REFERENCES                                                                                     KDD’22. 1717–1727.
+ [1] K. Bhatia, K. Dahiya, H. Jain, P. Kar, A. Mittal, Y. Prabhu, and M. Varma. 2016.     [29] Xiangguo Sun, Hong Cheng, Jia Li, Bo Liu, and Jihong Guan. 2023. All in One:
+     The extreme classification repository: Multi-label datasets and code. http:               Multi-Task prompting for graph neural networks. In KDD’23.
+     //manikvarma.org/downloads/XC/XMLRepository.html                                     [30] Shantanu Thakoor, Corentin Tallec, Mohammad Gheshlaghi Azar, Mehdi Azabou,
+ [2] Wei-Lin Chiang, Xuanqing Liu, Si Si, Yang Li, Samy Bengio, and Cho-Jui Hsieh.             Eva L Dyer, Remi Munos, Petar Veličković, and Michal Valko. 2022. Large-scale
+     2019. Cluster-gcn: An efficient algorithm for training deep and large graph               representation learning on graphs via bootstrapping. In ICLR’22.
+     convolutional networks. In KDD’19. 257–266.                                          [31] Petar Velickovic, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro
+ [3] Eli Chien, Wei-Cheng Chang, Cho-Jui Hsieh, Yu Hsiang-Fu, Jiong Zhang, Ol-                 Liò, and Yoshua Bengio. 2018. Graph Attention Networks. In ICLR’18.
+     gica Milenkovic, and Inderjit S.Dhillon. 2022. Node Feature Extraction by Self-      [32] Kuansan Wang, Zhihong Shen, Chiyuan Huang, Chieh-Han Wu, Yuxiao Dong,
+     Supervised Multi-scale Neighborhood Prediction. In ICLR’22.                               and Anshul Kanakia. 2020. Microsoft academic graph: When experts are not
+ [4] Kevin Clark, Minh-Thang Luong, Quoc V Le, and Christopher D Manning. 2020.                enough. Quantitative Science Studies 1, 1 (2020), 396–413.
+     Electra: Pre-training text encoders as discriminators rather than generators. In     [33] Liang Wang, Nan Yang, Xiaolong Huang, Binxing Jiao, Linjun Yang, Daxin Jiang,
+     ICLR’20.                                                                                  Rangan Majumder, and Furu Wei. 2022. Text embeddings by weakly-supervised
+ [5] Michaël Defferrard, Xavier Bresson, and Pierre Vandergheynst. 2016. Convo-                contrastive pre-training. arXiv preprint arXiv:2212.03533 (2022).
+     lutional Neural Networks on Graphs with Fast Localized Spectral Filtering. In        [34] Song Wang, Kaize Ding, Chuxu Zhang, Chen Chen, and Jundong Li. 2022. Task-
+     NeurIPS’16. 3837–3845.                                                                    adaptive few-shot node classification. In KDD’22.
+ [6] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT:        [35] Max Welling and Thomas N Kipf. 2017. Semi-supervised classification with graph
+     Pre-training of Deep Bidirectional Transformers for Language Understanding. In            convolutional networks. In ICLR’17.
+     NAACL-HLT’19 (1). 4171–4186.                                                         [36] Zhihao Wen and Yuan Fang. 2023. Augmenting low-Resource text classification
+ [7] Kaize Ding, Jianling Wang, Jundong Li, Kai Shu, Chenghao Liu, and Huan Liu.               with graph-grounded pre-training and prompting. In SIGIR’23.
+     2020. Graph prototypical networks for few-shot learning on attributed networks.      [37] Felix Wu, Amauri Souza, Tianyi Zhang, Christopher Fifty, Tao Yu, and Kilian
+     In CIKM’20.                                                                               Weinberger. 2019. Simplifying graph convolutional networks. In ICML’19.
+ [8] Zhengxiao Du, Yujie Qian, Xiao Liu, Ming Ding, Jiezhong Qiu, Zhilin Yang, and        [38] Bingbing Xu, Huawei Shen, Qi Cao, Yunqi Qiu, and Xueqi Cheng. 2019. Graph
+     Jie Tang. 2022. GLM: General language model pretraining with autoregressive               wavelet neural network. In ICLR’19.
+     blank infilling. In ACL’22. 320–335.                                                 [39] Hao Yan, Chaozhuo Li, Ruosong Long, Chao Yan, Jianan Zhao, Wenwen Zhuang,
+ [9] Chelsea Finn, Pieter Abbeel, and Sergey Levine. 2017. Model-agnostic meta-                Jun Yin, Peiyan Zhang, Weihao Han, Hao Sun, et al. 2023. A comprehensive
+     learning for fast adaptation of deep networks. In ICML’17.                                study on text-attributed graphs: Benchmarking and rethinking. In NeurIPS’23.
+[10] William L. Hamilton, Zhitao Ying, and Jure Leskovec. 2017. Inductive Represen-       [40] Beining Yang, Kai Wang, Qingyun Sun, Cheng Ji, Xingcheng Fu, Hao Tang,
+     tation Learning on Large Graphs. In NeurIPS’17.                                           Yang You, and Jianxin Li. 2023. Does Graph Distillation See Like Vision Dataset
+[11] Kaveh Hassani and Amir Hosein Khasahmadi. 2020. Contrastive multi-view                    Counterpart?. In NeurIPS’23.
+     representation learning on graphs. In ICML’20. 4116–4126.                            [41] Junhan Yang, Zheng Liu, Shitao Xiao, Chaozhuo Li, Defu Lian, Sanjay Agrawal,
+[12] Pengcheng He, Xiaodong Liu, Jianfeng Gao, and Weizhu Chen. 2021. DeBERTa:                 Amit Singh, Guangzhong Sun, and Xing Xie. 2021. GraphFormers: GNN-nested
+     Decoding-enhanced BERT with Disentangled Attention. In ICLR’21.                           Transformers for Representation Learning on Textual Graph. In NeurIPS’21.
+[13] Xiaoxin He, Xavier Bresson, Thomas Laurent, Adam Perold, Yann LeCun, and             [42] Zhilin Yang, Zihang Dai, Yiming Yang, Jaime G. Carbonell, Ruslan Salakhutdi-
+     Bryan Hooi. 2023. Harnessing explanations: LLM-to-LM interpreter for enhanced             nov, and Quoc V. Le. 2019. XLNet: Generalized Autoregressive Pretraining for
+     text-attributed graph representation learning. arXiv preprint arXiv:2305 (2023).          Language Understanding. In NeurIPS’19. 5754–5764.
+[14] Zhenyu Hou, Yufei He, Yukuo Cen, Xiao Liu, Yuxiao Dong, Evgeny Kharlamov,            [43] Huaxiu Yao, Chuxu Zhang, Ying Wei, Meng Jiang, Suhang Wang, Junzhou Huang,
+     and Jie Tang. 2023. GraphMAE2: A Decoding-Enhanced Masked Self-Supervised                 Nitesh Chawla, and Zhenhui Li. 2020. Graph few-shot learning via knowledge
+     Graph Learner. In WWW’23. 737–746.                                                        transfer. In AAAI’20.
+[15] Zhenyu Hou, Xiao Liu, Yukuo Cen, Yuxiao Dong, Hongxia Yang, Chunjie Wang,            [44] Michihiro Yasunaga, Jure Leskovec, and Percy Liang. 2022. LinkBERT: Pretraining
+     and Jie Tang. 2022. GraphMAE: Self-Supervised Masked Graph Autoencoders. In               Language Models with Document Links. In ACL’22.
+     KDD’22. 594–604.                                                                     [45] Rex Ying, Ruining He, Kaifeng Chen, Pong Eksombatchai, William L Hamilton,
+[16] Kexin Huang and Marinka Zitnik. 2020. Graph meta learning via local subgraphs.            and Jure Leskovec. 2018. Graph convolutional neural networks for web-scale
+     NeurIPS’20 (2020).                                                                        recommender systems. In KDD’18.
+[17] Xuanwen Huang, Kaiqiao Han, Dezheng Bao, Quanjin Tao, Zhisheng Zhang,                [46] Yuning You, Tianlong Chen, Yongduo Sui, Ting Chen, Zhangyang Wang, and
+     Yang Yang, and Qi Zhu. 2023. Prompt-based node feature extractor for few-shot             Yang Shen. 2020. Graph Contrastive Learning with Augmentations. In NeurIPS’20.
+     learning on text-attributed graphs. arXiv preprint arXiv:2309.02848 (2023).          [47] Jianxiang Yu, Yuxiang Ren, Chenghua Gong, Jiaqi Tan, Xiang Li, and Xuecang
+[18] Shaoxiong Ji, Shirui Pan, Erik Cambria, Pekka Marttinen, and S Yu Philip. 2021.           Zhang. 2023. Empower text-attributed graphs learning with large language
+     A survey on knowledge graphs: Representation, acquisition, and applications.              models (llms). arXiv preprint arXiv:2310.09872 (2023).
+     IEEE transactions on neural networks and learning systems 33, 2 (2021), 494–514.     [48] Hanqing Zeng, Hongkuan Zhou, Ajitesh Srivastava, Rajgopal Kannan, and Vik-
+[19] Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush                       tor K. Prasanna. 2020. GraphSAINT: Graph Sampling Based Inductive Learning
+     Sharma, and Radu Soricut. 2020. Albert: A lite bert for self-supervised learning          Method. In ICLR’20.
+     of language representations. In ICLR’20.                                             [49] Jiaqi Zeng and Pengtao Xie. 2021. Contrastive self-supervised learning for graph
+[20] Jure Leskovec and Christos Faloutsos. 2006. Sampling from large graphs. In                classification. In AAAI’21, Vol. 35. 10824–10832.
+     KDD’06.                                                                              [50] Hengrui Zhang, Qitian Wu, Junchi Yan, David Wipf, and Philip S. Yu. 2021. From
+[21] Chaozhuo Li, Bochen Pang, Yuming Liu, Hao Sun, Zheng Liu, Xing Xie, Tianqi                Canonical Correlation Analysis to Self-supervised Graph Neural Networks. In
+     Yang, Yanling Cui, Liangjie Zhang, and Qi Zhang. 2021. Adsgnn: Behavior-graph             NeurIPS’21. 76–89.
+     augmented relevance modeling in sponsored search. In SIGIR’21. 223–232.              [51] Jianan Zhao, Meng Qu, Chaozhuo Li, Hao Yan, Qian Liu, Rui Li, Xing Xie, and
+[22] Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer             Jian Tang. 2023. Learning on Large-scale Text-attributed Graphs via Variational
+     Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A                Inference. In ICLR’23.
+     robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692        [52] Shu Zhao, Jialin Chen, Jie Chen, Yanping Zhang, and Jie Tang. 2022. Hierarchi-
+     (2019).                                                                                   cal label with imbalance and attributed network structure fusion for network
+[23] Ilya Loshchilov and Frank Hutter. 2017. Decoupled weight decay regularization.            embedding. AI Open 3 (2022), 91–100.
+     arXiv preprint arXiv:1711.05101 (2017).                                              [53] Shu Zhao, Ziwei Du, Jie Chen, Yanping Zhang, Jie Tang, and S Yu Philip. 2023.
+[24] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. Efficient                  Hierarchical representation learning for attributed networks. IEEE Transactions
+     estimation of word representations in vector space. arXiv preprint arXiv:1301.3781        on Knowledge and Data Engineering 35, 3 (2023), 2641–2656.
+     (2013).                                                                              [54] Yizhen Zheng, Shirui Pan, Vincent Cs Lee, Yu Zheng, and Philip S Yu. 2022.
+[25] Jiezhong Qiu, Qibin Chen, Yuxiao Dong, Jing Zhang, Hongxia Yang, Ming Ding,               Rethinking and Scaling Up Graph Contrastive Learning: An Extremely Efficient
+     Kuansan Wang, and Jie Tang. 2020. GCC: Graph contrastive coding for graph                 Approach with Group Discrimination. In NeurIPS’22.
+     neural network pre-training. In KDD’20. 1150–1160.                                   [55] Fan Zhou, Chengtai Cao, Kunpeng Zhang, Goce Trajcevski, Ting Zhong, and Ji
+[26] Emanuele Rossi, Fabrizio Frasca, Ben Chamberlain, Davide Eynard, Michael                  Geng. 2019. Meta-gnn: On few-shot node classification in graph meta-learning.
+     Bronstein, and Federico Monti. 2020. Sign: Scalable inception graph neural                In CIKM’2019.
+     networks. arXiv preprint arXiv:2004.11198 7 (2020), 15.                              [56] Jason Zhu, Yanling Cui, Yuming Liu, Hao Sun, Xue Li, Markus Pelger, Tianqi Yang,
+[27] Jake Snell, Kevin Swersky, and Richard S. Zemel. 2017. Prototypical networks              Liangjie Zhang, Ruofei Zhang, and Huasha Zhao. 2021. Textgnn: Improving text
+     for few-shot learning. In NeurIPS’17.                                                     encoder via graph neural network in sponsored search. In WWW’21. 2848–2857.
+[28] Mingchen Sun, Kaixiong Zhou, Xin He, Ying Wang, and Xin Wang. 2022. Gppt:            [57] Yanqiao Zhu, Yichen Xu, Feng Yu, Qiang Liu, Shu Wu, and Liang Wang. 2020.
+     Graph pre-training and prompt tuning to generalize graph neural networks. In              Deep graph contrastive representation learning. arXiv preprint arXiv:2006.04131
+                                                                                               (2020).
+Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs                                     KDD ’24, August 25–29, 2024, Barcelona, Spain
+
+
+A APPENDIX                                                                              passing, replicating the prompt initialization process. Moreover,
+A.1 Implementation Notes                                                                the label text embeddings within the prompt graph can adaptively
+                                                                                        influence the target node, potentially offering more effectiveness
+Running environment. The experiments are conducted on a                                 than static text prompts with uniform contributions.
+Linux machine with AMD EPYC 7642 48-Core Processor, 1T RAM,
+and 8 NVIDIA A100 (80G). Our code is implemented with PyTorch                           A.3    Baselines
+1.10 and Python 3.8.                                                                    We conduct five baselines, among which GPN, G-Meta, and TENT
+                                                                                        are based on meta-learning and do not utilize raw texts. GIANT
+Model Configuration. Our framework involves the joint training
+                                                                                        employs raw texts for self-supervised learning on graphs. G2P2
+of LM and GNN, with some of the key parameters presented in
+                                                                                        also leverages raw texts and follows the paradigm of pre-training
+Table 7. For more detailed configurations, please find in our code.
+                                                                                        and prompting. All of them address the few-shot node classification
+              Table 7: Key parameters of the P2TAG.                                     problem. For each 𝑁 -way 𝐾-shot few-shot setting, we sample 5
+                                                                                        groups, each containing 50 tasks for testing. To ensure a fair com-
+  Parameters                              Value                                         parison, we save the constructed tasks, and all baselines, including
+                                                                                        our proposed model, are tested on these tasks. G-Meta is an excep-
+  language model                          microsoft/deberta-base                        tion due to its more complex sampling process, but we ensure the
+  sequence length                         128                                           same number of testing tasks.
+  mask rate                               0.75
+                                                                                          • GPN1 applies the prototype network from meta-learning to
+  GNN encoder                             graph attention network                           graphs. We set the number of episodes for training to 2000.
+  GNN hidden size                         768                                             • G-Meta2 implements the meta-learning method for graphs at
+  walk length                             10                                                three levels using local subgraphs. To match our number of test
+  number of root                          10                                                tasks, the batch size was set to 50 during the generation of test
+  length of query set                     10                                                tasks, and this process is repeated 5 times.
+  number of test groups                   5                                               • TENT3 tunes the model across multiple tasks. We modify this
+  number of task in each group            50                                                method by Deep Graph Library (DGL) to enable its application
+                                                                                            on larger-scale graphs, such as the ogbn-products.
+  number of tokens                        the number of classes of task                   • GIANT4 performs extreme multi-label classification on the raw
+  prompt epochs                           50                                                texts, resulting in stronger node features. We directly download
+                                                                                            their pre-trained node features for evaluation on the ogbn-arxiv
+                                                                                            and ogbn-products datasets.
+A.2      Comparing P2TAG with GPrompt                                                     • G2P25 enhances text representation with graph structure, align-
+Though P2TAG shares a similar task and intuition with GPrompt [17],                         ing at three levels, and subsequently performs few-shot classifi-
+there are significant differences in the prompt design. Since the                           cation through prompting. We set the hidden layer dimension
+prompting parts are crucial for the pre-training and prompting                              to 128 and the number of epochs to 3.
+paradigm, solely considering the task and intuition may not be fair.
+Therefore, we further elaborate our design here:                                        A.4    Analysis of P2TAG Inference Cost
+   Difference in Fundamental Settings of Prompting. GPrompt                             We analyze the inference cost of P2TAG and baselines with respect
+uses the entire GNN model as the prompt, which requires fine-                           to the text sequence length 𝐾, embedding dimension 𝑑, number of
+tuning the GNN for each downstream task. In contrast, we freeze the                     nodes 𝑁 , number of nodes 𝑏 in the ego-graph, and the number of
+GNN parameters and instead use an auxiliary prompt graph to alter                       graph tokens 𝑡.
+the input. This approach, we believe, introduces a significant change                      The cost of P2TAG (LM) stems from the language model (LM),
+to the community. Our method not only preserves the knowledge                           with a complexity of 𝑂 (𝑁 ×(𝐾𝑑 2 +𝐾 2𝑑)). P2TAG (GNN) additionally
+encapsulated within the GNN model but also reduces the number of                        utilizes a GNN encoder with negligible computation overhead. The
+training parameters to a minimal set of node embeddings, thereby                        complexity is 𝑂 (𝑁 × (𝐾𝑑 2 + 𝐾 2𝑑)). P2TAG includes two stages:
+enhancing computational efficiency.                                                     pre-training and prompting. The complexity is 𝑂 ((𝑁 + 𝑏 + 𝑡) ×
+   Novel Label Text Prompt Initialization Strategy. Further-                            (𝐾𝑑 2 + 𝐾 2𝑑)). The complexity of GIANT is 𝑂 (𝑁 × (𝐾𝑑 2 + 𝐾 2𝑑) +
+more, we introduce a novel strategy for initializing the prompt                         𝑟𝑑 log(𝑁 )), where 𝑟 is a hyperparameter. The complexity of G2P2
+graph by encoding the label texts to embeddings, which is a unique                      is 𝑂 ((𝑁 + 𝑐 + 1) × (𝐾𝑑 2 + 𝐾 2𝑑)), where 𝑐 represents the number of
+and effective element in the TAG scenario. By incorporating the                         neighbors.
+label text embedding, we can easily initialize the prompt graph and                        Overall, the proposed P2TAG exhibits computational costs simi-
+align the label space more closely with the downstream task. For ex-                    lar to other baselines, yet achieves improved performance in few-
+ample, a straightforward text prompt design might be: “Given labels                     shot classification.
+student, teacher, worker, the person with attributes [feature] belongs                     1 https://github.com/kaize0409/GPN_Graph-Few-shot
+                                                                                           2 https://github.com/mims-harvard/G-Meta
+to [cls]”. In the graph domain, we initialize the prompt graph with                        3 https://github.com/SongW-SW/TENT
+these label text embeddings. As a result, the target node embedding                        4 https://github.com/amzn/pecos/tree/mainline/examples/giant-xrt
+naturally aligns closely with the label text embedding via message                         5 https://github.com/WenZhihao666/G2P2
+KDD ’24, August 25–29, 2024, Barcelona, Spain                                                                                                         Huanjing Zhao et al.
+
+
+A.5      Ablation Study about the GNN Backbone                                               into training, validation, and test sets, which limits us to the 3-
+We use GAT due to its ability to adaptively transfer information                             way setting. We further conducted new experiments on the ogbn-
+from our prompt graph to the target node, matching our graph                                 arxiv dataset under the 15-way setting for nine models (including
+prompt design. Our ablation study on GCN and GraphSAGE within                                variants). The results are as follows:
+P2TAG on the ogbn-arxiv dataset shows:
+                                                                                             Table 9: Comparison under the 15-way setting on the ogbn-
+ Table 8: Ablation study results on the ogbn-arxiv dataset.                                  arxiv dataset.
+ GNN Encoder   5-way 3-shot (%)   5-way 5-shot (%)   10-way 3-shot (%)   10-way 5-shot (%)
+ GCN             75.41 ± 1.21       78.90 ± 0.61       60.40 ± 1.26        64.54 ± 0.69              Model           15-way 3-shot (%)       15-way 5-shot (%)
+ GraphSAGE       74.02 ± 1.43       77.58 ± 0.73       59.60 ± 1.40        64.45 ± 0.95
+                                                                                                     Raw Features       32.24 ± 0.26            37.37 ± 0.82
+ GAT (Ours)      80.18 ± 0.27       84.76 ± 0.89       67.81 ± 0.97        70.88 ± 0.96
+                                                                                                     GPN                38.38 ± 0.39            44.46 ± 0.68
+                                                                                                     G-Meta             39.36 ± 0.28            44.85 ± 0.48
+   GAT outperforms the other encoders, as expected. The perfor-                                      TENT               37.61 ± 0.32            40.20 ± 0.37
+mance gap can be attributed to the lack of adaptive selection when                                   GIANT              52.77 ± 0.50            57.74 ± 0.86
+introducing information (including noise) from the prompt graph                                      G2P2               48.48 ± 0.97            52.24 ± 0.85
+                                                                                                     P2TAG (LM)         57.31 ± 0.57            62.71 ± 0.66
+into the target node embedding.
+                                                                                                     P2TAG (GNN)        58.49 ± 0.53            63.60 ± 0.68
+                                                                                                                    59.42 ± 0.42 (6.65 ↑)   64.05 ± 0.56 (6.31 ↑)
+A.6      Comparing More Classes Settings in
+                                                                                                     P2TAG
+
+         Few-Shot Experiments
+                                                                                                We can find that increasing the number of classes indeed makes
+We chose the 3-way, 5-way, and 10-way settings across all datasets
+                                                                                             the few-shot node classification task more challenging for all mod-
+for two reasons. First, most works on few-shot node classification [7,
+                                                                                             els. For example, the raw feature method achieves 59.31% in the
+16, 34, 43] retain these settings, so we chose to follow them. Second,
+                                                                                             5-way setting, but only 44.59% in the 10-way setting. Nevertheless,
+the limited number of classes in the datasets, such as the Amazon
+                                                                                             P2TAG consistently outperforms the baselines, improving over the
+dataset with only slightly more than 10 classes, restricts us to these
+                                                                                             next best method by 6.65% and 6.31%, respectively.
+settings. Some meta-learning methods require splitting the classes
+
