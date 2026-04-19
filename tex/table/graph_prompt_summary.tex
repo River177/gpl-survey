@@ -69,6 +69,12 @@ $\tilde{\textbf{s}}^t_i \leftarrow \textrm{Readout}(\{ \textbf{p}_t \odot f_{\pi
 $\tilde{\textbf{s}}_i \leftarrow f^T_{\pi^T} (\mathcal{G}^T | f^D_{\pi^{D}} (\mathcal{G}^D))$  & 
 Fixed &  \cmark   & \cmark  & \cmark& \cmark & \xmark \\ \midrule
 
+\makecell{GraphPrompter\\(ICDE 2025 \cite{lv2025graphprompter}) }& \xmark & \cmark & \xmark &
+\makecell{candidate prompts: \\$\mathcal{G}^{S}=\{ G_p \}_{p=1}^{N}$ \\task graph: $G^T$ \\cache: $\mathcal{C}$}
+& \makecell{$\hat{\mathcal{S}}' \leftarrow \hat{\mathcal{S}} \cup \mathcal{C}$ \\ $\textbf{H} \leftarrow \mathrm{GNN}^{T}(G^{T}(\hat{\mathcal{S}}',Q))$}
+& \makecell{$L_{NM}=\sum_{q \in Q_{NM}} \mathcal{L}_{CE}(P_q^{NM},y_q^{NM})$ \\ $L_{MT}=\sum_{q \in Q_{MT}} \mathcal{L}_{CE}(P_q^{MT},y_q^{MT})$}
+&  \cmark   & \cmark  & \xmark& \cmark & \xmark \\ \midrule
+
 \makecell{SGL-PT \\(arXiv \cite{zhu2023sglpt}) }& \cmark & \xmark & \cmark & 
 \makecell{prompt token: \\one vector for each graph}
 & 
@@ -86,6 +92,12 @@ connect to all nodes in the graph  &
 
 & \xmark   & \xmark  & \cmark & \xmark & \cmark \\ \midrule
 
+\makecell{RELIEF\\(KDD 2025 \cite{zhu2024relief}) }& \cmark & \cmark & \cmark
+& \makecell{feature prompt matrix: \\$\textbf{P}_t \in \mathbb{R}^{n \times d}$}
+& \makecell{$\textbf{X}^{*} \leftarrow \textbf{X} + \textbf{P}_t$ \\ $p_t^{a,z} = (a_t,z_t)$}
+& \makecell{$r_t \leftarrow \mathcal{L}_{t-1} - \mathcal{L}_{t}$ \\H-PPO}
+& \cmark   & \xmark  & \cmark & \xmark & \cmark \\ \midrule
+
 
 
 
@@ -98,6 +110,12 @@ connect to all nodes in the graph  &
 & \makecell{$\min_{\textbf{p}, \textbf{P}, \phi} \sum_{(y_i, v_i)}$\\$ \mathcal{L}( p_{\phi}(\tilde{\textbf{s}}_i), y_i )  $}
 
 & \xmark  & \xmark & \cmark & \xmark & \cmark \\ \midrule
+
+\makecell{DAGPrompT\\(WWW 2025 \cite{chen2025dagprompt})} & \xmark & \cmark & \xmark
+& \makecell{GLoRA: $\Theta_{\mathrm{glora}}$ \\class prompts: $\textbf{P}^{(l)}$ \\hop coeff.: $\gamma^{(l)}$}
+& \makecell{$\textbf{H}^{(l)} \leftarrow (\textbf{A}+P_AQ_A^{\top}) \textbf{H}^{(l-1)} (W_0+PQ^{\top})$ \\ $S^{(l)} \leftarrow \mathrm{Sim}(\textbf{H}^{(l)}, \textbf{P}^{(l)})$}
+& \makecell{$\bar{S} \leftarrow \sum_{l=0}^{L} \gamma^{(l)} S^{(l)}$ \\Similarity Loss}
+& \cmark  & \xmark & \cmark & \cmark & \xmark \\ \midrule
 
 
 \makecell{ULTRA-DP \\(arXiv \cite{chen2023ultradp})}& \xmark & \cmark &\xmark  
@@ -112,6 +130,12 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 
 &\cmark   & \xmark  & \xmark& \xmark & \cmark \\ \midrule
 
+\makecell{IGAP\\(WWW 2024 \cite{yan2024igap})} & \xmark & \cmark & \cmark
+& \makecell{signal prompts: \\$\mathcal{P}_s=[\textbf{p}_{s1},...,\textbf{p}_{sL}]$ \\spectral aligner \\label prompt: $\textbf{P}_{l}=[\textbf{p}_1,...,\textbf{p}_d]$}
+& \makecell{$\tilde{\textbf{x}}_{i} \leftarrow \textbf{x}_{i} + \sum_{s} \alpha_{is} \textbf{p}_{s}$ \\ $\textbf{U}^{pt}_{K} \leftarrow \textbf{P}\textbf{U}^{ft}_{K}$}
+& \makecell{$\mathcal{L}_{\mathrm{InfoNCE}}^{cls}$}
+& \cmark   & \xmark  & \cmark& \cmark & \xmark \\ \midrule
+
 
 \makecell{HetGPT \\(WWW 2024 \cite{ma2023hetgpt})} & \xmark& \cmark & \xmark  
 & \makecell{prompt token: \\$\mathcal{F}= \{ \textbf{f}_i^A \}_{i=1}^K$ \\for $A \in \mathcal{A}$\\ task token: $\textbf{c}_y \in \mathbb{R}^d$}
@@ -121,6 +145,12 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 & \makecell{$  \min_{\textbf{C}, \mathcal{F}} -\sum_{(y_i, v_i)} \log $\\$  \frac{  \textrm{exp}( \textrm{sim} ( \textbf{z}_i, \textbf{c}_{y_i} )/\tau )  }{ \sum_{y \in \textbf{Y}}  \textrm{exp}( \textrm{sim} ( \textbf{z}_i, \textbf{c}_{y} ) /\tau )  }       $ }
 
 &\cmark   & \xmark  &\xmark & \cmark & \xmark \\ \midrule
+
+\makecell{P2TAG\\(KDD 2024 \cite{zhao2024p2tag})} & \cmark & \xmark & \xmark
+& \makecell{prompt graph: $\mathcal{G}_{p}$ \\text prompt: $\textbf{w}_{t}$ \\label text embeddings}
+& \makecell{$A_{\mathcal{G}_{ego},\mathcal{G}_{p}}(i,j) \leftarrow \mathds{1}[\mathrm{Sim}(\textbf{x}_{i},\textbf{t}_{j}) > \delta]$ \\ $\tilde{\textbf{z}}_{v} \leftarrow \mathrm{MLP}(\mathrm{READOUT}(f_{\mathrm{GNN}}(G_{v};\mathcal{G}_{p})), \textbf{w}_{t})$}
+& \makecell{Mixed Prompt Learning}
+& \cmark  & \xmark & \xmark& \xmark & \cmark \\ \midrule
 
 
 \makecell{SAP\\(arXiv \cite{ge2023enhancing})} & \cmark & \xmark & \xmark 
