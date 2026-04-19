@@ -156,7 +156,7 @@
 
 ### 跨域 / 持续学习
 
-1. `One Prompt Fits All`
+1. `One Prompt Fits All (NeurIPS 2025)`
 2. `GP2F`
 3. `Prompt-Driven Continual Graph Learning`
 
@@ -247,7 +247,7 @@
    - `Killing Two Birds with One Stone`
 
 4. **Prompting under Cross-Domain or Continual Settings**
-   - `One Prompt Fits All`
+   - `One Prompt Fits All (NeurIPS 2025)`
    - `GP2F`
    - `Prompt-Driven Continual Graph Learning`
 
@@ -288,7 +288,7 @@
 - 异构图：`HGPROMPT`, `HePa`, `HGMP`, `MultiHGPT`
 - 带符号图：`SGPT`
 - 时空/动态图：`Prompt-Based Spatio-Temporal Graph Transfer Learning`, `Event-Aware Prompt Learning`
-- 多模态/跨域：`Killing Two Birds with One Stone`, `One Prompt Fits All`, `GP2F`
+- 多模态/跨域：`Killing Two Birds with One Stone`, `One Prompt Fits All (NeurIPS 2025)`, `GP2F`
 - very recent：`MAGPrompt`, `Unsupervised Prompting`, `MGP`
 
 这个版本的优点是：
@@ -306,4 +306,3 @@
 2. [5.tex](</D:/GPL/gpl-survey/tex/5.tex>)
 
 建议先改表，再改正文。因为表格会反过来决定正文该怎么组织主线与 specialized settings。
-

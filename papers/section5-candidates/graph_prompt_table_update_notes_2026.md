@@ -43,7 +43,7 @@
 | Prompt-Based Spatio-Temporal Graph Transfer Learning | CIKM 2024 | 高 | 视情况而定 | 是一篇不错的 prompt-based transfer 方法，但针对时空图，场景较专。只有在你希望主表覆盖 dynamic / temporal graph 时才值得加入。 |
 | CLEAR | 2025，正式发表为 LNCS chapter | 中 | 视情况而定 | 适合作为 heterogeneous graph prompting 的补充方法。如果你想在 `HetGPT` 之外再加一个异构图代表方法，可以考虑。 |
 | SGPT | CIKM 2025 | 高 | 视情况而定 | signed graph 上的 prompting 很新，也有意思，但仍偏领域特化。更适合作为 extension，而不是核心代表行。 |
-| One Prompt Fits All | arXiv 2025 | 中 | 暂时可观察 | “universal adaptation” 方向很贴近你的表，但目前还是 preprint。后续如果发表了，会很值得加入。 |
+| One Prompt Fits All | NeurIPS 2025 | 中高 | 视情况而定 | “universal adaptation” 方向和你的表高度相关。现在已有正式会议接收，更值得在跨域适配讨论中重点提到；若主表后续扩展 cross-domain 方向，也可以优先考虑。 |
 | Edge Prompt Tuning for GNNs | arXiv 2025 | 中 | 暂时可观察 | 在机制上有新意，因为它提示的是 edge，而不是只提示 node feature。发表后会是很好的补充。 |
 | MAGPrompt | arXiv 2026 | 中 | 暂时可观察 | 机制上把 prompting 推到 message-passing 层面，思路不错，但时间太新。 |
 | Unsupervised Prompting for Graph Neural Networks | arXiv 2025 | 中 | 暂时可观察 | 一个额外检到的方法，优点是摆脱了 label 依赖，但目前还没有正式发表。 |
@@ -94,7 +94,7 @@
 | Edge Prompt Tuning for GNNs | 2025 | 仅 arXiv | 中 | 暂时观察 | 机制有新意，但未正式发表。 |
 | GraphPrompter | 2025 | ICDE 2025 | 高 | 是 | 如果要覆盖 graph in-context learning，它很重要。 |
 | Graph Prompting for Graph Learning Models: Recent Advances and Future Directions | 2025 | KDD 2025 | 高 | 否 | survey / perspective。 |
-| One Prompt Fits All | 2025 | 仅 arXiv | 中 | 暂时观察 | universal adaptation 很有潜力。 |
+| One Prompt Fits All | 2025 | NeurIPS 2025 | 中高 | 视情况而定 | universal adaptation 很有潜力，而且已有正式会议接收。 |
 | Graph Your Own Prompt | 2025 | 仅 arXiv | 低 | 否 | 不够贴合当前表格 taxonomy。 |
 | Event-Aware Prompt Learning for Dynamic Graphs | 2025 | 仅 arXiv | 中 | 暂时不建议 | dynamic graph 特化。 |
 | GraphTOP | 2025 | 仅 arXiv | 中 | 暂时观察 | topology-oriented prompting 有潜力。 |
@@ -128,4 +128,3 @@
 
 - GraphPrompter (ICDE 2025)
 - Pre-Training and Prompting for Few-Shot Node Classification on Text-Attributed Graphs (KDD 2024)
-

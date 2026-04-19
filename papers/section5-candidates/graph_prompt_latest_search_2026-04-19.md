@@ -129,11 +129,11 @@
 
 1. **One Prompt Fits All: Universal Graph Adaptation for Pretrained Models**
    - 方法名：文中可记为 `UniPrompt`
-   - 发表情况：arXiv 2025
-   - 状态：未见正式发表版本
+   - 发表情况：NeurIPS 2025
+   - 状态：NeurIPS 2025 main conference accepted
    - 重要性：中高
-   - 推荐动作：建议在 discussion 或 future directions 中提到；暂不建议直接进主表
-   - 原因：它的贡献更偏统一解释和 universal adaptation，思路重要，但目前还是 preprint。
+   - 推荐动作：建议在 cross-domain / universal adaptation 的正文讨论中重点提到；如后续主表希望覆盖跨域适配方向，也值得优先考虑
+   - 原因：它的贡献更偏统一解释和 universal adaptation，方向重要，而且现在已有正式会议接收，但仍属于跨域适配取向的方法，不一定要直接塞进当前主表
    - 链接：https://arxiv.org/abs/2509.22416
 
 2. **MAGPrompt: Message-Adaptive Graph Prompt Tuning for Graph Neural Networks**
