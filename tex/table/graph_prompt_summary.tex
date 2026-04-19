@@ -133,24 +133,38 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 \makecell{IGAP\\(WWW 2024 \cite{yan2024igap})} & \xmark & \cmark & \cmark
 & \makecell{signal prompts: \\$\mathcal{P}_s=[\textbf{p}_{s1},...,\textbf{p}_{sL}]$ \\spectral aligner \\label prompt: $\textbf{P}_{l}=[\textbf{p}_1,...,\textbf{p}_d]$}
 & \makecell{$\tilde{\textbf{x}}_{i} \leftarrow \textbf{x}_{i} + \sum_{s} \alpha_{is} \textbf{p}_{s}$ \\ $\textbf{U}^{pt}_{K} \leftarrow \textbf{P}\textbf{U}^{ft}_{K}$}
-& \makecell{$\mathcal{L}_{\mathrm{InfoNCE}}^{cls}$}
+& \makecell{$\min_{\mathcal{P}_s,\textbf{P},\textbf{P}_l,\phi}$ \\ $\mathcal{L}_{\mathrm{InfoNCE}}^{cls}$}
 & \cmark   & \xmark  & \cmark& \cmark & \xmark \\ \midrule
 
+\makecell{Self-Pro\\(ECML PKDD 2024 \cite{gong2024selfpro})} & \cmark & \xmark & \xmark
+& \makecell{self adapter: $g_{\phi}$ \\semantic prompt: $\textbf{s}_v$ \\structural prompt: $\Delta \textbf{A}$}
+& \makecell{$\textbf{t}_v \leftarrow \mu \textbf{s}_v + (1-\mu)\textbf{h}_v$ \\ $\textbf{t}'_v \leftarrow g_{\phi}(\textbf{t}_v)$}
+& \makecell{$L_{\mathrm{NC}} = -\sum_{v \in V_L}\log $\\$\frac{\exp(\mathrm{sim}(\textbf{t}'_v,\textbf{t}'_{y_v})/\tau)}{\sum_{c \in C}\exp(\mathrm{sim}(\textbf{t}'_v,\textbf{t}'_{c})/\tau)}$\\$L_{\mathrm{LP}} = -\sum_{(v,a,b)\in\mathcal{T}}\log $\\$\frac{\exp(\mathrm{sim}(\textbf{t}'_v,\textbf{t}'_a)/\tau)}{\exp(\mathrm{sim}(\textbf{t}'_v,\textbf{t}'_a)/\tau)+\exp(\mathrm{sim}(\textbf{t}'_v,\textbf{t}'_b)/\tau)}$}
+& \cmark & \cmark & \xmark & \cmark & \xmark \\ \midrule
 
-\makecell{HetGPT \\(WWW 2024 \cite{ma2023hetgpt})} & \xmark& \cmark & \xmark  
-& \makecell{prompt token: \\$\mathcal{F}= \{ \textbf{f}_i^A \}_{i=1}^K$ \\for $A \in \mathcal{A}$\\ task token: $\textbf{c}_y \in \mathbb{R}^d$}
+\makecell{PSP\\(ECML PKDD 2024 \cite{ge2024psp})} & \cmark & \xmark & \xmark
+& \makecell{prototype nodes: \\$\mathcal{P}=\{\textbf{p}_{c}\}_{c=1}^{C}$ \\weighted edges: $\textbf{W}\in\mathbb{R}^{N\times C}$}
+& \makecell{$G' \leftarrow (V \cup \mathcal{P}, E \cup \textbf{W})$ \\ $\textbf{P} \leftarrow \mathrm{GNN}([\textbf{X},\textbf{X}_{P}],[\textbf{A},\textbf{W}])$}
+& \makecell{$L_{pro} \!=\! -\frac{1}{|D|}\sum_{(v_i,c_i)\in D}\log$ \\ $\frac{\exp(\mathrm{sim}(\textbf{z}^{(1)}_i,\textbf{p}_{c_i})/\tau)}{\sum_{c\in C}\exp(\mathrm{sim}(\textbf{z}^{(1)}_i,\textbf{p}_c)/\tau)}$}
+& \cmark & \xmark & \cmark & \cmark & \xmark \\ \midrule
 
-&  \makecell{$\tilde{\textbf{s}}_i^A \leftarrow \textbf{x}_i^A +$\\$ \sum_{k=1}^K w_{ik} \textbf{f}_k^A$, \\ $\textbf{z}_i = f_{\pi}(G, \tilde{\textbf{s}}_i^A)$}
+\makecell{SUPT\\(arXiv \cite{lee2024supt})} & \cmark & \cmark & \cmark
+& \makecell{basis prompts: \\$\{\textbf{b}_{j}\}_{j=1}^{k}$ \\assignment score: $\alpha$}
+& \makecell{$\textbf{p}_i \leftarrow \sum_j \sigma(\alpha)_{i,j}\textbf{b}_j$ \\ $\textbf{X}^{*} \leftarrow \textbf{X} + \textbf{p}$}
+& \makecell{$\max_{\psi,\phi} P_{f_{\theta},h_{\phi}}(y \mid g_{\psi}(G))$ \\ $(+\ L_{LP}\ \text{for SUPTsoft})$}
+& \cmark & \xmark & \cmark & \xmark & \cmark \\ \midrule
 
-& \makecell{$  \min_{\textbf{C}, \mathcal{F}} -\sum_{(y_i, v_i)} \log $\\$  \frac{  \textrm{exp}( \textrm{sim} ( \textbf{z}_i, \textbf{c}_{y_i} )/\tau )  }{ \sum_{y \in \textbf{Y}}  \textrm{exp}( \textrm{sim} ( \textbf{z}_i, \textbf{c}_{y} ) /\tau )  }       $ }
+\makecell{EdgePrompt\\(ICLR 2025 \cite{fu2025edge})} & \cmark & \cmark & \cmark
+& \makecell{edge prompts: \\$\{\textbf{e}_{ij}^{(l)}\}$ \\anchor prompts: $\textbf{P}^{(l)}$}
+& \makecell{$\textbf{h}_i^{(l)} \leftarrow \mathrm{COMB}^{(l)}(\textbf{h}_i^{(l-1)},$\\$\mathrm{AGG}^{(l)}(\{\textbf{h}_j^{(l-1)}\},\{\textbf{e}_{ij}^{(l)}\}))$}
+& \makecell{$\min_{g,\{\textbf{P}^{(l)},\textbf{W}^{(l)}\}}\frac{1}{|V_L|}\sum_{v_i\in V_L}$ \\ $\ell_D(g(f(G')_i),y_i)$}
+& \cmark & \xmark & \cmark & \xmark & \cmark \\ \midrule
 
-&\cmark   & \xmark  &\xmark & \cmark & \xmark \\ \midrule
-
-\makecell{P2TAG\\(KDD 2024 \cite{zhao2024p2tag})} & \cmark & \xmark & \xmark
-& \makecell{prompt graph: $\mathcal{G}_{p}$ \\text prompt: $\textbf{w}_{t}$ \\label text embeddings}
-& \makecell{$A_{\mathcal{G}_{ego},\mathcal{G}_{p}}(i,j) \leftarrow \mathds{1}[\mathrm{Sim}(\textbf{x}_{i},\textbf{t}_{j}) > \delta]$ \\ $\tilde{\textbf{z}}_{v} \leftarrow \mathrm{MLP}(\mathrm{READOUT}(f_{\mathrm{GNN}}(G_{v};\mathcal{G}_{p})), \textbf{w}_{t})$}
-& \makecell{Mixed Prompt Learning}
-& \cmark  & \xmark & \xmark& \xmark & \cmark \\ \midrule
+\makecell{ProNoG\\(KDD 2025 \cite{yu2025pronog})} & \cmark & \xmark & \cmark
+& \makecell{condition-net: \\$\mathrm{CondNet}(\cdot;\phi_t)$ \\node prompt: $\textbf{p}_{t,v}$}
+& \makecell{$\textbf{s}_v \leftarrow \mathrm{Avg}(\{\textbf{h}_u \!\cdot\! \mathrm{sim}(\textbf{h}_u,\textbf{h}_v):u\!\in\!V(\mathcal{S}_v)\})$ \\ $\tilde{\textbf{h}}_{t,v} \leftarrow \textbf{p}_{t,v}\odot \textbf{h}_v$}
+& \makecell{$L_{\mathrm{down}} \!=\! -\sum_{(x_i,y_i)\in D_t}\log$ \\ $\frac{\exp(\mathrm{sim}(\tilde{\textbf{h}}_{t,x_i},\bar{\textbf{h}}_{t,y_i})/\tau)}{\sum_{c\in Y}\exp(\mathrm{sim}(\tilde{\textbf{h}}_{t,x_i},\bar{\textbf{h}}_{t,c})/\tau)}$}
+& \cmark & \xmark & \cmark & \cmark & \xmark \\ \midrule
 
 
 \makecell{SAP\\(arXiv \cite{ge2023enhancing})} & \cmark & \xmark & \xmark 

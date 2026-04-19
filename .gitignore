@@ -46,4 +46,6 @@ papers/zotero-test/pdfs/*
 .worktrees/
 
 .agents/*
+
+# PDF（全仓库）
 *.pdf
