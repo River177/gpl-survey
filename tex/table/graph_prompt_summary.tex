@@ -160,7 +160,7 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 & \makecell{$\min_{g,\{\textbf{P}^{(l)},\textbf{W}^{(l)}\}}\frac{1}{|V_L|}\sum_{v_i\in V_L}$ \\ $\ell_D(g(f(G')_i),y_i)$}
 & \cmark & \xmark & \cmark & \xmark & \cmark \\ \midrule
 
-\makecell{UniPrompt\\(NeurIPS 2025 \cite{huang2025oneprompt})} & \cmark & \xmark & \xmark
+\makecell{UniPrompt\\(NeurIPS 2025 \cite{huang2025oneprompt})} & \cmark & \cmark & \cmark
 & \makecell{prompt graph: $\tilde{\textbf{A}}^{init}$ \\edge weights: $\Psi=\{w_{ij}\}$}
 & \makecell{$(\tilde{\textbf{A}}^{init})_{ij}\!\leftarrow\! S_{ij},\ S_{ij}\!\in\!\mathrm{top}\text{-}k\{S_{i\cdot}\}$ \\ $\hat{\textbf{A}}^{(t)}\!\leftarrow\!\tau \hat{\textbf{A}}^{(t-1)}+(1-\tau)\tilde{\textbf{A}}$}
 & \makecell{$\min_{\phi,\Psi}\frac{1}{|V_L|}\sum_{v_i\in V_L}$ \\ $\ell_D(g_{\phi}(f_{\theta}(p_{\Psi}(A,X))_i),y_i)$}
