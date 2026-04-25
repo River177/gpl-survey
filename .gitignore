@@ -49,3 +49,9 @@ papers/zotero-test/pdfs/*
 
 # PDF（全仓库）
 *.pdf
+
+skills-lock.json
+
+.claude/*
+
+*.sty

@@ -11,6 +11,16 @@
       "sourceType": "github",
       "computedHash": "fbfac1bb60db78a05f130747c078e85c6ea3208723b96093de5ead50185efc3f"
     },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "9e1c8b3103f92fa8092568a44fe64858de7c5c9dc65ce4bea8f168080e889cfd"
+    },
+    "humanizer": {
+      "source": "softaworks/agent-toolkit",
+      "sourceType": "github",
+      "computedHash": "34a38e6acc60d4529612d41ffe740bca0060d3c5e89e2a0d24ae795f67157fbb"
+    },
     "pdf": {
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",
@@ -25,6 +35,11 @@
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",
       "computedHash": "85ec3db2e7951b98d3d8bc7106f3a76fc66e245eab1391312f8d36edbd57f7a9"
+    },
+    "read-arxiv-paper": {
+      "source": "karpathy/nanochat",
+      "sourceType": "github",
+      "computedHash": "fbfe8363abc18db544f627d00a69078f2371f2c272c480c2e83d065fc6588b02"
     },
     "scientific-writing": {
       "source": "K-Dense-AI/scientific-agent-skills",
