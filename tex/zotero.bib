@@ -2177,3 +2177,120 @@
 	archivePrefix = {arXiv},
 	url = {https://arxiv.org/abs/2503.07655},
 }
+
+
+@inproceedings{yu_hgprompt_2024,
+	title = {{HGPROMPT}: Bridging Homogeneous and Heterogeneous Graphs for Few-shot Prompt Learning},
+	volume = {38},
+	url = {https://doi.org/10.1609/aaai.v38i15.29596},
+	pages = {16578--16586},
+	number = {15},
+	booktitle = {Proceedings of the {AAAI} Conference on Artificial Intelligence},
+	publisher = {Association for the Advancement of Artificial Intelligence ({AAAI})},
+	author = {Yu, Xingtong and Fang, Yuan and Liu, Zemin and Zhang, Xinming},
+	date = {2024},
+	year = {2024},
+	file = {PDF:/home/river/Zotero/storage/FAZ974IC/HGPROMPT-AAAI2024.pdf:application/pdf},
+}
+
+
+@inproceedings{jia_hepa_2025,
+	title = {{HePa}: Heterogeneous Graph Prompting for All-Level Classification Tasks},
+	url = {https://doi.org/10.1609/aaai.v39i11.33297},
+	booktitle = {Proceedings of the {AAAI} Conference on Artificial Intelligence},
+	publisher = {Association for the Advancement of Artificial Intelligence ({AAAI})},
+	author = {Jia, Jinghong and Song, Lei and Li, Jiaxing and Kong, Youyong},
+	date = {2025},
+	year = {2025},
+	file = {PDF:/home/river/Zotero/storage/GCA6RB69/HePa-AAAI2025.pdf:application/pdf},
+}
+
+
+@inproceedings{jiao_hgmp_2025,
+	title = {{HGMP}: Heterogeneous Graph Multi-Task Prompt Learning},
+	url = {https://doi.org/10.24963/ijcai.2025/332},
+	pages = {2982--2990},
+	booktitle = {Proceedings of the Thirty-Fourth International Joint Conference on Artificial Intelligence},
+	publisher = {{IJCAI}},
+	author = {Jiao, Pengfei and Ni, Jialong and Jin, Di and Guo, Xuan and Liu, Huan},
+	date = {2025},
+	year = {2025},
+	file = {PDF:/home/river/Zotero/storage/X9YILVEF/HGMP-IJCAI2025.pdf:application/pdf},
+}
+
+
+@article{wang_multihgpt_2025,
+	title = {{MultiHGPT}: Multi-task heterogeneous graph prompt tuning},
+	volume = {62},
+	url = {https://doi.org/10.1016/j.ipm.2025.104236},
+	pages = {104236},
+	number = {6},
+	journaltitle = {Information Processing \& Management},
+	journal = {Information Processing \& Management},
+	publisher = {Elsevier {BV}},
+	author = {Wang, Yifan and Cao, Yixin and Li, Zeping and Dong, Bowen and Ye, Guangnan and Chai, Hongfeng},
+	date = {2025},
+	year = {2025},
+	file = {PDF:/home/river/Zotero/storage/DEDGFLD8/Wang 等 - MultiHGPT Multi-task heterogeneous graph prompt tuning.pdf:application/pdf},
+}
+
+
+@inproceedings{fu_edge_2024,
+	title = {Edge Prompt Tuning for Graph Neural Networks},
+	url = {https://openreview.net/forum?id=92vMaHotTM},
+	abstract = {Pre-training powerful Graph Neural Networks ({GNNs}) with unlabeled graph data in a self-supervised manner has emerged as a prominent technique in recent years. However, inevitable objective gaps often exist between pre-training and downstream tasks. To bridge this gap, graph prompt tuning techniques design and learn graph prompts by manipulating input graphs or reframing downstream tasks as pre-training tasks without fine-tuning the pre-trained {GNN} models. While recent graph prompt tuning methods have proven effective in adapting pre-trained {GNN} models for downstream tasks, they overlook the crucial role of edges in graph prompt design, which can significantly affect the quality of graph representations for downstream tasks. In this study, we propose {EdgePrompt}, a simple yet effective graph prompt tuning method from the perspective of edges. Unlike previous studies that design prompt vectors on node features, {EdgePrompt} manipulates input graphs by learning additional prompt vectors for edges and incorporates the edge prompts through message passing in the pre-trained {GNN} models to better embed graph structural information for downstream tasks. Our method is compatible with prevalent {GNN} architectures pre-trained under various pre-training strategies and is universal for different downstream tasks. We provide comprehensive theoretical analyses of our method regarding its capability of handling node classification and graph classification as downstream tasks. Extensive experiments on ten graph datasets under four pre-training strategies demonstrate the superiority of our proposed method against six baselines. Our code is available at https://github.com/xbfu/{EdgePrompt}.},
+	eventtitle = {The Thirteenth International Conference on Learning Representations},
+	author = {Fu, Xingbo and He, Yinhan and Li, Jundong},
+	urldate = {2026-04-19},
+	date = {2024-10-04},
+	langid = {english},
+	file = {Full Text PDF:/home/river/Zotero/storage/49RJRUSJ/Fu 等 - 2024 - Edge Prompt Tuning for Graph Neural Networks.pdf:application/pdf},
+}
+
+
+@misc{huang_one_2025,
+	title = {One Prompt Fits All: Universal Graph Adaptation for Pretrained Models},
+	url = {http://arxiv.org/abs/2509.22416},
+	doi = {10.48550/arXiv.2509.22416},
+	shorttitle = {One Prompt Fits All},
+	abstract = {Graph Prompt Learning ({GPL}) has emerged as a promising paradigm that bridges graph pretraining models and downstream scenarios, mitigating label dependency and the misalignment between upstream pretraining and downstream tasks. Although existing {GPL} studies explore various prompt strategies, their effectiveness and underlying principles remain unclear. We identify two critical limitations: (1) Lack of consensus on underlying mechanisms: Despite current {GPLs} have advanced the field, there is no consensus on how prompts interact with pretrained models, as different strategies intervene at varying spaces within the model, i.e., input-level, layer-wise, and representation-level prompts. (2) Limited scenario adaptability: Most methods fail to generalize across diverse downstream scenarios, especially under data distribution shifts (e.g., homophilic-to-heterophilic graphs). To address these issues, we theoretically analyze existing {GPL} approaches and reveal that representation-level prompts essentially function as fine-tuning a simple downstream classifier, proposing that graph prompt learning should focus on unleashing the capability of pretrained models, and the classifier should adapt to downstream scenarios. Based on our findings, we propose {UniPrompt}, a novel {GPL} method that adapts any pretrained models, unleashing the capability of pretrained models while preserving the input graph. Extensive experiments demonstrate that our method can effectively integrate with various pretrained models and achieve strong performance across in-domain and cross-domain scenarios.},
+	number = {{arXiv}:2509.22416},
+	publisher = {{arXiv}},
+	author = {Huang, Yongqi and Zhao, Jitao and He, Dongxiao and Wang, Xiaobao and Li, Yawen and Huang, Yuxiao and Jin, Di and Feng, Zhiyong},
+	urldate = {2026-04-19},
+	date = {2025-10-14},
+	eprinttype = {arxiv},
+	eprint = {2509.22416 [cs]},
+	keywords = {Computer Science - Machine Learning},
+	file = {Preprint PDF:/home/river/Zotero/storage/94CXDFNT/Huang 等 - 2025 - One Prompt Fits All Universal Graph Adaptation for Pretrained Models.pdf:application/pdf;Snapshot:/home/river/Zotero/storage/PDC4GHXN/2509.html:text/html},
+}
+
+
+@inproceedings{hu_prompt-based_2024,
+	title = {Prompt-Based Spatio-Temporal Graph Transfer Learning},
+	url = {https://doi.org/10.1145/3627673.3679554},
+	doi = {10.1145/3627673.3679554},
+	abstract = {Spatio-temporal graph neural networks have proven efficacy in capturing complex dependencies for urban computing tasks such as forecasting and kriging. Yet, their performance is constrained by the reliance on extensive data for training on a specific task, thereby limiting their adaptability to new urban domains with varied task demands. Although transfer learning has been proposed to remedy this problem by leveraging knowledge across domains, the cross-task generalization still remains under-explored in spatio-temporal graph transfer learning due to the lack of a unified framework. To bridge the gap, we propose Spatio-Temporal Graph Prompting ({STGP}), a prompt-based framework capable of adapting to multi-diverse tasks in a data-scarce domain. Specifically, we first unify different tasks into a single template and introduce a task-agnostic network architecture that aligns with this template. This approach enables capturing dependencies shared across tasks. Furthermore, we employ learnable prompts to achieve domain and task transfer in a two-stage prompting pipeline, facilitating the prompts to effectively capture domain knowledge and task-specific properties. Our extensive experiments demonstrate that {STGP} outperforms state-of-the-art baselines in three tasks-forecasting, kriging, and extrapolation-achieving an improvement of up to 10.7\%.},
+	pages = {890--899},
+	booktitle = {Proceedings of the 33rd {ACM} International Conference on Information and Knowledge Management},
+	publisher = {{ACM}},
+	author = {Hu, Junfeng and Liu, Xu and Fan, Zhencheng and Yin, Yifang and Xiang, Shili and Ramasamy, Savitha and Zimmermann, Roger},
+	date = {2024},
+	year = {2024},
+	file = {PDF:/home/river/Zotero/storage/86AYSGSL/Hu 等 - 2024 - Prompt-Based Spatio-Temporal Graph Transfer Learning.pdf:application/pdf},
+}
+
+
+@misc{yu_event-aware_2025,
+	title = {Event-Aware Prompt Learning for Dynamic Graphs},
+	url = {https://arxiv.org/abs/2510.11339},
+	abstract = {Real-world graph typically evolve via a series of events, modeling dynamic interactions between objects across various domains. For dynamic graph learning, dynamic graph neural networks ({DGNNs}) have emerged as popular solutions. Recently, prompt learning methods have been explored on dynamic graphs. However, existing methods generally focus on capturing the relationship between nodes and time, while overlooking the impact of historical events. In this paper, we propose {EVP}, an event-aware dynamic graph prompt learning framework that can serve as a plug-in to existing methods, enhancing their ability to leverage historical events knowledge. First, we extract a series of historical events for each node and introduce an event adaptation mechanism to align the fine-grained characteristics of these events with downstream tasks. Second, we propose an event aggregation mechanism to effectively integrate historical knowledge into node representations. Finally, we conduct extensive experiments on four public datasets to evaluate and analyze {EVP}.},
+	number = {2510.11339},
+	publisher = {{arXiv}},
+	author = {Yu, Xingtong and Liang, Ruijuan and Zhang, Xinming and Fang, Yuan},
+	date = {2025},
+	eprinttype = {arxiv},
+	eprint = {2510.11339},
+	note = {Primary Class: cs.{LG}},
+	file = {PDF:/home/river/Zotero/storage/JPMMW8Y2/Yu 等 - 2025 - Event-Aware Prompt Learning for Dynamic Graphs.pdf:application/pdf},
+}
