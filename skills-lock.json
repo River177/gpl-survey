@@ -32,9 +32,9 @@
       "computedHash": "5e2ad9baf55279cc9e79580bfc99bcfa368c4ffe300c9ac635b694ff7e4df530"
     },
     "pyzotero": {
-      "source": "K-Dense-AI/scientific-agent-skills",
+      "source": "k-dense-ai/scientific-agent-skills",
       "sourceType": "github",
-      "computedHash": "85ec3db2e7951b98d3d8bc7106f3a76fc66e245eab1391312f8d36edbd57f7a9"
+      "computedHash": "4de42de41a4ef860649b129cf36322f785a8c2f630b7af709552702d0f0cc167"
     },
     "read-arxiv-paper": {
       "source": "karpathy/nanochat",
