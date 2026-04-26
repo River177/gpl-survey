@@ -1,5 +1,5 @@
 \section{Prompt Design for Graph Tasks}\label{sec:ptask}
-After reviewing graph pre-training objectives, we now turn to how prompts are designed and used to adapt pre-trained graph models. As shown in \figref{fig:prompt}, a graph prompt usually contains three components: prompt tokens with prompt vectors, token structures that preserve correlations among these tokens, and inserting patterns that specify how prompts are integrated with the original graph. Based on these components, this section asks four questions: \textit{Question 1:} How do these works design the graph prompt? \textit{Question 2:} How do these works reformulate downstream tasks to the pre-training tasks? \textit{Question 3:} How do these works learn an effective prompt? and \textit{Question 4:} What are the inner connections of these works, their advantages and limitations? With these questions, we summarize representative methods in \tabref{tab:graph_prompt_summary}.
+After reviewing graph pre-training objectives, we now turn to how prompts are designed and used to adapt pre-trained graph models. As shown in \figref{fig:prompt}, a graph prompt usually contains three components: prompt tokens with prompt vectors, token structures that preserve correlations among these tokens, and inserting patterns that specify how prompts are integrated with the original graph. Based on these components, this section asks four questions: \textit{Question 1:} How do they design a graph prompt? \textit{Question 2:} How do they reformulate downstream tasks to the pretext? \textit{Question 3:} How do they learn a graph prompt? and \textit{Question 4:} What are their connections, pros and cons? With these questions, we summarize representative methods in \tabref{tab:graph_prompt_summary}.
 
 
 \begin{figure}[t]
@@ -13,7 +13,7 @@ After reviewing graph pre-training objectives, we now turn to how prompts are de
 
 \subsection{Prompt Token, Structure, and Inserting Pattern}\label{subsec:pdesign}
 
-\textit{\dotuline{Question 1: How do They Design A Graph Prompt?}}
+\textit{\dotuline{Question 1: How do they design a graph prompt?}}
 
 \textbf{A. Prompt as Tokens. }
 The simplest graph prompt can be treated as some additional features added to the original graph features \cite{zhu2023graphcontrol}. For example, given a graph feature matrix $\mathbf{X}=\{x_1,\cdots, x_N\} \in \mathbb{R}^{N\times d}$ where $x_i\in \mathbb{R}^{1\times d}$ is the feature of $i$-th node and $d$ is the dimension of the feature space. \citet{fang2022prompt} and \citet{shirkavand2023deep} treat the basic prompt as a learnable vector $p \in \mathbb{R}^{1\times d}$, which can be added to all node features and make the manipulated feature matrix be $\mathbf{X}^{*}=\{x_1+p,\cdots, x_N+p\}$. In this way, we can use the reformulated features to replace the original features and process the graph with pre-trained graph models. A later work \cite{fang2023universal} further extends one prompt token to multiple tokens and makes the performance better. PGCL \cite{gong2023prompt} design a prompt vector for semantic view and another prompt vector for contextual view, then they add these prompt vectors to the graph-level representations by element-wise multiplication. A similar prompt design is also adopted in VNT \cite{tan2023virtual}. The difference is that their inserting pattern does not add the prompt token to the original graph feature but concatenates the prompt token with the original node set and tries to integrate them by the self-attention function in a graph transformer. In GraphPrompt \cite{liu2023graphprompt}, the prompt token is similar to the format defined by \citet{fang2022prompt}. The difference thing is that previous work designed the prompt tokens in the initial feature space, while this method assumes the prompt in the hidden layer of the graph model. Usually, the hidden size will be smaller than the original feature, making their prompt token shorter than the previous one. Another different thing is that the graph prompt here is used to assist graph pooling operation (a.k.a $\text{Readout}$). For example, given the node set $\mathcal{V}=\{v_1,\cdots, v_{|\mathcal{V}|}\}$, the embedding of node $v$ is $\textbf{h}_v \in \mathbb{R}^{1\times d}$, a prompt token $\textbf{p}_t \in \mathbb{R}^{1\times d}$ specified to task $t$ is inserted to the graph nodes by the element-wise multiplication ($\otimes$): $\textbf{s}_t=\text{Readout}(\{\textbf{p}_t \otimes \textbf{h}_v:v \in \mathcal{V}\})$. Similarly, SGL-PT \cite{zhu2023sglpt} creates a prompt token to connect to all nodes in the graph. The prompt token preserves a global perception of the graph and can assist their global branch of the pre-training tasks, which can be also treated as a pooling strategy. Aiming at aligning node classification and link prediction, GPPT \cite{sun2022gppt} defines graph prompts as additional tokens that contain task tokens and structure tokens. Here the task token refers to the description of the downstream node label to be classified and the structure token is the representation of the subgraph surrounding the target node. By this means, predicting node $v$'s label can be reformulated to predict a potential link between node $v$'s structure token and the label task token. 
@@ -49,7 +49,7 @@ The pre-training strategy in SAP \cite{ge2023enhancing} is to compare node repre
 
 \subsection{Prompt Tuning}\label{subsec:pt}
 
-\textit{\dotuline{Question 3: How do They Learn A Graph Prompt? }}
+\textit{\dotuline{Question 3: How do they learn a graph prompt? }}
 
 The answering function determines how predictions are read out, but the prompt itself still has to be learned. Existing methods differ mainly in whether they learn prompts across tasks, for a specific downstream task, or under an objective aligned with the pretext task.
 
@@ -68,7 +68,7 @@ Intuitively, prompting aims at reformulating downstream tasks to the pre-trainin
 
 \subsection{Further Discussion}\label{subsec:pdiscussion}
 
-\textit{\dotuline{Question 4: What are Their Connections, Pros and Cons?}}
+\textit{\dotuline{Question 4: What are their connections, pros and cons?}}
 
 The preceding subsections describe prompt form, answering function, and tuning strategy separately. In practice, these choices are coupled: a prompt that is easy to insert may have limited expressive power, while a more structured prompt may require stronger assumptions about the downstream graph.
 
