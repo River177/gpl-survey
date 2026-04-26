@@ -149,7 +149,7 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 & \cmark & \xmark & \cmark & \cmark & \xmark \\ \midrule
 
 \makecell{SUPT\\(arXiv \cite{lee2024supt})} & \cmark & \cmark & \cmark
-& \makecell{basis prompts: \\$\{\textbf{b}_{j}\}_{j=1}^{k}$ \\assignment score: $\alpha$}
+& \makecell{basis prompts: \\$\{\textbf{b}_{j}\}_{j=1}^{k}$ \\$\alpha^{(m)} \!=\! (\tilde{D}^{-\frac{1}{2}}\tilde{A}\tilde{D}^{-\frac{1}{2}})^{m}\!(X\!\oplus\!\sum_j b_j)W$}
 & \makecell{$\textbf{p}_i \leftarrow \sum_j \sigma(\alpha)_{i,j}\textbf{b}_j$ \\ $\textbf{X}^{*} \leftarrow \textbf{X} + \textbf{p}$}
 & \makecell{$\max_{\psi,\phi} P_{f_{\theta},h_{\phi}}(y \mid g_{\psi}(G))$ \\ $(+\ L_{LP}\ \text{for SUPTsoft})$}
 & \cmark & \xmark & \cmark & \xmark & \cmark \\ \midrule
@@ -166,7 +166,7 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 & \makecell{$\min_{\phi,\Psi}\frac{1}{|V_L|}\sum_{v_i\in V_L}$ \\ $\ell_D(g_{\phi}(f_{\theta}(p_{\Psi}(A,X))_i),y_i)$}
 & \cmark & \xmark & \xmark & \xmark & \cmark \\ \midrule
 
-\makecell{ProNoG\\(KDD 2025 \cite{yu2025pronog})} & \cmark & \xmark & \cmark
+\makecell{ProNoG\\(KDD 2025 \cite{yu2025pronog})} & \cmark & \xmark & \xmark
 & \makecell{condition-net: \\$\mathrm{CondNet}(\cdot;\phi_t)$ \\node prompt: $\textbf{p}_{t,v}$}
 & \makecell{$\textbf{s}_v \leftarrow \mathrm{Avg}(\{\textbf{h}_u \!\cdot\! \mathrm{sim}(\textbf{h}_u,\textbf{h}_v):u\!\in\!V(\mathcal{S}_v)\})$ \\ $\tilde{\textbf{h}}_{t,v} \leftarrow \textbf{p}_{t,v}\odot \textbf{h}_v$}
 & \makecell{$L_{\mathrm{down}} \!=\! -\sum_{(x_i,y_i)\in D_t}\log$ \\ $\frac{\exp(\mathrm{sim}(\tilde{\textbf{h}}_{t,x_i},\bar{\textbf{h}}_{t,y_i})/\tau)}{\sum_{c\in Y}\exp(\mathrm{sim}(\tilde{\textbf{h}}_{t,x_i},\bar{\textbf{h}}_{t,c})/\tau)}$}
