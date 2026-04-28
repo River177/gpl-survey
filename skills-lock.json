@@ -4,6 +4,7 @@
     "arxiv-search": {
       "source": "yorkeccak/scientific-skills",
       "sourceType": "github",
+      "skillPath": "skills/arxiv-search/SKILL.md",
       "computedHash": "dbf9afcf79e59c54dc66f9cd17455f70fdde038c20ba4f3af3b359f40761a350"
     },
     "bgpt-paper-search": {
@@ -39,12 +40,14 @@
     "read-arxiv-paper": {
       "source": "karpathy/nanochat",
       "sourceType": "github",
+      "skillPath": ".claude/skills/read-arxiv-paper/SKILL.md",
       "computedHash": "fbfe8363abc18db544f627d00a69078f2371f2c272c480c2e83d065fc6588b02"
     },
     "scientific-writing": {
-      "source": "K-Dense-AI/scientific-agent-skills",
+      "source": "davila7/claude-code-templates",
       "sourceType": "github",
-      "computedHash": "c402452909f1fc3060cd8ac167523c2d4c43cd56573530ee3c22eb063692f4e5"
+      "skillPath": "cli-tool/components/skills/scientific/scientific-writing/SKILL.md",
+      "computedHash": "ccc643803bfd2448f289e3e309c3a7c062ceb9630155ae800217f04a769450b7"
     }
   }
 }

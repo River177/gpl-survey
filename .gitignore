@@ -57,3 +57,5 @@ skills-lock.json
 *.sty
 
 tex/.omc/*
+
+.agents/*
