@@ -1,0 +1,99 @@
+\section{综述方法}\label{sec:method}
+
+\subsection{研究目标}
+
+本综述研究了图提示学习作为迈向更可迁移和可复用图学习系统的途径。我们围绕表 \ref{tab:rqs} 总结的三个迁移挑战来组织讨论：跨模态、跨域和跨任务迁移。提示学习已成为NLP和视觉领域的重要自适应机制 \cite{brown2020language, gao2021making,
+% radford2021learning,
+wang2023chatvideo}，但其在图学习中的作用仍未完全确定。因此，我们的目标不是假设提示是一个通用解决方案，而是要研究图提示如何以及何时帮助图模型在任务和域之间迁移，以及它们如何与其他模态（如文本和图像）交互。除了这些共同的迁移挑战外，图提示与NLP和CV中的对应方法也不同，这促使我们提出表 \ref{tab:rqs} 中列出的更具体的研究问题。
+
+% the following content can be removed
+% By answering these detailed questions, we wish to achieve the following objectives:
+
+% \begin{itemize}
+%     \item Unifying Diverse Approaches for Understanding Existing Work. A unified framework to consolidate varied approaches in graph prompting is needed so that we can facilitate a comprehensive understanding of existing methodologies.
+%     \item Diving into the Purpose of Prompts in the Graph Learning. To achieve this goal, we need to explore the inherent nature and strategic roles of prompts in graphs, which are mostly not as straightforward as the ones in the language area.
+%     \item Designing Effective Graph Prompts. By summarizing the most representative works in graph prompts, we wish to find a fundamental creation in the design of graph prompts, focusing on creating efficient, versatile, and context-sensitive prompts that cater to specific requirements of graph-based tasks.
+%     % \item Assessing the Effectiveness of Graph Prompts. Currently, there are no widely accepted criteria for evaluating the effectiveness and efficiency of graph prompts, including their adaptability and scalability in different application scenarios. Proposing a comprehensive evaluation framework is a pressing need to further accelerate this research area.
+%     \item  Implementing Graph Prompts in Real-World Scenarios. We need to provide a general programming tool to facilitate the practical implications of graph prompts in real-world settings, assessing their implementation challenges, and highlighting successful case studies.
+%     \item Identifying Challenges, Limitations and the Future of Graph Prompting. Currently, graph prompt research is very primitive and nascent, leaving many tough problems to be solved. By summarizing current challenges and future directions, we wish to push forward this research area to achieve more impact on related applications.
+% \end{itemize}
+
+
+
+
+\input{pic/taxonomy}
+
+\subsection{分类体系}
+
+图 \ref{fig:Taxonomy} 总结了我们如何组织图提示文献的分类体系。该分类体系旨在展示基于提示的方法如何与图学习中的预训练目标、迁移设置和应用场景相关联。
+
+
+\textbf{(1) 图提示的预训练策略。}
+
+提示方法通常是由将下游任务与预训练期间诱导的行为对齐的需求所驱动的。因此，综述首先回顾图学习中的代表性预训练策略，然后再转向提示本身。我们将现有预训练方法分为节点级、边级、图级和多任务设置，然后研究后续的提示方法如何复用或适配这些目标。这种设置使得将提示方法与它们所依赖的预训练假设进行比较变得更加容易。
+
+
+
+\textbf{(2) 图学习中的提示方法。}
+
+为了覆盖表 \ref{tab:rqs} 中定义的三个迁移挑战，我们从三个方向分析图提示：\romannumeral1. 图任务的提示设计（\secref{sec:ptask}）；\romannumeral2. 图的多模态提示（\secref{sec:pmodal}）；\romannumeral3. 使用提示技术的图域自适应（\secref{sec:challenges}）。在这三个方向中，表 \ref{tab:rqs} 中的详细问题连接了方法设计、自适应机制、实践范围和开放挑战。
+
+\textit{\romannumeral1. 图任务的提示设计。} 在这一部分，我们为图提示设计引入了一个统一的分析框架。我们围绕三个组成部分组织现有方法：\textit{提示标记}（表示提示内容）、\textit{标记结构}（指定多个提示单元如何组织）和\textit{插入模式}（决定提示如何与原始图结合）。我们进一步讨论回答函数，即如何从被提示的图中产生下游预测，并总结代表性的优化策略，如元学习、任务特定调优和代理目标对齐。这种组织方式使我们能够从共同假设、设计差异和权衡方面比较方法。
+
+
+\textit{\romannumeral2. 图的多模态提示。} 在这一部分，我们讨论用于文本属性图和其他多模态图设置中的提示方法。图-LLM和图-语言研究的近期增长极大地扩展了这一领域，因此我们的目标不是提供图-LLM方法的完整综述。相反，我们关注明确涉及图结构的面向提示的接口和自适应机制。
+
+\textit{\romannumeral3. 使用提示技术进行图域自适应。} 然后我们研究当预训练和下游图来自不同域时提示是如何使用的。这一部分将语义对齐与结构对齐分开，因为特征含义和图拓扑通常以不同方式变化。这种组织也澄清了为什么跨域图提示不能被简化为普通任务自适应。
+
+
+\begin{table}[!t]
+\centering
+\caption{研究问题与范围}
+\label{tab:rqs}
+% \resizebox{0.48\textwidth}{!}{%
+\begin{tabular}{@{}l|l@{}}
+\toprule
+\multirow{3}{*}{图学习中的迁移挑战}
+        & \makecell[l]{P1: 如何使模型对不同模态具有通用性？\\(\secref{sec:pmodal}) } \\\cmidrule(l){2-2}
+        & \makecell[l]{P2: 如何使模型对不同域具有通用性？\\(\secref{sec:challenges})} \\\cmidrule(l){2-2}
+        & \makecell[l]{P3: 如何使模型对不同任务具有通用性？\\(\secref{sec:ptask}) }  \\ \midrule
+\multirow{5}{*}{图提示的详细问题}
+        & \makecell[l]{Q1: 如何用统一框架理解现有工作？\\(\secref{sec:ptask})} \\\cmidrule(l){2-2}
+        & \makecell[l]{Q2: 图提示的本质是什么？\\(\secref{sec:ptask}, \secref{sec:challenges})}   \\\cmidrule(l){2-2}
+        & \makecell[l]{Q3: 如何设计图提示？(\secref{sec:ptask}) } \\\cmidrule(l){2-2}
+        % & \makecell[l]{How to Evaluate the Quality \\of Graph Prompts?     }    \\\cmidrule(l){2-2}
+        & \makecell[l]{Q4: 如何在实际应用中部署图提示？\\(\secref{sec:app}, \secref{sec:prog})}  \\\cmidrule(l){2-2}
+        & \makecell[l]{Q5: 当前挑战和未来方向是什么？(\secref{sec:challenges}) }   \\ \bottomrule
+\end{tabular}%
+% }
+\end{table}
+
+
+
+\textit{\romannumeral3. 通过提示技术进行图域自适应。} 在这一部分，我们回顾了两个方向的工作：处理图域间语义对齐的方法和处理结构对齐的方法。
+
+\subsection{文献概述}
+本综述涵盖了截至2026年初发表的代表性图提示论文，重点关注会议和期刊文章以及有影响力的arXiv预印本。综述的文献包括来自NeurIPS、SIGKDD、Web Conference、ICLR、CIKM、ICML、IJCAI、EMNLP、SIGIR、ACL、AAAI、WSDM和TKDE等会议的工作。当这些预印本在正式发表前对后续文献、基准测试或公开实现产生了可见影响时，我们也会纳入近期预印本。图 \ref{fig:venue_dis} 总结了收集论文的会议分布，图 \ref{fig:top10keys} 显示了它们标题中出现最频繁的关键词。
+
+
+\begin{figure*}[!t]
+\centering
+\subfloat[收集论文的会议分布。]{
+\label{fig:venue_dis}
+\includegraphics[width=0.4\textwidth]{pic/reference_venue.pdf}%
+}
+\subfloat[收集论文标题中出现的前15个关键词]{
+\label{fig:top10keys}
+\includegraphics[width=0.5\textwidth]{pic/top_keywords_bar.pdf}%
+}
+\caption{收集论文的统计信息}\vspace{-3ex}
+\label{fig:credit_case}
+\end{figure*}
+
+
+
+\subsection{与现有工作的联系}
+
+近期关于图提示学习的综述主要在范围和组织原则上有所不同。\citet{wu2023survey} 回顾了图提示方法的早期浪潮，重点关注技术、应用和方法论空间相对紧凑时的开放挑战。\citet{long2024towards} 扩展了关于设计原则、应用场景、基准测试问题和提示调优策略的讨论。\citet{fu2025graphprompting}围绕"预训练与提示"工作流程组织文献，强调了数据级、表示级和任务级视角。
+
+我们的侧重点在两个方面有所不同。首先，我们采用了一个统一的分解方法，将图提示分解为提示标记、标记结构、插入模式、回答函数和提示调优策略。其次，我们将图提示放在一个更广泛的分类体系中，该体系还包括预训练策略、多模态提示和图域自适应。我们还通过讨论应用场景和支持工具包（如ProG）保持实践视角。关于图基础模型、图-LLM集成和图自监督学习的相关综述 \cite{liu2023graph, li2023survey, xie2023selfsupervised, yu2023selfsupervised} 提供了更广泛的背景，而本综述则专门关注图提示及其周围的自适应机制。
