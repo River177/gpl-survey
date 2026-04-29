@@ -55,3 +55,7 @@ skills-lock.json
 .claude/*
 
 *.sty
+
+tex/.omc/*
+
+.agents/*
