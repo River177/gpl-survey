@@ -85,14 +85,13 @@
 
 \IEEEtitleabstractindextext{
 \begin{abstract}
-\justify{Artificial General Intelligence (AGI) has accelerated foundation-model research across multiple domains, yet graph data remains less explored than text and vision in this paradigm. This survey reviews graph prompt learning from the perspectives of cross-modality, cross-domain, and cross-task generalization, and develops a unified view based on prompt tokens, token structures, and insertion patterns. It further examines the relationship between graph pre-training and prompting, discusses how prompts align downstream tasks with pretext objectives, and summarizes representative prompt tuning strategies. The resulting taxonomy covers over one hundred representative studies in recent years across pre-training strategies, prompt design, multi-modal prompting, and graph domain adaptation. We also summarize application scenarios and supporting resources, including ProG and a curated repository of papers, benchmarks, and code. Finally, the survey discusses current challenges and future directions for graph prompting in graph representation learning and related AGI-oriented applications.
-Relevant resources are available at \url{https://github.com/WxxShirley/Awesome-Graph-Prompt} and \url{https://github.com/sheldonresearch/ProG}.
+\justify{Recent advances in foundation models have reshaped natural language processing and computer vision, but adaptation paradigms for graph-structured data remain less mature. Graph prompt learning has emerged as a promising approach for adapting pre-trained graph models with limited parameter updates, while also raising graph-specific questions about topology, task alignment, and transferability. This survey reviews graph prompt learning from the perspectives of cross-task, cross-domain, and cross-modal transfer. We first relate graph prompting to graph pre-training and then introduce a unified analytical framework covering prompt tokens, token structures, and insertion patterns. Based on this framework, we summarize representative methods for graph task prompting, multi-modal graph prompting, and graph domain adaptation. We further discuss application scenarios in online social networks, recommender systems, knowledge management, and biomedical graph learning, together with supporting resources such as ProG and curated graph prompting repositories. Finally, we identify open challenges in graph foundation models, transfer protocols, prompt evaluation, theoretical understanding, and interpretability. Relevant resources are available at \url{https://github.com/WxxShirley/Awesome-Graph-Prompt} and \url{https://github.com/sheldonresearch/ProG}.
 }
 
 \end{abstract}
 
 \begin{IEEEkeywords}
-graph prompt, graph pre-training, graph learning, artificial general intelligence.
+graph prompt learning, graph pre-training, graph representation learning, graph foundation models, transfer learning.
 \end{IEEEkeywords}}
 
 
@@ -112,7 +111,7 @@ graph prompt, graph pre-training, graph learning, artificial general intelligenc
 \input{7.ProG}
 \input{8.Discussion}
 \input{9.Conclusion}
-\input{Ack}
+% \input{Ack}
 
 
 \normalem % disable auto underline
@@ -122,4 +121,3 @@ graph prompt, graph pre-training, graph learning, artificial general intelligenc
 % \input{author}
 
 \end{document}
-
