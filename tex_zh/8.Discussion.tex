@@ -1,0 +1,29 @@
+\section{挑战与未来方向}\label{sec:dis}
+\subsection{当前挑战}\label{sec:challenges}
+图提示学习已取得了显著的研究进展，从通用基准任务走向更专业化的设置和应用场景。然而，该领域在模型基础、评估、应用和迁移性方面仍面临若干挑战。在本小节中，我们详细讨论这些挑战。
+
+\textbf{图模型内在局限。} 提示源自NLP领域 \cite{brown2020language, lester2021power, liu2023pretrain}，在NLP中预训练语言模型为适应下游任务提供了相对统一的骨干和文本接口。图提示学习面临着不同的情况。许多图提示并非与LLM提示在相同意义上的上下文提示；它们通常是插入图模型中的提示标记、提示图、任务模板或结构适配器。因此主要限制不仅是图模型规模较小，还缺乏广泛可复用的图基础模型、统一的图任务接口以及跨域足够多样的预训练语料。这使得设计能够一致地激活可迁移结构知识的提示变得困难，无法像文本提示能够从大语言模型中引出知识那样。
+
+\textbf{图提示学习的直观评估。}
+在NLP领域，提示通常采用离散文本格式 \cite{brown2020language, robinson2023leveraging}，允许直观的理解、比较和解释。相比之下，图提示通常是潜在或模型内部的。早期方法使用可学习标记 \cite{sun2022gppt, fang2023universal, fang2022prompt, tan2023virtual, ma2023hetgpt} 或增强图 \cite{sun2023all, huang2023prodigy, ge2023enhancing}，而更新的设计还包含语义提示、类原型、边提示、频谱提示和提示选择机制 \cite{gong2024selfpro, ge2024psp, fu2025edge, yan2024igap, lv2025graphprompter}。这些多样的形式使图提示更具表达力，但也使检查提示编码了什么以及不同的提示设计应该如何比较变得更加困难。因此，评估仍然严重依赖下游准确率，而提示质量、结构相关性和跨任务鲁棒性的直观度量仍然不发达。
+
+\textbf{更多下游应用。}
+图提示学习仍然主要在节点和图分类等开源基准任务上进行评估 \cite{hamilton2017inductive, xu2018how}，但其应用证据不再仅限于这些设置。DyGPrompt \cite{yu2025dygprompt} 将图提示扩展到动态交互图，而 GraphPro \cite{yang2024graphpro} 和 GPT4Rec \cite{zhang2024gpt4rec} 将时间和多级提示应用于推荐系统。在知识图谱补全中，APKGC \cite{maoliniyazi2026apkgc} 和 FFCL-KGC \cite{zhu2026ffclkgc} 表明自适应或双重提示可以改进结构化关系预测。生物医学研究如 MOAT \cite{long2024moat}、DDIPrompt \cite{wang2024ddiprompt}、Prompt-DDG \cite{wu2024promptddg} 和蛋白质多聚体提示学习 \cite{gao2024protein} 进一步在分子、药物相互作用和蛋白质相互作用图上展示了应用证据。然而，这一进展在不同领域之间分布不均。推荐和生物医学应用已经提供了相对具体的证据，而社交网络安全、工业知识管理和其他高风险设置仍然缺乏统一评估协议和面向部署的研究。关键挑战是为每个应用场景构建尊重其结构、时间和语义约束的领域特定预训练图模型和提示设计。
+
+\textbf{可迁移提示设计。}
+迁移性已成为图提示学习中的核心关注点。早期研究 \cite{liu2023graphprompt, sun2022gppt, gong2023prompt, fang2023universal, fang2022prompt, ge2023enhancing} 通常在同一数据集或密切相关任务的预训练和提示调优内进行评估。PRODIGY \cite{huang2023prodigy} 探索了同一域内的迁移性，All in One \cite{sun2023all} 提供了跨任务和域迁移性的实证结果。更近期的工作进一步研究了语义对齐 \cite{zhu2023graphcontrol}、结构对齐 \cite{zhao2023graphglow}、通用提示 \cite{huang2025oneprompt}、跨模型提示融合 \cite{he2026gp2f}、无源图域自适应 \cite{zhang2024collaborate} 和多域图基础模型 \cite{wang2025multidomain, yu2025samgpt}。尽管有这些进展，该领域仍然缺乏统一的迁移协议和诊断工具来解释为什么一个提示在一个图域成功而在另一个失败。实现可靠的迁移性需要共同考虑任务模板、语义特征空间、图结构模式和预训练数据多样性。
+
+\subsection{未来方向}
+基于上述对图提示的分析，我们总结未来方向如下：
+
+\textbf{从图基础模型中学习知识。} 目前，图模型仍然经常针对特定领域或任务定制，限制了其跨更广泛领域的泛化能力 \cite{liu2023graph, zhu2023graphcontrol}。\citet{liu2023one} 的OFA模型通过将图特征映射到语言兼容空间来解决来自各种域的图的分类任务，这是迈向图基础模型的重要一步。图提示不必取代基于语言的接口，而是可以通过提供结构感知、任务感知和参数高效的自适应机制来补充图基础模型和图-LLM接口。正如文本提示使LLMs适应多样化应用 \cite{robinson2023leveraging, wang2023knowledge, brown2020language}，图提示可以帮助图基础模型在保持图拓扑和结构语义的同时暴露任务特定知识。因此，一个有前景的方向是开发可与图原生基础模型和图-语言模型一起工作的提示接口。
+
+\textbf{可迁移学习。} 正如第 \ref{sec:challenges} 节所讨论的，图提示学习已开始解决跨任务、跨域和跨预训练模型的迁移问题，但对迁移性的系统理解仍然缺乏。现有方法将不同任务重新表述为统一模板 \cite{sun2023all, huang2023prodigy}、对齐语义特征 \cite{zhu2023graphcontrol}或适配结构模式 \cite{zhao2023graphglow}。更近期的方法进一步考虑了通用提示和跨模型自适应 \cite{huang2025oneprompt, he2026gp2f}。未来工作应从孤立的迁移实验转向标准化的跨数据集、跨任务和跨骨干评估。同样重要的是，刻画提示何时因为捕获任务语义、图结构或预训练分布偏差而迁移的特征。这样的诊断将使异构图、时间图、多域图和应用特定图的可迁移图提示更加可靠。
+
+
+\textbf{更多理论基础。} 尽管图提示学习在各种下游任务上展示了令人印象深刻的成果 \cite{guo2023datacentric, wen2023voucher, yang2023empirical}，但许多方法仍然由对NLP中提示调优的经验类比所驱动 \cite{liu2022ptuning, brown2020language, gao2021making, tsimpoukelli2021multimodal, qin2021learning, shin2020autoprompt}。近期理论努力已开始从图特定视角解释图提示。\citet{wang2025does} 将图提示分析为近似图变换算子的数据操作，并在图神经模型下推导此类操作的误差界。这一视角将提示插入与图增强、任务重新表述和上下游对齐联系起来。然而，理论基础仍然不完整。未来的分析应进一步解释提示形式如何与图同构、同质性和异质性、结构分布迁移、提示能力和参数效率相互作用。针对时间、异构、分子或知识图的专门提示可能也需要与用于通用图分类基准的假设不同的假设。
+
+
+\textbf{更可解释和可理解的设计。} 虽然现有图提示学习方法在各种下游任务上展示了令人印象深刻的结果 \cite{guo2023datacentric, wen2023voucher, yang2023empirical}，但我们对究竟从提示中学到了什么仍然缺乏清晰理解。提示向量的黑箱学习模式引发了对它们可解释性的质疑，以及我们是否能在输入数据和被提示的图之间建立有意义的对应关系 \cite{sun2023all}。随着提示设计变得更加结构化，解释应超越可视化提示向量，而应阐明提示如何对应到节点、边、子图、原型、时间模式或几何约束 \cite{gong2024selfpro, ge2024psp, fu2025edge, yan2024igap}。这些问题对于理解和解释提示至关重要，但在图提示研究中仍然探索不足。为了迈向可信的图提示学习，探索自我可解释性 \cite{dai2021selfexplainable}
+% , zhang2021protgnn}
+以实现图提示的直观解释是有前景的。通过深入了解学习到的提示向量和结构，我们可以增强对底层机制的理解并提高图提示的可解释性。这反过来可以导致在推荐、生物医学建模、安全和隐私敏感图学习等高风险应用中更有效地利用提示。

@@ -1,0 +1,77 @@
+\section{预备知识}\label{sec:pre}
+
+本节介绍综述其余部分所需的背景知识。我们首先定义整篇论文中使用的基本符号，然后回顾图表示学习的主要阶段，包括浅层嵌入、监督图神经网络和基于预训练的迁移。我们还简要回顾了提示学习的发展，并解释为什么在图学习中提示值得单独讨论，而不是被视为NLP实践的直接复制。
+
+\subsection{符号定义}\label{sec:notation}
+设图表示为 $\mathcal{G} = (\mathcal{V}, \mathcal{E}$，其中 $\mathcal{V} = \{ v_1, v_2, \ldots, v_N \}$ 是节点集合，$\mathcal{E} \subseteq \mathcal{V} \times \mathcal{V}$ 是边集合。每个节点 $v_i$ 与一个特征向量 $\mathbf{x}_i \in \mathbb{R}^D$ 相关联。我们用 $\mathbf{X} \in \mathbb{R}^{N \times D}$ 表示节点特征矩阵，用 $\mathbf{A} \in \{0,1\}^{N \times N}$ 表示邻接矩阵，其中 $\mathbf{A}_{ij} = 1$ 当且仅当 $(v_i, v_j) \in \mathcal{E}$。
+
+
+\subsection{图表示学习}
+图表示学习经历了几个重叠的发展阶段。早期工作集中在浅层嵌入方法上，这些方法将节点映射到可学习的低维向量，然后在下流任务中复用。代表性例子包括DeepWalk~\cite{perozzi2014deepwalk} 和node2vec~\cite{grover2016node2vec}。这些方法很灵活，因为学习到的嵌入通常可以在多个任务中复用，但它们通常是转导性的，不能自然地整合丰富的节点属性。
+
+
+浅层嵌入方法通常根据如何定义节点相似性来分组。一条常见路线是基于矩阵分解的~\cite{
+% belkin2001laplacian,
+% ahmed2013distributed,
+% cao2015grarep,
+ou2016asymmetric, zhang2019prone}；另一条是基于随机游走的~\cite{grover2016node2vec, perozzi2014deepwalk, wang2019hyperbolic, wang2022common}。当目标是保持结构接近性在紧凑表示中时，这些方法仍然很有用，但一旦节点属性、未见节点或任务特定监督变得核心，它们的迁移行为就有限了。
+
+
+图神经网络（GNNs）通过参数化的邻域聚合学习任务相关表示来解决其中一些限制。大多数GNN遵循消息传递框架，使用比浅层嵌入更具表达力的编码器。代表性架构包括谱方法和空间方法变体~\cite{defferrard2016convolutional, he2021bernnet, niepert2016learning, hamilton2017inductive, velickovic2018graph, shi2021masked, xu2018how}。在许多设置中，GNNs优于浅层嵌入，因为它们可以结合图结构和节点特征。权衡是它们通常为特定任务训练，当任务变化时往往需要重新训练或监督。
+
+
+这种对比激发了贯穿综述其余部分的迁移问题。浅层嵌入灵活但在建模能力上有限。任务特定GNNs更具表达力，但在新设置中复用性较差。预训练和提示都可以理解为改进迁移的尝试，尽管通过不同的机制。
+
+
+
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.49\textwidth]{pic/WhyPrompt2.pdf}
+    \caption{图学习中灵活性和表达性的示意图。(a) 浅层节点嵌入方法通常可在任务间复用，但建模能力有限。(b) 任务特定GNNs更具表达力，但通常需要重新训练或监督才能适应新任务。(c) 提示可以通过在复用预训练图模型的同时调整输入来改善权衡。}
+    \label{fig:pre1}
+\end{figure}
+
+\subsection{预训练与微调}
+预训练和微调已成为图表示学习中一种常见的迁移范式。通常的工作流程是在大规模图数据上预训练模型（有或无标签），然后通过更新模型参数使其适应下游任务。在图学习中，代表性的预训练目标包括图自编码~\cite{
+% kipf2016variational,
+wang2017mgae}、掩码组件建模~\cite{hu2020strategies, rong2020selfsupervised} 和图对比学习~\cite{velickovic2019deep, sun2020infograph}。我们将在第~\ref{sec:pretrain_method}节中详细回顾这些目标。
+
+
+这种范式改进了迁移，因为下游模型不再从零开始。然而，微调仍然是模型中心的：适应新任务的通常方式是更新部分或全部模型参数。这可以工作得很好，但也意味着迁移通常依赖于重复优化、监督访问以及新任务与预训练模型之间的稳定匹配。
+
+
+\subsection{提示学习简史}\label{sec:his_prompt}
+
+提示学习成为另一种适配预训练模型的方法，特别是当完全微调变得越来越昂贵时。不是为每个下游问题更新整个模型，而是通过修改输入、任务接口或一小部分可学习的提示参数，使得下游问题以更接近于模型在预训练期间已经见过的形式呈现~\cite{liu2023pretrain}。
+
+在NLP中，提示有几种形式。有些是离散模板，如完形填空式提示。其他的则是学习的连续提示，包括基于前缀的方法~\cite{lester2021power, li2021prefixtuning}。提示构建可能依赖于手动模板~\cite{
+% petroni2019language,
+brown2020language, schick2021fewshot, schick2021it}、离散提示搜索~\cite{jiang2020how, haviv2021bertese, shin2020autoprompt, gao2021making}，或直接在嵌入空间中进行提示~\cite{li2021prefixtuning, lester2021power, tsimpoukelli2021multimodal, qin2021learning}。这些进展并没有完全取代微调。相反，它们扩展了可用自适应机制的集合。
+
+
+对于图学习，提示学习出于类似的原因具有吸引力：它可能能够以更少的更新参数实现迁移，并在预训练图编码器和下游自适应模块之间建立更清晰的分隔。同时，图提示并不是NLP提示的直接复制，因为图输入是结构化对象，提示设计还必须考虑拓扑、插入模式和图级预测机制。
+
+
+\subsection{为什么需要图提示？}\label{sec:why_prompt}
+
+% In this part of our study, we aim to understand why prompts are important. We want to uncover the fundamental aspects of graph prompts. What exactly do graph prompts do in graph problems? How do they fit into the complex graphs, and how do they help us achieve the broader goal of creating AI systems that can handle graph data effectively? These questions highlight the significant role that graph prompts play in shaping the future of AI when dealing with graph information.
+
+
+\textbf{A. 图提示与图微调的区别。}
+图提示与图微调的区别最容易从适应发生的位置来陈述。微调主要是一种模型级自适应策略：预训练的图模型被调整，使其参数更好地适应下游任务。相比之下，提示主要是一种输入级或数据级自适应策略：下游图通过提示标记、提示结构或提示诱导的接口进行修改，然后才由预训练模型处理。实际上，图提示可能仍然涉及少量可训练参数，但核心思想不是为每个新任务重新优化整个编码器。
+
+% From the whole picture of AIG, there are many techniques for model-level consideration (like model structure design, training, tunning, etc.) Intuitively, these model-level tricks are more like an iceberg on the surface, while the underwater part, that is data, still heavily relies on some primitive hand-crafted work. Compared with the model-level technique, we have very limited learnable approaches to help us handle data-level issues. Graph prompting is just a very notable choice.
+
+\textbf{B. 提示作为可学习的图修改。}
+理解图提示的一种有用方法是将其视为图变换的可学习近似。设 $\varphi^*$ 表示预训练的图模型，$\mathcal{G}$ 表示原始图，$\mathcal{G}_p^*$ 表示提示图或提示模块，$\psi(\mathcal{G}, \mathcal{G}_p^*)$ 表示通过将提示插入输入而产生的提示图。设 $\mathbf{g}(\mathbf{A}, \mathbf{X})$ 表示原始图结构和节点特征的目标变换。那么，在概念层面上，图提示可以写为
+\begin{equation}\label{equ:error_bound_new}%\vspace{-0.05in}
+    \varphi^*\left(\psi(\mathcal{G}, \mathcal{G}_p^*)\right)=\varphi^*(\mathbf{g}(\mathbf{A}, \mathbf{X})) + O^{*}_{p\varphi},
+\end{equation}
+其中 $O^{*}_{p\varphi}$ 是提示输入与预训练模型 $\varphi^*$ 下理想变换之间的残差差异。这个表达式不应被解读为正式保证。它是一个概念视角：提示可以被解释为一种可学习的方式来调整图结构、节点特征或任务接口，使得下游输入更好地匹配预训练编码器已经捕捉到的行为。
+
+
+\textbf{C. 超越任务自适应的用途。}
+这一视角也解释了为什么图提示可能在普通任务迁移之外有用。如果提示可以作为可学习的图修改，那么它就可以在推理前用于调整输入，例如通过补偿结构不匹配、引入辅助提示节点或将图与另一种模态对齐。原则上，这为超出标准下游自适应的应用打开了大门，包括域对齐、多模态接口和面向鲁棒性的输入调整。这些用途是否有帮助仍然取决于任务，但关键点是提示改变了适应的表达方式：不仅通过模型更新，还通过可学习的方式修改输入图本身。
+
+简而言之，图提示值得单独研究，因为它改变了适应的单元。不是仅仅依赖重复的模型再训练，而是提供了一种在复用预训练图编码器的同时，通过提示参数、提示结构和提示图构建来表达下游自适应的方式。这种转变正是使图提示既灵活又在技术上不同于传统微调的关键。

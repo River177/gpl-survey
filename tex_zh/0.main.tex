@@ -1,0 +1,126 @@
+\documentclass[10pt,journal,compsoc]{IEEEtran}
+
+
+\usepackage[usenames,svgnames]{xcolor}
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{amsfonts}
+\usepackage{ dsfont }
+% \usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{hyperref}
+\hypersetup{colorlinks,allcolors=black}
+
+\usepackage{ulem}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{bm}
+\usepackage{pifont}
+\usepackage{mydef}
+\usepackage{threeparttable}
+\usepackage{ragged2e}
+\usepackage[numbers]{natbib}
+\usepackage{siunitx}
+\usepackage[edges]{forest}
+
+\usepackage{xeCJK}
+\setCJKmainfont[BoldFont={Hei}, ItalicFont={Kai}]{STSong}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand\red[1]{{\color{red}{#1}}}
+\newcommand{\figref}[1]{图~\ref{#1}}
+\newcommand{\tabref}[1]{表~\ref{#1}}
+\newcommand{\secref}[1]{第~\ref{#1}~节}
+% \newcommand{\eqnref}[1]{式~(\ref{#1})}
+% \renewcommand{\justify}{\leftskip=0pt \rightskip=0pt plus 0cm}
+
+
+\begin{document}
+
+
+\title{图提示学习：综合综述与未来展望}
+
+
+% \author{
+% \IEEEauthorblockN{Xiangguo~Sun\IEEEauthorrefmark{1},
+% Jiawen~Zhang\IEEEauthorrefmark{2},
+% Xixi~Wu\IEEEauthorrefmark{3},
+% Hong~Cheng\IEEEauthorrefmark{1},
+% Yun~Xiong\IEEEauthorrefmark{3},
+% Jia~Li\IEEEauthorrefmark{2}
+% }
+
+% \IEEEauthorblockA{
+% \IEEEauthorrefmark{1}The Chinese University of Hong Kong, Hong Kong SAR.} \\
+% \IEEEauthorblockA{\IEEEauthorrefmark{2}Hong Kong University of Science and Technology (Guangzhou), China.} \\
+% \IEEEauthorblockA{\IEEEauthorrefmark{3}Fudan University, China}
+% }
+
+
+
+% \author{Hao~Wu,
+%         Sixu~An,
+%         Hong~Cheng,
+%          Jia~Li,
+%          Xiangguo~Sun
+
+% \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem Xiangguo~Sun, Hong~Cheng: Department of Systems Engineering and Engineering Management, and Shun Hing Institute of Advanced Engineering, The Chinese University of Hong Kong, Hong Kong SAR.  \\\{xgsun, hcheng\}@se.cuhk.edu.hk
+
+% \IEEEcompsocthanksitem Jiawen~Zhang, Jia~Li: Hong Kong University of Science and Technology (Guangzhou), China. \\jzhang302@connect.hkust-gz.edu.cn,jialee@ust.hk
+
+% \IEEEcompsocthanksitem Xixi~Wu, Yun~Xiong: Shanghai Key Laboratory of Data Science, School of Computer Science, Fudan University, China. \\ 21210240043@m.fudan.edu.cn, yunx@fudan.edu.cn
+% }
+% }
+
+
+
+% \markboth{IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING}%
+% \markboth{IEEE TRANSACTIONS}%
+% {Xiangguo Sun \MakeLowercase{\textit{et al.}}: }
+
+
+
+\IEEEtitleabstractindextext{
+\begin{abstract}
+\justify{通用人工智能（AGI）加速了跨领域基础模型的研究，然而图数据在这一范式中仍不如文本和视觉数据受到广泛关注。本综述从跨模态、跨域和跨任务泛化的视角审视图提示学习，并基于提示标记、标记结构和插入模式建立了统一框架。本综述进一步探讨了图预训练与提示的关系，讨论了提示如何将下游任务与代理目标对齐，并总结了具有代表性的提示调优策略。该分类体系涵盖了过去数年在一百余项代表性研究，涵盖预训练策略、提示设计、多模态提示和图域自适应等方向。我们还总结了应用场景和支持资源，包括ProG以及精心整理的论文、基准测试和代码库。最后，本综述讨论了当前挑战和未来方向，为图表示学习及相关面向通用人工智能的应用中图提示的未来发展提供了展望。相关资源请访问 \url{https://github.com/WxxShirley/Awesome-Graph-Prompt} 和 \url{https://github.com/sheldonresearch/ProG}。
+}
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+图提示，图预训练，图学习，通用人工智能。
+\end{IEEEkeywords}}
+
+
+
+\maketitle
+
+
+
+
+
+\input{1.intro}
+\input{2.methodology}
+\input{3.Preliminaries}
+\input{4.Pre-training}
+\input{5}
+\input{6.Applications}
+\input{7.ProG}
+\input{8.Discussion}
+\input{9.Conclusion}
+\input{Ack}
+
+
+\normalem % disable auto underline
+\bibliographystyle{IEEEtranSN}
+\bibliography{zotero}
+% \bibliography{080322.bib}
+% \input{author}
+
+\end{document}

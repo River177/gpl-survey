@@ -1,0 +1,42 @@
+\section{图神经网络预训练与图提示}\label{sec:pretrain_method}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.49\textwidth]{pic/pretraining.pdf}
+    \caption{图预训练方法。}
+    \label{fig:pretrain}
+\end{figure}
+
+
+图预训练是图表示学习中"预训练、提示与预测"范式的关键步骤。该方法利用现成可用的信息对固有图结构进行编码，为跨不同下游任务的泛化提供了坚实基础。通过将这些预训练方法整合到综合工作流程中，我们探索了它们与后续提示和预测阶段的相互作用，揭示了这种整体方法的优势和局限性。这种独特视角使我们的综述与众不同，将图预训练定位为更广泛的图提示学习过程的一个组成部分。为了更好地说明提示范式的动机，我们现在深入探讨传统"预训练与微调"框架中的四种不同预训练策略。
+
+
+
+\subsection{节点级策略}\label{sec:node_pre}
+节点级预训练方法旨在学习节点及其邻域的可迁移局部表示。如图~\ref{fig:pretrain}所示，这些方法通常围绕对比或预测目标构建。在对比设置中，自监督信号通常通过扰动图结构或节点属性创建，然后最大化原始视图和增强视图之间的一致性。代表性的节点级对比方法包括~\cite{cheng2023wiener, zhu2021graph, jin2021multiscale, peng2020graph, jiang2021pretraining, wang2021selfsuperviseda}。
+
+预测性节点级方法则从无扰动图中重建掩码或损坏的信息。代表性例子包括掩码自编码和相关重建目标~\cite{hou2022graphmae, wang2017mgae, park2019symmetric, wang2021selfsupervised, hou2023graphmae2}。这些方法可以学习有用的局部模式，但它们的迁移性仍然取决于代理目标与下游任务的匹配程度。特别地，以局部损坏或重建为中心的方法可能低估远程依赖或图级语义的重要性。近期工作也将面向节点的预训练扩展到多图设置，这更符合图基础模型视角下的迁移~\cite{lachi2024graphfm}。
+
+
+\subsection{边级策略}\label{sec:edge_pre}
+边级预训练专注于节点交互和成对关系，这使其与链路预测等任务特别相关。一种常见方法是判别一对节点之间是否存在边，这可以看作是一种对比或关系判别目标~\cite{jin2021node, long2022pretraining}。另一种方法重建掩码或损坏的边，通常通过邻接恢复或相关生成目标~\cite{tan2023s2gae, li2023what, pan2018adversarially, hasanzadeh2019semiimplicit, kim2021how}。
+
+这些策略在下游性能强烈依赖局部连接模式时很有用。它们的局限性在于通常仅以结构为中心。因此，当节点属性、高阶语义或图级目标比成对边恢复更重要时，它们可能无法很好地迁移。近期基准测试工作也以比边重建更广泛的视角评估迁移~\cite{xu2024graphfm}。
+
+
+\subsection{图级策略}\label{sec:graph_pre}
+图级预训练旨在改进整图表示，特别是针对在子图或完整图实例上定义的下游任务。与节点级和边级设置类似，图级策略通常分为基于重建和对比方法。基于重建的方法掩码图组件并学习恢复它们~\cite{xie2022selfsupervised, rong2020selfsupervised}。对比方法则最大化局部和全局视图之间的互信息~\cite{velickovic2019deep, sun2020infograph, hassani2020contrastive, sun2021mocl, subramonian2021motifdriven}，或区分正负图对~\cite{you2020graph, suresh2021adversarial, thakoor2021bootstrapped, qiu2020gcc}。
+
+这些方法通常会产生有用的图级表示，特别是当下游目标接近代理任务时。主要困难是在具有更大语义差距的任务和数据集之间迁移。当预训练信号与某种图结构过于狭窄地对齐时，所得编码器可能迁移很差，甚至可能遭受负迁移~\cite{rosenstein2005transfer}。更近期的工作将图级预训练推向跨域和文本属性图设置，这扩大了迁移范围，超出了单一图族~\cite{he2024unigraph, song2024pure}。
+
+
+\subsection{多任务预训练}\label{sec:multi_pre}
+多任务预训练结合多个目标，使编码器能够同时从图数据的多个视图学习。典型选择包括属性重建和结构恢复的联合优化~\cite{hu2020strategies, hu2020gptgnn, zhang2020graphbert, fang2022geometryenhanced}。例如，Hu等人~\cite{hu2020strategies} 在节点和图级别同时预训练GNN，以便局部和全局信息可以一起学习。其他工作结合多个粒度的对比学习~\cite{jiang2021contrastive, xu2021infogcl}。
+
+多任务预训练的优势是广度：编码器不那么依赖单一代理任务。缺点是优化复杂性。不同目标可能相互竞争，所得模型可能在某些任务上表现不佳，即使聚合预训练损失有所改善。因此，多任务预训练最好被理解为一个更广泛的设计空间，而不是负迁移的保证补救方案。这条思路现在与多图和多域预训练重叠，目标是构建能够在图集合之间迁移的编码器，而不仅仅是在单一基准内~\cite{lachi2024graphfm, yu2025samgpt}。
+
+
+\subsection{进一步讨论} \label{sec:pre-train-dis}
+幸运的是，"提示与预测"范式为上述挑战提供了一个稳健的解决方案。该方法可以充分发挥模型性能，并与先进的GNN架构无缝集成。该范式不是通过目标工程使预训练GNN适应下游任务，而是使用图提示将下游任务重新表述为在预训练阶段解决的问题。这种创新策略有效地弥合了代理任务和下游任务之间的差距，同时避开了次优性能的陷阱。此外，与传统微调方法相比，提示范式表现出卓越的灵活性，使其在需要少样本甚至零样本学习的场景中表现出色，在这些场景中，用有限或无标签数据适应新上下文至关重要。在当前模型规模激增和下游任务不断增加的环境中，提示范式的兴起代表了一股不可阻挡的变革性趋势。
+
+\input{table/graph_prompt_summary}
