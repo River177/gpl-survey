@@ -36,6 +36,20 @@
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \renewcommand{\justify}{\leftskip=0pt \rightskip=0pt plus 0cm}
 
+% --- relax float placement so large (double-column) figures place near their
+% --- references instead of piling up at the end of the document.
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\setcounter{dbltopnumber}{3}
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.65}
+\renewcommand{\dbltopfraction}{0.92}
+\renewcommand{\dblfloatpagefraction}{0.65}
+\extrafloats{64}
+
 
 
 \begin{document}
