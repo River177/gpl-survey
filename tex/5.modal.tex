@@ -1,0 +1,40 @@
+\section{Graph Prompting in Multi-Modal and Multi-Domain Areas}\label{sec:pmodal}
+
+\subsection{Multi-Modal Prompting with Graphs}\label{subsec:multi_modal}
+
+This section turns to settings in which graph prompting must interact with other modalities or transfer across domains. We discuss two adjacent directions: integrating graphs with modalities such as text, and adapting prompted graph models under domain shift. Current evidence is strongest in text-attributed graphs, textual graph understanding, and molecular graph-language modeling; more general multimodal graph prompting is still less settled. Recent surveys review graph--LLM systems and graph learning under distribution shifts~\cite{ren2024surveyllmgraph,wu2024graphshifts,shi2024graphdomain}. Here we focus on representative methods in which prompts or prompt-like adaptation interfaces play a central role.
+
+
+
+
+\textbf{A. Prompting in Text-Attributed Graphs.} Early work in text-attributed graphs (TAGs) mainly used prompts to expose graph context to language models or to align text and topology under limited supervision. G2P2~\cite{wen2023augmenting} combines graph-grounded pre-training with prompting for low-resource text classification. GIMLET~\cite{zhao2023gimlet} couples graph and text encoders for prompt-based molecular tasks, while \citet{li2023promptbased} use hand-crafted language templates to inject both raw text and graph structure into node classification. P2TAG~\cite{zhao2024p2tag} makes this coupling more explicit by using mixed prompts that combine text prompts with a prompt graph initialized from label text embeddings. STAGE~\cite{zolnai2024stage} uses pre-trained LLM embeddings as a lightweight interface for TAGs. GraphiT~\cite{khoshraftar2025graphit} further studies prompt-optimized LLMs for efficient node classification, and \citet{zhu2025llmasgnn} treat the LLM itself as a TAG foundation model with a learned graph vocabulary. The trend is no longer just to write better textual templates; newer methods try to make the graph structure and text prompt share the same adaptation interface.
+
+
+
+\textbf{B. Large Language Models in Graph Data Processing. }
+\citet{chen2023exploring} study two early pipelines for graph-enhanced node classification: using LLMs to enrich text attributes before GNN prediction, and using LLMs directly as predictors. \citet{fatemi2023talk} then show that graph serialization and prompt design substantially affect how well LLMs reason over graph inputs. PATTON~\cite{jin2023patton} pushes this direction toward pre-training on text-rich networks, while KGP~\cite{wang2023knowledge} uses a knowledge-graph-guided prompting pipeline for multi-document question answering. In the same vein, G-Retriever~\cite{he2024gretriever} treats textual graph question answering as a retrieval-augmented generation problem and uses graph-aware retrieval to expose the most relevant substructures to the language model. Relative to earlier graph-serialization studies, this line has shifted from asking whether LLMs can process graph information at all to designing better retrieval, serialization, and prompting interfaces for graph-conditioned reasoning.
+
+
+
+
+
+
+\textbf{C. Multi-modal Fusion with Graph and Prompting. }
+Beyond text, prompt-based multi-modal fusion with graphs is most visible in vision-language and molecular applications. SynerGPT~\cite{edwards2023synergpt} applies in-context prompting to drug synergy prediction. GraphAdapter~\cite{li2023graphadapter} introduces a graph-aware adapter mechanism for vision-language models, and GIT-Mol~\cite{liu2023gitmol} jointly models molecular graphs, images, and text with a prompt-driven LLM backbone. HeGraphAdapter~\cite{zhao2024hegraphadapter} studies graph-conditioned adaptation for multi-modal vision-language models with heterogeneous graph structure, and GraphT5~\cite{kim2025grapht5} proposes a graph-language model for molecular data through cross-token attention. Current evidence is still concentrated in a few vertical domains, so a reusable recipe for graph-centric multimodal prompting has not yet stabilized.
+
+
+
+
+
+\subsection{Graph Domain Adaptation with Prompting}\label{subsec:pdomain}
+Graph domain adaptation remains difficult for two reasons: models must align feature semantics across domains, and they must also handle structural shift.
+
+
+\textbf{A. Semantic Alignment. }
+Prompt-based graph frameworks provide one route to semantic alignment. All in One~\cite{sun2023all} provides a prompt-based interface that can be reused across different graph tasks and datasets. GraphControl~\cite{zhu2023graphcontrol} conditions a pre-trained graph model on downstream-specific information, and \citet{zhang2023structure} use triple-style prompts for knowledge graph transfer. \citet{yi2023contrastive} combine personalized prompts with contrastive learning for cross-domain recommendation, while \citet{liu2023one} map graph features into language space and then rely on an LLM encoder to reduce semantic mismatch across domains. More recent cross-domain prompting methods make the adaptation mechanism explicit. UniPrompt \cite{huang2025oneprompt} maintains learnable edge weights over a prompt graph to adapt pre-trained GNNs to new domains without task-specific tuning. GP2F \cite{he2026gp2f} fuses multiple pre-trained GNNs with adaptive prompts for cross-domain transfer. Collaborate to Adapt~\cite{zhang2024collaborate} addresses source-free graph domain adaptation, and multi-domain graph foundation models suggest that transfer improves when pre-training already exposes the model to semantically diverse graph collections~\cite{wang2025multidomain,yu2025samgpt}. A practical limitation remains: language-based alignment works best when graph features have interpretable semantics, which is often not the case for dense latent features.
+
+
+
+
+\textbf{B. Structural Alignment.}
+\citet{cao2023when} show that structural gap can place an upper bound on graph transferability, which explains why semantic alignment alone is often insufficient. GraphGLOW~\cite{zhao2023graphglow} tackles this problem by learning graph-shared structural patterns that can be reused across datasets. DeepGPT~\cite{shirkavand2023deep} adapts graph transformers with prompt tokens at the input and layer levels, which provides a parameter-efficient way to absorb structural differences across datasets. AAGOD~\cite{guo2023datacentric} is closer to distribution-shift detection than classical domain adaptation, but it is still relevant because it treats a learnable perturbation on the adjacency matrix as a prompt-like mechanism. The same concern has also pushed the field toward multi-graph pre-training and stricter evaluation. \citet{zhao2024all} and \citet{wang2025multidomain} both study transfer across multiple graph datasets, while \citet{liu2024revisiting} show that many reported gains in unsupervised graph domain adaptation remain sensitive to evaluation protocol and benchmark choice. Prompt-based structural adaptation is useful, but its benefit still depends on the diversity of structures seen during pre-training and on how domain shift is measured.

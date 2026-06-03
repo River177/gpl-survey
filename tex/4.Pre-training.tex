@@ -40,5 +40,3 @@ The advantage of multi-task pre-training is breadth: the encoder is less tied to
 
 \subsection{Further Discussion} \label{subsec:pre-train-dis}
 The above strategies show that graph pre-training can provide reusable encoders, but they also clarify why pre-training alone is not sufficient for broad transfer. A pre-trained model is useful only when its learned representations and pretext objectives remain compatible with downstream tasks, domains, and graph structures. Prompting offers one way to reduce this mismatch: instead of fully re-optimizing the encoder for every new setting, a graph prompt can adjust the input graph, task interface, or readout process so that the downstream problem is closer to the behavior induced during pre-training. This does not make prompting a universal replacement for fine-tuning, since its effectiveness still depends on prompt design, pre-training diversity, and the size of the distribution shift. It does, however, provide a practical adaptation mechanism for settings where supervision is limited or repeated full fine-tuning is expensive.
-
-\input{table/graph_prompt_summary}

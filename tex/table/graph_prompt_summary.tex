@@ -172,18 +172,6 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 & \makecell{$L_{\mathrm{down}} \!=\! -\sum_{(x_i,y_i)\in D_t}\log$ \\ $\frac{\exp(\mathrm{sim}(\tilde{\textbf{h}}_{t,x_i},\bar{\textbf{h}}_{t,y_i})/\tau)}{\sum_{c\in Y}\exp(\mathrm{sim}(\tilde{\textbf{h}}_{t,x_i},\bar{\textbf{h}}_{t,c})/\tau)}$}
 & \cmark & \xmark & \cmark & \cmark & \xmark \\ \midrule
 
-
-\makecell{SAP\\(arXiv \cite{ge2023enhancing})} & \cmark & \xmark & \xmark 
-& \makecell{task token: \\$\mathcal{P}= \{ \textbf{c}_y \}_{y \in \textbf{Y}}$ \\structure token: \\$\mathcal{W}= \{ (v_i, c_j) \}_{v_i \in \mathcal{V}, c_j \in \mathcal{P}}$ }
-
-& \makecell{$G' \leftarrow (\mathcal{V} \cup \mathcal{P}, \mathcal{E} \cup \mathcal{W})$ \\$\textbf{Z}^{(1)} = \textrm{MLP}_{\pi'}(\textbf{X})$ \\ $\textbf{Z}^{(2)} = \textrm{GNN}_{\pi''}( [ \textbf{X}, \textbf{P}], $\\$[\textbf{A}, \textbf{W}] )$}
-
-& \makecell{$\min_{\textbf{W}}  - \sum_{(y_i,v_i)} \log $\\$\frac{\textrm{exp}( \textrm{sim}( \textbf{z}_i^{(1)}, \textbf{z}_{y_i}^{(2)} ) / \tau )}{ \sum_{y \in \textbf{Y}} \textrm{exp}( \textrm{sim}( \textbf{z}_i^{(1)}, \textbf{z}_{y}^{(2)} ) / \tau ) }$}
-
-& \cmark  &\xmark& \cmark& \cmark & \xmark \\ \midrule
-
-
-
 \makecell{VNT\\(KDD 2023 \cite{tan2023virtual})} & \cmark & \cmark & \xmark 
 & \makecell{$\boldsymbol{P}=\left[\boldsymbol{p}_1 ; \ldots ; \boldsymbol{p}_P\right]$,\\$\boldsymbol{p}_p \in \mathbb{R}^F$ }
 
