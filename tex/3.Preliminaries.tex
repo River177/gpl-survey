@@ -47,7 +47,7 @@ This paradigm improves transfer because the downstream model no longer starts fr
 
 Prompt learning emerged as another way to adapt pre-trained models, especially when full fine-tuning became increasingly expensive. Rather than updating the whole model for every downstream problem, prompting changes the input, the task interface, or a small set of learnable prompt parameters so that the downstream problem is presented in a form closer to what the model has already seen during pre-training~\cite{liu2023pretrain}.
 
-In NLP, prompts take several forms. Some are discrete templates such as cloze-style prompts. Others are learned continuous prompts, including prefix-based methods~\cite{lester2021power, li2021prefixtuning}. Prompt construction may rely on manual templates~\cite{
+In NLP, prompts take several forms. Some are discrete templates such as cloze-style prompts. Others are learned continuous prompts, including soft prompt tuning~\cite{lester2021power} and prefix tuning~\cite{li2021prefixtuning}. Prompt construction may rely on manual templates~\cite{
 % petroni2019language,
 brown2020language, schick2021fewshot, schick2021it}, discrete prompt search~\cite{jiang2020how, haviv2021bertese, shin2020autoprompt, gao2021making}, or prompting directly in the embedding space~\cite{li2021prefixtuning, lester2021power, tsimpoukelli2021multimodal, qin2021learning}. These developments do not replace fine-tuning altogether. Instead, they expand the set of available adaptation mechanisms.
 
