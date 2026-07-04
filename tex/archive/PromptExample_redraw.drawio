@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-06-15T19:37:09.320+08:00" agent="GitHub Copilot CLI" version="24.7.17" type="device">
+  <diagram name="Fig2a" id="fig2a-redraw">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="355.128" pageHeight="207.127" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="rect-2" value="" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=#FFFFFF;strokeColor=none;strokeWidth=0.740;fontSize=7.891;fontFamily=Times New Roman;fontStyle=0;align=center;verticalAlign=middle;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="0.000" y="0.000" width="355.128" height="207.127" as="geometry" />
+        </mxCell>
+        <mxCell id="text-3" value="&lt;b&gt;&lt;i&gt;Prompt&lt;/i&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=14.302;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#F4B400;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="19.729" y="58.193" width="59.188" height="17.261" as="geometry" />
+        </mxCell>
+        <mxCell id="rect-4" value="" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=#FFF2CC;strokeColor=#FFD966;strokeWidth=0.740;fontSize=7.891;fontFamily=Times New Roman;fontStyle=0;align=center;verticalAlign=middle;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="81.383" y="28.603" width="231.820" height="53.261" as="geometry" />
+        </mxCell>
+        <mxCell id="text-5" value="&lt;b&gt;Help me answer a multiple choice&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=11.343;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#111111;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="87.796" y="33.535" width="207.158" height="14.302" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#111111;strokeWidth=0.740;endArrow=none;endFill=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="87.796" y="49.809" as="sourcePoint" />
+            <mxPoint x="256.481" y="49.809" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="text-7" value="Question: Greenhouses are great for plants like" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=10.356;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#111111;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="87.796" y="53.261" width="207.158" height="13.315" as="geometry" />
+        </mxCell>
+        <mxCell id="text-8" value="A. Pizza   B. Lollipops   C. French beans" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=10.356;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#111111;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="87.796" y="67.563" width="207.158" height="13.315" as="geometry" />
+        </mxCell>
+        <mxCell id="ellipse-9" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#76B5C5;strokeColor=#3A6F7D;strokeWidth=0.986;fontSize=5.918;fontFamily=Times New Roman;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="32.553" y="120.824" width="30.580" height="24.658" as="geometry" />
+        </mxCell>
+        <mxCell id="rect-10" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=#CFEAF0;strokeColor=#94B8BD;strokeWidth=0.740;fontSize=7.891;fontFamily=Times New Roman;fontStyle=0;align=center;verticalAlign=middle;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="37.979" y="109.975" width="20.716" height="18.740" as="geometry" />
+        </mxCell>
+        <mxCell id="ellipse-11" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8FFFF;strokeColor=#0086A8;strokeWidth=0.986;fontSize=5.918;fontFamily=Times New Roman;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="41.432" y="116.879" width="6.905" height="6.904" as="geometry" />
+        </mxCell>
+        <mxCell id="ellipse-12" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8FFFF;strokeColor=#0086A8;strokeWidth=0.986;fontSize=5.918;fontFamily=Times New Roman;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="52.776" y="116.879" width="6.905" height="6.904" as="geometry" />
+        </mxCell>
+        <mxCell id="rect-13" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=#EEEEEE;strokeColor=#111111;strokeWidth=0.740;fontSize=7.891;fontFamily=Times New Roman;fontStyle=0;align=center;verticalAlign=middle;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="44.884" y="129.701" width="13.811" height="3.945" as="geometry" />
+        </mxCell>
+        <mxCell id="ellipse-14" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFC000;strokeColor=#ED7D31;strokeWidth=0.740;fontSize=5.918;fontFamily=Times New Roman;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="46.364" y="106.029" width="5.919" height="5.918" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4472C4;strokeWidth=0.986;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="197.293" y="81.864" as="sourcePoint" />
+            <mxPoint x="197.293" y="101.591" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rect-16" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=#79AD9E;strokeColor=#79AD9E;strokeWidth=0.986;fontSize=7.891;fontFamily=Times New Roman;fontStyle=0;align=center;verticalAlign=middle;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="81.383" y="102.084" width="231.820" height="51.289" as="geometry" />
+        </mxCell>
+        <mxCell id="text-17" value="◎" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=28.603;fontFamily=Times New Roman;fontStyle=0;align=center;verticalAlign=middle;shadow=0;fontColor=#FFFFFF;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="120.842" y="112.934" width="36.499" height="36.494" as="geometry" />
+        </mxCell>
+        <mxCell id="text-18" value="&lt;b&gt;Pre-trained Large&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=14.795;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#FFFFFF;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="163.753" y="110.468" width="135.639" height="17.754" as="geometry" />
+        </mxCell>
+        <mxCell id="text-19" value="&lt;b&gt;Language Model&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=14.795;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#FFFFFF;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="163.753" y="131.674" width="143.038" height="17.754" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4472C4;strokeWidth=0.986;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="197.293" y="153.373" as="sourcePoint" />
+            <mxPoint x="197.293" y="172.606" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="text-21" value="&lt;b&gt;&lt;i&gt;Answer&lt;/i&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=14.302;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#C00000;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="19.729" y="171.620" width="59.188" height="17.261" as="geometry" />
+        </mxCell>
+        <mxCell id="rect-22" value="" style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=#FCE4D6;strokeColor=#ED7D31;strokeWidth=0.740;fontSize=7.891;fontFamily=Times New Roman;fontStyle=0;align=center;verticalAlign=middle;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="81.383" y="171.620" width="231.820" height="21.206" as="geometry" />
+        </mxCell>
+        <mxCell id="text-23" value="The correct answer is C. French beans." style="rounded=0;whiteSpace=wrap;html=1;arcSize=14;absoluteArcSize=1;fillColor=none;strokeColor=none;strokeWidth=0.000;fontSize=10.356;fontFamily=Times New Roman;fontStyle=0;align=left;verticalAlign=middle;shadow=0;fontColor=#111111;spacing=0;resizable=0;rotatable=0;" vertex="1" parent="1">
+          <mxGeometry x="88.782" y="175.565" width="199.759" height="13.315" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
