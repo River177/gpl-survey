@@ -1,6 +1,6 @@
 \begin{table*}[ht]
 \centering
-\caption{Summary of existing representative works on graph prompt. $\mathcal{S}$: Subgraph. $V(\mathcal{S})$: Node set within subgraph $\mathcal{S}$. $\pi$: Pre-trained parameters. $\phi$: Task head parameters. $\theta$: Prompt parameters. $\tilde{\textbf{s}}$: Filled prompt.
+\caption{Summary of selected representative works on graph prompt. The pre-training columns indicate the task level explicitly used or assumed by each method's upstream objective, and the downstream columns indicate task levels explicitly evaluated or supported in the original paper. Preset denotes a hand-crafted or rule-based answering function without a trainable task head, while Learnable denotes a learned classifier, decoder, or task head. $\mathcal{S}$: Subgraph. $V(\mathcal{S})$: Node set within subgraph $\mathcal{S}$. $\pi$: Pre-trained parameters. $\phi$: Task head parameters. $\theta$: Prompt parameters. Tilded variables and $\textbf{X}^{*}$ denote prompted representations or prompted features.
 }
 \label{tab:graph_prompt_summary}
 \resizebox{0.99\textwidth}{!}{
@@ -33,7 +33,7 @@ Cross Entropy
 \makecell{All in One\\ (KDD 2023 \cite{sun2023all})} & \xmark & \xmark & \cmark  
 & \makecell{prompt token: \\$\mathcal{P}=\{ \textbf{p}_1, ..., \textbf{p}_{|\mathcal{P}|} \}$ \\token structure: \\$\{ (\textbf{p}_i, \textbf{p}_j) | \textbf{p}_i, \textbf{p}_j \in \mathcal{P} \}$}
 
-&\makecell{$w_{ik} \leftarrow \sigma(\textbf{p}_k \cdot \textbf{x}^T_i)$ \\ if $\sigma(\textbf{p}_k \cdot \textbf{x}^T_i) > \delta$ else $0$  \\$\tilde{\textbf{s}}_i \!\!\!\leftarrow \textbf{x}_i \!\!+ \sum^{|\mathcal{P}|}_{k=1} w_{ik} \textbf{p}_k $ }
+&\makecell{$w_{ik} \leftarrow \sigma(\textbf{p}_k \cdot \textbf{x}^T_i)$ if $> \delta$ \\ $G' \leftarrow (V \cup \mathcal{P}, E \cup E_{\mathcal{P}} \cup E_{\mathrm{cross}})$ \\ $E_{\mathrm{cross}}=\{(v_i,\textbf{p}_k,w_{ik})\}$}
 
 & % $\textrm{MetaLearning} (f_{\theta, \phi | \pi} )$  
 Meta-Learning
@@ -51,19 +51,6 @@ $\tilde{\textbf{s}}^t_i \leftarrow \textrm{Readout}(\{ \textbf{p}_t \odot f_{\pi
 &\makecell{$\min_{\textbf{p}_t} - \sum_{(y_i, \mathcal{S}_i)}\ln$\\$  \frac{\exp ( \textrm{sim} (\tilde{\textbf{s}}_i^t , \textbf{c}_{y_i} ) / \tau )}{ \sum_{y \in Y} \exp ( \textrm{sim} (\tilde{\textbf{s}}_i^t , \textbf{c}_y) / \tau) } $ }
 &  \cmark   &\xmark  &\cmark & \cmark & \xmark \\  \midrule
 
-
-\makecell{PGCL \\(arXiv \cite{gong2023prompt})} & \xmark & \xmark & \cmark 
-& \makecell{semantic token: $\mathbf{p}^s\in \mathbb{R}^d$\\contextual token: $\mathbf{p}^c\in \mathbb{R}^d$}
-
-& \makecell{$z_x^{p s}=z_x^s\odot \mathbf{p}^s$\\$ z_x^{p c}=z_x^c \odot \mathbf{p}^c$
-} 
-
-&\makecell{$\min-\sum_{(v, a, b) \in \mathcal{T}} \log $\\$\frac{\exp \left(\operatorname{sim}\left(z_v^p, z_a^p\right) / \tau\right)}{\sum_{u \in\{x, y\}} \exp \left(\operatorname{sim}\left(z_v^p, z_u^p\right) / \tau\right)}$ }
-
-&  \cmark   &\cmark  &\cmark & \cmark & \xmark \\  \midrule
-
-
-
 \makecell{PRODIGY \\(NeurIPS 2023 \cite{huang2023prodigy}) }& \xmark & \cmark & \xmark & 
 \makecell{data graph: \\$\mathcal{G}^D \sim \oplus^k_{i=1} \mathcal{N} (\mathcal{V}_i,\mathcal{G}_i)$ \\task graph: $\mathcal{G}^T$}& 
 $\tilde{\textbf{s}}_i \leftarrow f^T_{\pi^T} (\mathcal{G}^T | f^D_{\pi^{D}} (\mathcal{G}^D))$  & 
@@ -79,7 +66,7 @@ Fixed &  \cmark   & \cmark  & \cmark& \cmark & \xmark \\ \midrule
 \makecell{prompt token: \\one vector for each graph}
 & 
 connect to all nodes in the graph  & 
-\makecell{contrastive loss and \\reconstruction loss} &  \cmark   & \xmark  & \xmark& \cmark & \xmark \\ \midrule
+\makecell{contrastive loss and \\reconstruction loss} &  \xmark   & \xmark  & \cmark& \cmark & \xmark \\ \midrule
 
 
 \makecell{GPF-Plus \\(NeurIPS 2023 \cite{fang2023universal}) }& \cmark & \cmark & \cmark  
@@ -102,7 +89,7 @@ connect to all nodes in the graph  &
 
 
 
-\makecell{DeepGPT\\(arXiv \cite{shirkavand2023deep})} & \cmark & \cmark & \cmark 
+\makecell{DeepGPT\\(arXiv \cite{shirkavand2023deep})} & \xmark & \xmark & \xmark 
 & \makecell{prompt token: \\$\textbf{p} \in \mathbb{R}^d$ \\ prefix token: \\$\textbf{P} \in \mathbb{R}^{|\mathcal{P}| \times d}$ }
 
 & \makecell{ $\tilde{\textbf{x}}_i \leftarrow \textbf{x}_i + \textbf{p} $ \\ $\tilde{\textbf{s}}_i \leftarrow  f_{\textbf{P}, \pi}(G,  \tilde{\textbf{x}}_i) $}
@@ -185,7 +172,6 @@ $ \mathcal{E}\cup \{ (v_i^p, v_i) \},\textbf{X} \cup \{ \textbf{p}_i \})$
 \end{tabular}%
 }
 \end{table*}
-
 
 
 

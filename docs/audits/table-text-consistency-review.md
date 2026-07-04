@@ -2,13 +2,13 @@
 
 > 生成时间：2026-07-04  
 > 范围：`tex/table/graph_prompt_summary.tex` 与 `tex/5.tex`、`tex/5.modal.tex` 的一致性。  
-> 处理原则：本文只给解释和修复方案，暂不执行 TeX 修改，等待审查后再动正文和表格。
+> 当前状态：方案已按审查意见执行；PGCL 已从表格和正文引用中移除，Self-Pro 保留。
 
 ## 1. 结论摘要
 
-当前表格的主要问题不是 LaTeX 结构，而是语义口径不够统一。最需要优先改的是 All in One、PGCL、SGL-PT、DeepGPT，以及正文出现但表格缺席的 HetGPT 和 GraphControl。另一个横向问题是表头里的 `pre-training task` 没有明确说明它到底指"方法自身使用的预训练目标"，还是"可兼容的上游预训练任务"。这会直接影响 DeepGPT、GPF/GPF-Plus、SUPT、UniPrompt 等行的勾选解释。
+当前表格的主要问题不是 LaTeX 结构，而是语义口径不够统一。最需要优先改的是 All in One、PGCL/Self-Pro 的取舍、SGL-PT、DeepGPT，以及正文出现但表格缺席的 HetGPT 和 GraphControl。另一个横向问题是表头里的 `pre-training task` 没有明确说明它到底指"方法自身使用的预训练目标"，还是"可兼容的上游预训练任务"。这会直接影响 DeepGPT、GPF/GPF-Plus、SUPT、UniPrompt 等行的勾选解释。
 
-建议采用保守方案：先统一表格口径，再做少量行级修正。表格不需要重做 taxonomy，也不必把所有正文方法都塞进去；但 caption 需要明确它是 selected representative works，并解释列的含义。对确实会造成误读的行，例如 All in One 的插入公式和 PGCL/SGL-PT 的下游任务标记，应直接修改。
+建议采用保守方案：先统一表格口径，再做少量行级修正。表格不需要重做 taxonomy，也不必把所有正文方法都塞进去；但 caption 需要明确它是 selected representative works，并解释列的含义。对确实会造成误读的行，例如 All in One 的插入公式、SGL-PT 的下游任务标记，以及 PGCL/Self-Pro 的重复版本问题，应直接修改。
 
 ## 2. 复核来源
 
@@ -17,7 +17,7 @@
 | 方法/问题 | 主要来源 |
 |---|---|
 | All in One | `tex/table/graph_prompt_summary.tex:33-40`；`tex/5.tex:31,45,54,66,89`；arXiv:2307.01504 页面说明其将 node/edge/graph tasks reformulate to graph-level task，并使用 meta-learning |
-| PGCL | `tex/table/graph_prompt_summary.tex:55-63`；`tex/5.tex:23,74`；DBLP 记录 `journals/corr/abs-2310-10362`；注意 arXiv 当前 `2310.10362` 页面显示为 Self-Pro，存在元数据冲突 |
+| PGCL / Self-Pro | `tex/table/graph_prompt_summary.tex:55-63,140-147`；`tex/5.tex:23,25,74,97`；arXiv API `2310.10362v1/v3`；DBLP `journals/corr/abs-2310-10362` 与 `conf/pkdd/GongLYCTY24` |
 | SGL-PT | `tex/table/graph_prompt_summary.tex:78-82`；`tex/5.tex:23`；arXiv:2302.12449 摘要明确 "aiming for graph classification task" |
 | DeepGPT | `tex/table/graph_prompt_summary.tex:105-112`；`tex/5.modal.tex:40`；arXiv:2309.10131 摘要称其面向 graph based prediction tasks，核心是 freeze pre-trained parameters and update added tokens |
 | HetGPT | `tex/5.tex:25,54,74,87,106`；ACM DOI 10.1145/3589334.3645685 摘要说明其用于 pre-trained HGNNs，semi-supervised node classification |
@@ -85,34 +85,24 @@ $E_{\mathrm{cross}}=\{(v_i,\mathbf{p}_k,w_{ik})\}$
 
 正文不需要大改。最多在 `tex/5.tex:31` 之后加一句说明：All in One modifies both the node set and the edge set, rather than simply adding a prompt vector to node features.
 
-### 4.2 PGCL
+### 4.2 PGCL / Self-Pro
 
 #### 相关解释
 
-当前表格把 PGCL 的 downstream tasks 标为 node、edge、graph 全部支持。正文却把 PGCL 描述为 semantic/contextual prompt vectors applied to graph-level representations，并在 tuning 段说 PGCL introduces graph-level loss to align with the pre-training task。二者明显不一致。
+当前表格已经包含 Self-Pro 行：`tex/table/graph_prompt_summary.tex:140-147` 以 `gong2024selfpro` 引用 ECML PKDD 2024 版本，列出了 self adapter、semantic prompt、structural prompt、NC/LP losses，以及 node/link downstream。PGCL 也在表格中作为单独行出现：`tex/table/graph_prompt_summary.tex:55-63` 使用 `gong2023prompt`。
 
-PGCL 的公开元数据存在一个需要特别记录的问题。`tex/zotero.bib` 里 `gong2023prompt` 的标题是 "Prompt Tuning for Multi-View Graph Contrastive Learning"。DBLP 也记录了同题名、作者 Chenghua Gong 等、CoRR `abs/2310.10362`、DOI `10.48550/arXiv.2310.10362`。但是 arXiv 当前 `2310.10362` 页面显示为 "Self-Pro: A Self-Prompt and Tuning Framework for Graph Neural Networks"，这与 DBLP 和若干搜索摘要不一致。也就是说，PGCL 原文页面目前不能稳定复核，可能是 arXiv 元数据被替换、撤稿/覆盖、或外部索引错误。
+元数据复核显示，PGCL 是 `arXiv:2310.10362v1` 的历史版本，题名为 "Prompt Tuning for Multi-View Graph Contrastive Learning"；同一 arXiv ID 的 v2/v3 已变为 Self-Pro。arXiv API 分版本查询显示：`2310.10362v1` 是 PGCL，`2310.10362v2` 和 `v3` 均是 Self-Pro。Semantic Scholar、OpenAlex 和 DOI resolver 默认都指向最新版 Self-Pro。DBLP 既保留了 CoRR 的 PGCL 记录，也有 ECML/PKDD 2024 的 Self-Pro 记录。
 
-在无法稳定读取原文 PDF 的情况下，应避免继续声称 node+edge+graph 三类下游都明确支持。结合当前正文对 PGCL 的 graph-level representation / graph-level loss 描述，保守处理应把 PGCL 视为 graph-level prompt tuning 方法。
+从综述表格角度看，继续同时保留 PGCL 和 Self-Pro 会制造不必要的版本混淆。PGCL 是早期 arXiv v1，后续同一 ID 演化为 Self-Pro 并发表在 ECML PKDD 2024。既然主表已经有 Self-Pro，建议直接保留 Self-Pro，删除 PGCL 行和正文中对 PGCL 的方法性描述。这样可以避免读者点击无版本号 arXiv/DOI 后看到 Self-Pro，却在表格中看到 PGCL 这一不稳定旧题名。
 
 #### 解决方案
 
-建议把 PGCL downstream tasks 暂改为 graph only：
+建议执行以下调整：
 
-```latex
-& \xmark & \xmark & \cmark
-```
-
-prompt tuning 单元格建议避免使用 `(v,a,b)` 这种会让读者误解为节点/边三元组的符号，改成 graph/view-level contrastive notation，例如：
-
-```latex
-\makecell{
-$\mathcal{L}_{\mathrm{GCL}}(\tilde{\mathbf{z}}^{s},\tilde{\mathbf{z}}^{c})$\\
-graph/view-level contrastive loss
-}
-```
-
-同时建议在审稿前人工确认 PGCL 原文 PDF。如果后续能找到原文且其确实显式评测 node/edge tasks，再恢复对应勾选；在当前证据下不建议保留三类全勾。
+1. 删除 `graph_prompt_summary.tex` 中的 PGCL 行，保留已有 Self-Pro 行。
+2. 删除或替换 `tex/5.tex:23,74` 中的 PGCL 叙述。若需要保留 multi-view/asymmetric contrast 的脉络，用 Self-Pro 表述更稳妥，例如 "Self-Pro constructs semantic and structural prompts from the input graph and reuses the pre-trained projector as a downstream adapter."
+3. `tex/zotero.bib` 中 `gong2023prompt` 可以保留在 bibliography 池里作为历史记录，但正文和表格不再引用它。若未来仍要引用 PGCL，必须显式写 `arXiv:2310.10362v1`。
+4. `docs/audits/待修复问题清单.md` 的 T2 应从"修正 PGCL 勾选"改为"删除 PGCL，保留 Self-Pro"。
 
 ### 4.3 SGL-PT
 
@@ -213,7 +203,7 @@ GraphControl 出现在 `tex/5.modal.tex:34` 的 domain adaptation 语义对齐�
 | P0 | All in One | 改 insertion pattern，从 feature addition 改为 prompt subgraph attachment |
 | P0 | SGL-PT | downstream 从 node 改为 graph；必要时修正文段避免歧义 |
 | P1 | DeepGPT | pre-training task 不再三列全勾，改为 backbone-dependent 或全部 `\xmark` + 说明 |
-| P1 | PGCL | 暂按 graph-only downstream 处理，并在内部备注原文 metadata 需人工确认 |
+| P1 | PGCL / Self-Pro | 删除 PGCL 行和正文引用，保留已有 Self-Pro 行；必要时用 Self-Pro 承接语义/结构提示的叙述 |
 
 ### 5.2 可选项
 
@@ -269,10 +259,24 @@ $E_{\mathrm{cross}}=\{(v_i,\mathbf{p}_k,w_{ik})\}$
 
 并在 prompt component 或 insertion cell 保留 `pre-trained graph transformer` 的信息。
 
-## 7. 仍需人工确认的问题
+### 6.5 PGCL / Self-Pro 处理草案
 
-PGCL 的原文元数据需要人工确认。DBLP 记录 `Prompt Tuning for Multi-View Graph Contrastive Learning` 为 CoRR `abs/2310.10362`，但 arXiv 当前 `2310.10362` 页面是 Self-Pro。为避免引入错误，建议在修改前找到 PGCL 的 PDF 或作者主页版本。如果找不到，保守方案是把 PGCL 视为 graph-level prompt tuning 方法，并把 downstream 勾选收缩到 graph。
+建议删除 PGCL 行，而不是继续维护 v1 引用：
 
-## 8. 本次不执行的内容
+```latex
+% Remove the PGCL row because arXiv:2310.10362v1 later became Self-Pro.
+```
 
-本文档不直接修改 `graph_prompt_summary.tex` 或 `5.tex`。待审查确认后，再按上面的 P0/P1 顺序执行 TeX 修改，并重新编译全文。
+已有 Self-Pro 行可以保留。若正文需要替换 PGCL，可使用 Self-Pro 的现有表述：
+
+```latex
+Self-Pro \cite{gong2024selfpro} constructs semantic and structural prompts from the input graph and reuses the pre-trained projector as a downstream adapter.
+```
+
+## 7. PGCL 元数据结论
+
+PGCL 的元数据已经复核清楚：它是 `arXiv:2310.10362v1`，但同一 arXiv ID 的 v2/v3 改成了 Self-Pro。因此，DBLP 和旧 BibTeX 记录不是完全凭空错误，而是绑定到了历史 v1；但任何无版本号的 arXiv URL、DOI、Semantic Scholar 或 OpenAlex 查询现在都会显示 Self-Pro。由于当前表格已经包含正式发表的 Self-Pro，建议主表和正文都不再保留 PGCL。这样比维护一个需要版本号解释的历史 v1 更稳妥。
+
+## 8. 执行记录
+
+已按推荐方案修改 `graph_prompt_summary.tex` 和 `5.tex`。本次执行包括：更新表格 caption 的列语义；修正 All in One insertion pattern；删除 PGCL 行和正文引用，保留 Self-Pro；将 SGL-PT downstream 改为 graph；将 DeepGPT 的 pre-training task 三列改为不勾选；并同步更新审计主清单。后续仍可继续处理表格可读性和版面问题，但这属于版面优化，不属于本轮表格-正文事实一致性修复。
