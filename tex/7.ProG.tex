@@ -1,32 +1,17 @@
-\section{\texttt{ProG}: A Unified Library for Graph Prompting}\label{sec:prog}
-An indispensable component for fortifying the graph prompting ecosystem is a well-crafted tool. Despite the plethora of tools proposed for generalized graph learning, a notable absence persists in the realm of libraries dedicated to graph prompt functionalities. Addressing this gap, we are introducing \texttt{ProG} (Prompt Graph), an open-source, unified library meticulously designed to cater to the specific needs of graph prompting. This initiative promises to significantly enhance the landscape of graph-based applications by providing a versatile and comprehensive resource for researchers and practitioners alike.
+\section{\texttt{ProG}: Benchmark and Toolkit Support for Graph Prompting}\label{sec:prog}
+As graph prompting methods diversify, reproducible comparison becomes as important as the design of individual prompts. A method may differ from another one in its pre-training objective, prompt form, downstream task, backbone, shot setting, or evaluation metric, and these choices are often entangled in reported results. \texttt{ProG} was introduced as a graph prompt learning benchmark to reduce this friction by organizing graph prompting experiments around a common pre-train, prompt-tune, and evaluate workflow~\cite{zi2024prog}. In this survey, we treat \texttt{ProG} as part of the supporting infrastructure for the field rather than as another prompt method.
 
-%  Description
-\texttt{ProG} is a PyTorch-based library designed to facilitate single or multi-task prompting for pre-trained GNNs. 
-The architecture is illustrated in Figure~\ref{fig:prog}.
-It seamlessly integrates several widely used datasets in the graph prompt evaluation, including Cora, CiteSeer, Reddit,
-% ~\cite{hamilton2017inductive}, 
-Amazon,
-% ~\cite{shchur2019pitfalls}, 
-and Pubmed etc.
-% ~\cite{kipf2017semisupervised}. 
-The tool is equipped with essential evaluation metrics such as Accuracy, F1 Score, and AUC score, commonly employed in various graph prompt-related tasks. Notably, \texttt{ProG} incorporates state-of-the-art methods like All in One~\cite{sun2023all}, GraphPrompt~\cite{liu2023graphprompt}, GPPT~\cite{sun2022gppt}, GPF~\cite{fang2022prompt}, and GPF-Plus ~\cite{fang2023universal}, and it continues integrating more graph prompt models. In summary, \texttt{ProG} offers the following key features:
+\texttt{ProG-V2}\footnote{\url{https://github.com/sheldonresearch/ProG}} extends this benchmark into a more modular and reproducible toolkit. Its architecture, shown in Figure~\ref{fig:prog}, separates graph datasets, pre-training methods, prompt strategies, GNN backbones, downstream tasks, and evaluation reports into explicit components. The current implementation registers prompt strategies through a unified strategy interface and supports representative prompt families such as GPF, GPF-Plus, GraphPrompt, All in One, GPPT, PRODIGY, GraphPrompter, EdgePrompt, RELIEF, UniPrompt, Self-Pro, ProNoG, PSP, and DAGPrompT. It also provides several GNN backbones, including GCN, GAT, GIN, GraphSAGE, GCov, and GraphTransformer, so that prompt behavior can be studied without binding the toolkit to a single encoder.
 
+The toolkit also broadens the evaluation scope beyond a single classification setting. It supports node classification, graph classification, and link prediction through separate task interfaces, and it includes pre-training options such as DGI, GraphMAE, GraphCL, SimGRACE, Edgepred-GPPT, Edgepred-GraphPrompt, and MultiGprompt. The public reports cover a broad set of method combinations, with node- and graph-classification results under few-shot settings and link-prediction results under edge-task metrics such as AUROC and AUPRC. These results are released in a consistent matrix format, making it easier to inspect how different pre-training and prompting choices behave under shared settings.
 
+From an engineering perspective, the V2 version keeps the implementation organized around reusable extension points. Prompt strategies, GNN backbones, task interfaces, configuration, and result export are separated into modules, so new methods can be added without rewriting the full pipeline. This organization supports reproducible comparison while keeping the toolkit practical for researchers who want to test new prompt designs.
 
-\begin{itemize}
-    \item \textbf{Quick Initiation.} All models are implemented within a consistent environment, accompanied by detailed demos, ensuring a swift initiation for newcomers.
-    \item \textbf{Fully Modular.} \texttt{ProG} adopts a modular structure, empowering users to customize and construct models as needed.
-    \item \textbf{Easy Extendable.} \texttt{ProG} is designed for seamless extension to encompass additional methods and a broader spectrum of downstream tasks, adapting to evolving research needs.
-    \item \textbf{Standardized Evaluation.} \texttt{ProG} establishes a uniform set of evaluation processes, promoting equitable performance comparisons across models.
-\end{itemize}
+More broadly, \texttt{ProG} and curated resources such as Awesome Graph Prompt\footnote{\url{https://github.com/WxxShirley/Awesome-Graph-Prompt}} complement the taxonomy developed in this survey. The taxonomy helps readers understand how prompt tokens, structures, insertion patterns, answering functions, and tuning objectives relate to one another. The toolkit provides a practical route for implementing and comparing these choices under shared experimental conventions. As graph prompting moves toward heterogeneous graphs, dynamic graphs, link prediction, and cross-domain transfer, this kind of benchmark infrastructure will be important for separating genuine progress from differences caused by incompatible experimental setups.
 
 \begin{figure}[!t]
     \centering
     \includegraphics[width=0.5\textwidth]{pic/ProG_pipeline.pdf}
-    \caption{The architecture of \texttt{ProG}.}
+    \caption{The architecture of \texttt{ProG-V2}.}
     \label{fig:prog}
 \end{figure}
-
-
-For additional information and access to the library, please visit the website of our library\footnote{\url{https://github.com/sheldonresearch/ProG}}. Additionally, we have curated a GitHub repository\footnote{\url{https://github.com/WxxShirley/Awesome-Graph-Prompt}}, serving as a centralized resource for the latest advancements in graph prompt learning. This repository includes a list of research papers, benchmark datasets, and available codes, fostering an environment conducive to ongoing research in this dynamic field. Regular real-time updates ensure that the repository remains current with emerging papers and associated codes.
